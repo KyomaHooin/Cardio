@@ -3,7 +3,7 @@
 
 DESCRIPTION
 
-Secure NAS rsync backup GUI for Win64.
+Secure NAS rsync backup GUI for Win64-bit OS.
 
 TODO
 
@@ -34,7 +34,7 @@ NASBackup.ini - Configuration file.
 NASBackup.ico - Icon file.
 NASBackup.png - Application screen.
 
-      cygwin/ - <a href="https://cygwin.com>Cygwin</a> dll & binary.
+      cygwin/ - <a href="https://cygwin.com">Cygwin</a> dll & binary.
 </pre>
 SOURCE
 
