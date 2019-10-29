@@ -15,6 +15,11 @@ TODO
 
 FILE
 <pre>
+NASBackup.au3 - Source code.
+NASBackup.ini - Configuration file.
+NASBackup.ico - Icon file.
+
+      cygwin/ - Cygwin DLL & binary.
 </pre>
 SOURCE
 
