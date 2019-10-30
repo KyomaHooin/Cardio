@@ -4,7 +4,6 @@
 ; TODO:
 ;
 ; -auto vs gui
-; -logging
 ; -SSH key MGMT
 ; -rsync
 ;
@@ -12,65 +11,74 @@
 #AutoIt3Wrapper_Icon=NASBackup.ico
 #NoTrayIcon
 
-;INCUDE
 
-#include <DateTimeConstants.au3>
+;INCLUDE
+
+
+#include <File.au3>
 #include <GUIConstantsEx.au3>
+
 
 ;VAR
 
-$rsync = @ScriptDir & '\' & 'rsync.exe'
-$ini = @ScriptDir & '\' & 'NASBackup.ini'
+
+$ini = @ScriptDir & '\' & 'NASBackup.ini;
+;$rsync = @ScriptDir & '\' & 'rsync.exe'
+
+global $config[2][0], $component[4][10], $dirlist
+
 
 ;CONTROL
 
+
+; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then exit
+	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Program byl jiz spusten. [R]")
+	exit
+endif
+; 64-bit only
 ;if @OSArch <> 'X64' Then
-;	MsgBox(0,"NAS Záloha - Kardio Jan Škoda v1.0","Tento system není podporován. [x64 only]")
+;	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Tento system není podporován. [x64]")
 ;	Exit
 ;EndIf
+; logging
+$log = FileOpen(@ScriptDir & '\' & 'NASBackup.log',1)
+if @error then
+	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","System je pripojen pouze pro cteni. [RO]")
+	exit
+endif
 
-;GUI
 
-$gui = GUICreate("NAS Záloha - Kardio Jan Škoda v1.0", 492, 170, Default, Default)
-$gui_button_exit = GUICtrlCreateButton("Konec", 408, 136, 75, 25)
-$gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 136, 75, 25)
-$gui_check_schedule = GUICtrlCreateCheckbox("Automatická záloha", 8, 110, 115, 17)
-$gui_progress = GUICtrlCreateProgress(130, 110, 352, 16)
-$gui_dirpath1 = GUICtrlCreateInput("", 52, 10, 345, 21)
-$gui_button_path1 = GUICtrlCreateButton("Procházet", 408, 8, 75, 25)
-$gui_dirpath2 = GUICtrlCreateInput("", 52, 42, 345, 21)
-$gui_button_path2 = GUICtrlCreateButton("Procházet", 408, 40, 75, 25)
-$gui_dirpath3 = GUICtrlCreateInput("", 52, 74, 345, 21)
-$gui_button_path3 = GUICtrlCreateButton("Procházet", 408, 72, 75, 25)
-$gui_dirtext1 = GUICtrlCreateLabel("Adresáø:", 8, 14, 44, 17)
-$gui_dirtext2 = GUICtrlCreateLabel("Adresáø:", 8, 46, 44, 17)
-$gui_dirtext3 = GUICtrlCreateLabel("Adresáø:", 8, 78, 44, 17)
-;$gui_input_date = GUICtrlCreateDate("22:00", 126, 108, 55, 21,$DTS_TIMEFORMAT)
-$gui_error = GUICtrlCreateLabel("", 8, 140, 136, 17)
+; INIT
 
-;GUI INIT
 
-;set date format
-;$input_date_style = "HH:mm"
-;GUICtrlSendMsg($gui_input_date, $DTM_SETFORMATW, 0, $input_date_style)
-
-; set error color
-GUICtrlSetColor($gui_error, 0xFF0000)
-
-;LOAD HISTORY
-if FileExists($ini) then
-	$f = FileOpen($ini)
-	GUICtrlSetData($gui_dirpath1, StringRegExpReplace(FileReadLine($f,1),'^\[dir1\] (.*)','$1'))
-	GUICtrlSetData($gui_dirpath2, StringRegExpReplace(FileReadLine($f,2),'^\[dir2\] (.*)','$1'))
-	GUICtrlSetData($gui_dirpath3, StringRegExpReplace(FileReadLine($f,3),'^\[dir3\] (.*)','$1'))
-	$auto = StringRegExpReplace(FileReadLine($f,4),'^\[auto] (.*)','$1')
+logger("Program Start" & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
+; configuration
+if not FileExists($ini) then
+	; write template
+	$f = FileOpen($ini,1)
+	FileWriteLine($f, '[dir1]')
+	FileWriteLine($f, '[user]')
+	FileWriteLine($f, '[remote]')
+	FileWriteLine($f, '[target]')
 	FileClose($f)
-EndIf
+	logger("Default configuration INI loaded.")
+else
+	_FileReadToArray($ini,$configuration, 0, ' '); 0-based, split by space
+	logger("Configuration INI loaded.")
+endif
+; dirlist
+for $i = 0 to ubound($config) - 1
+	if StringRegExp($config[$i][0],'^[dir.*') then $dirlist += 1
+next
+; gui
+create_gui($configuration,$dirlist)
 
-;GUI
-GUISetState(@SW_SHOW)
-While 1
+
+; MAIN
+
+
+while 1
 	$event = GUIGetMsg()
 	; DIR 1
 	if $event = $gui_button_path1 Then; data path
@@ -151,4 +159,47 @@ While 1
 		;exit
 		exit
 	endif
-WEnd
+wend
+
+
+; FUNC
+
+
+func create_gui($dirlist,$config)
+	; head
+	$gui = GUICreate("NAS Záloha - Kardio Jan Škoda v1.0", 492, 170, Default, Default)
+	; dir
+	$gui_dirtext1 = GUICtrlCreateLabel("Adresáø:", 8, 14, 44, 17)
+	$gui_dirpath1 = GUICtrlCreateInput("", 52, 10, 345, 21)
+	$gui_button_path1 = GUICtrlCreateButton("Procházet", 408, 8, 75, 25)
+	; foot
+	$gui_progress = GUICtrlCreateProgress(130, 110, 352, 16)
+	$gui_error = GUICtrlCreateLabel("", 8, 140, 136, 17)
+	$gui_button_exit = GUICtrlCreateButton("Konec", 408, 136, 75, 25)
+	$gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 136, 75, 25)
+
+	;set date format
+	;$input_date_style = "HH:mm"
+	;GUICtrlSendMsg($gui_input_date, $DTM_SETFORMATW, 0, $input_date_style)
+
+	;set error color
+	GUICtrlSetColor($gui_error, 0xFF0000)
+
+	GUICtrlSetData($gui_dirpath1, StringRegExpReplace(FileReadLine($f,1),'^\[dir1\] (.*)','$1'))
+	GUICtrlSetData($gui_dirpath2, StringRegExpReplace(FileReadLine($f,2),'^\[dir2\] (.*)','$1'))
+	GUICtrlSetData($gui_dirpath3, StringRegExpReplace(FileReadLine($f,3),'^\[dir3\] (.*)','$1'))
+	$auto = StringRegExpReplace(FileReadLine($f,4),'^\[auto] (.*)','$1')
+
+	;show
+	GUISetState(@SW_SHOW)
+endfunc
+
+func update_gui()
+	WinCtrlSetPos
+	WinMove
+endfunc
+
+func logger($text)
+	FileWriteLine($log,$text)
+endfunc
+
