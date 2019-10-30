@@ -36,11 +36,13 @@ if UBound(ProcessList(@ScriptName)) > 2 then exit
 	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Program byl jiz spusten. [R]")
 	exit
 endif
+
 ; 64-bit only
 ;if @OSArch <> 'X64' Then
 ;	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Tento system není podporován. [x64]")
 ;	Exit
 ;EndIf
+
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackup.log',1)
 if @error then
@@ -72,7 +74,22 @@ for $i = 0 to ubound($config) - 1
 	if StringRegExp($config[$i][0],'^[dir.*') then $dirlist += 1
 next
 ; gui
-create_gui($configuration,$dirlist)
+
+$gui = GUICreate("NAS Záloha - Kardio Jan Škoda v1.0", 492, 170, Default, Default)
+
+for $i = 0 to $dirlist
+	$component[$i][0] = GUICtrlCreateLabel("Adresáø:", 8, 14, 44, 17); text
+	$component[$i][1] = GUICtrlCreateInput($configuration[$i][1], 52, 10, 345, 21); dir
+	$component[$i][2] = GUICtrlCreateButton("Procházet", 408, 8, 75, 25); select
+	$component[$1][3] = GUICtrlCreateButton("+", 408, 8, 75, 25); add
+next
+
+$gui_progress = GUICtrlCreateProgress(130, 110, 352, 16)
+$gui_error = GUICtrlCreateLabel("", 8, 140, 136, 17)
+$gui_button_exit = GUICtrlCreateButton("Konec", 408, 136, 75, 25)
+$gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 136, 75, 25)
+
+GUISetState(@SW_SHOW)
 
 
 ; MAIN
@@ -125,29 +142,6 @@ wend
 
 ; FUNC
 
-
-func create_gui($dirlist,$config)
-	; head
-	$gui = GUICreate("NAS Záloha - Kardio Jan Škoda v1.0", 492, 170, Default, Default)
-	; dir
-	$gui_dirtext1 = GUICtrlCreateLabel("Adresáø:", 8, 14, 44, 17)
-	$gui_dirpath1 = GUICtrlCreateInput("", 52, 10, 345, 21)
-	$gui_button_path1 = GUICtrlCreateButton("Procházet", 408, 8, 75, 25)
-	; foot
-	$gui_progress = GUICtrlCreateProgress(130, 110, 352, 16)
-	$gui_error = GUICtrlCreateLabel("", 8, 140, 136, 17)
-	$gui_button_exit = GUICtrlCreateButton("Konec", 408, 136, 75, 25)
-	$gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 136, 75, 25)
-	;set date format
-	;$input_date_style = "HH:mm"
-	;GUICtrlSendMsg($gui_input_date, $DTM_SETFORMATW, 0, $input_date_style)
-	;set error color
-	GUICtrlSetColor($gui_error, 0xFF0000)
-	; update data loop
-	GUICtrlSetData($gui_dirpath1, StringRegExpReplace(FileReadLine($f,1),'^\[dir1\] (.*)','$1'))
-	;show
-	GUISetState(@SW_SHOW)
-endfunc
 
 func update_gui()
 	WinCtrlSetPos
