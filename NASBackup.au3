@@ -92,9 +92,9 @@ while 1
 	for $i = 0 to $dirlist - 1
 		if $event = $component[$i][3] and $dirlist < 10 then
 			update_gui($configuration, $dirlist)
+			$dirlist += 1
 		endif
 	next
-	$dirlist += 1
 	; NAS config
 	if $event = $component[$i][3] then nas_gui()
 	; backup
