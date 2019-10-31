@@ -9,6 +9,7 @@ TODO
 
 <pre>
 -screenshot
+-compile x64
 </pre>
 
 NAS
