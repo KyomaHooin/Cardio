@@ -3,6 +3,7 @@
 ;
 ; TODO:
 ;
+; - NAS config
 ; -SSH key MGMT
 ; -rsync
 ;
@@ -25,7 +26,7 @@
 $ini = @ScriptDir & '\' & 'NASBackup.ini;
 $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
 
-global $config[2][0], $component[4][10], $dirlist
+global $configuration[2][0], $component[4][10], $dirlist
 
 
 ;CONTROL
@@ -33,20 +34,20 @@ global $config[2][0], $component[4][10], $dirlist
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then exit
-	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Program byl jiz spusten. [R]")
+	MsgBox(48,"NAS Záloha - Kardio Jan Skoda v1.0","Program byl jiz spusten. [R]")
 	exit
 endif
 
 ; 64-bit only
 ;if @OSArch <> 'X64' Then
-;	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","Tento system není podporován. [x64]")
+;	MsgBox(48,"NAS Záloha - Kardio Jan Skoda v1.0","Tento system není podporován. [x64]")
 ;	Exit
 ;EndIf
 
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackup.log',1)
 if @error then
-	MsgBox(48,"NAS Záloha - Kardio Jan Škoda v1.0","System je pripojen pouze pro cteni. [RO]")
+	MsgBox(48,"NAS Záloha - Kardio Jan Skoda v1.0","System je pripojen pouze pro cteni. [RO]")
 	exit
 endif
 
@@ -147,9 +148,22 @@ while 1
 
 	; exit
 	If $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
+		; update configuration
+		for $i = 0 to $dirlist
+			if GUICtrlRead($component[$i][1] <> '' then; not empty
+				if StringRegExp($configuration[$i][0],'^\[dir.*') then; update
+					$configuration[$i][1] = GUICrtlRead($component[$i][1])
+				else
+					_ArrayInsert($configuration, $i, '[dir' & $i & '] ' & GUICtrlRead($component[$i][1]), ' ')
+				endif
+		next
 		; write configuration
-		_FileWriteFromArray($ini, $configuration, Default, Default, ' ')
-		if @error then logger('Zapis konfigurace se nezdaril.')
+		$f = FileOpen($ini,2); overwrite
+		for $i = 0 to ubound($configuration) - 1
+			FileWriteLine($ini, $configuration[$i][0] & ' ' & $configuration[$i][1])
+		next
+		FileClose($f)
+		; exit
 		logger("Program exit: " & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
 		exit
 	endif
