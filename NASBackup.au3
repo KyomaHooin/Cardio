@@ -99,51 +99,58 @@ while 1
 	$event = GUIGetMsg()
 
 	; update directory
-	for $i = 0 to $dirlist
-		if $event = $component[$i][2] then; select
-			$dir_update = FileSelectFolder("Adresar", @HomeDrive)
-			if $dir_update then
-				$configuration[$i][1] = $dir_update; update configuration
-				GUICtrlSetData($component[$i][$2], $dir_update); update component
+	for $i = 0 to $dirlist - 1
+		if $event = $component[$i][2] then
+			$dir_input = FileSelectFolder("Adresar", @HomeDrive)
+			GUICtrlSetData($component[$i][$2], $dir_input)
+			$configuration[$i][1] = $dir_input
 	next
-
-	; update dir
-	for $i = 0 to $dirlist
+	; add directory
+	for $i = 0 to $dirlist - 1
 		if $event = $component[$i][3] then
-			$dirlist += 1
-			update_gui($configuration,$dirlist)
+			$dirlist += 1; ?
+			update_gui($configuration, $dirlist)
 	next
-
 	; NAS config
 	if $event = $component[$i][3] then nas_gui()
-
 	; backup
-	if $event = $gui_button_backup Then; data path
-		;test port/key/user/remote/target
-		
-		;reset progress
-		GUICtrlSetData($gui_progress, 0)
-		;disable re-run
-		GUICtrlSetState($gui_button_backup,$GUI_DISABLE)
-		; test directory
-		for $i = 0 to $dirlist
-			if GUICtrlRead($component[$i][1] <> '' then; not empty
-				if FileExists(GUICtrlRead($component[$i][1]) then; exists
-					;disable input
-					GUICtrlSetState($component[$i][1], $GUI_DISABLE); disable change
-					;rsync
-					RunWait($rsync & ' -az -e "' & $ssh & ' -p ' & $port & ' -i ' & $key & '" '&_
-					$user & '@' & $remote & ':/' & target & ' ' &_
-					GUICtrlRead($gui_dirpath1), @ScriptDir & '\bin', @SW_HIDE)
-					;update progress
-					GUICtrlSetData($gui_progress, round($j * 100/ $i))
-					;re-enable input
-					GUICtrlSetState($component[$i][1], $GUI_ENABLE)
-				else
-					GUICtrlSetData($gui_error,"E: Adresar [" & $i & "] neexistuje.")
+	if $event = $gui_button_backup then
+		; user/remote/port/target/key
+		if not $user = _ArraySearch($configuration,'[user]',0,0,0,1) then
+			GUICtrlSetData($gui_error,"E: Uzivatel neexistuje.")
+		elseif not $remote = _ArraySearch($configuration,'[remote]',0,0,0,1) then
+			GUICtrlSetData($gui_error,"E: Vzdaleny host neexistuje.")
+		elseif not $port = _ArraySearch($configuration,'[port]',0,0,0,1) then
+			GUICtrlSetData($gui_error,"E: Cislo portu neexistuje.")
+		elseif not $target = _ArraySearch($configuration,'[target]',0,0,0,1) then
+			GUICtrlSetData($gui_error,"E: Vzdaleny adresar neexistuje.")
+		elseif not $key = _ArraySearch($configuration,'[key]',0,0,0,1) then
+			GUICtrlSetData($gui_error,"E: Klic neexistuje.")
+		else
+			;reset progress
+			GUICtrlSetData($gui_progress, 0)
+			;disable re-run
+			GUICtrlSetState($gui_button_backup,$GUI_DISABLE)
+			; test directory
+			for $i = 0 to $dirlist
+				if GUICtrlRead($component[$i][1] <> '' then; not empty
+					if FileExists(GUICtrlRead($component[$i][1]) then; exists
+						;disable input
+						GUICtrlSetState($component[$i][1], $GUI_DISABLE); disable change
+						;rsync
+						RunWait($rsync & ' -az -e "' & $ssh & ' -p ' & $port & ' -i ' & $key & '" '&_
+						$user & '@' & $remote & ':/' & target & ' ' &_
+						GUICtrlRead($gui_dirpath1), @ScriptDir & '\bin', @SW_HIDE)
+						;update progress
+						GUICtrlSetData($gui_progress, round($j * 100/ $i))
+						;re-enable input
+						GUICtrlSetState($component[$i][1], $GUI_ENABLE)
+					else
+						GUICtrlSetData($gui_error,"E: Adresar [" & $i & "] neexistuje.")
+					endif
 				endif
-			endif
-		next
+			next
+		endif
 		;re-enable backup
 		GUICtrlSetState($gui_button_backup,$GUI_ENABLE)
 	endif
@@ -175,7 +182,7 @@ wend
 ; FUNC
 
 
-func update_gui($configuration,$dirlist)
+func update_gui($configuration, $dirlist)
 	if $dirlist <= 10 then
 		; resize gui
 		WinMove($gui, Default, Default, Default, Default, 74 + $dirlist * 32)
@@ -193,7 +200,7 @@ func update_gui($configuration,$dirlist)
 endfunc
 
 func logger($text)
-	FileWriteLine($log,$text)
+	FileWriteLine($log, $text)
 endfunc
 
 func nas_gui()
