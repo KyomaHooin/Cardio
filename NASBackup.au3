@@ -23,7 +23,7 @@ $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
 $ssh = @ScriptDir & '\bin\' & 'rsync.exe'
 
 
-global $configuration[2][0], $component[4][10], $dirlist, $user, $remote, $target, $port, $key
+global $configuration[2][0], $component[4][10], $dirlist
 
 
 ;CONTROL
@@ -196,7 +196,7 @@ func logger($text)
 	FileWriteLine($log,$text)
 endfunc
 
-func nas_gui($dirlist)
+func nas_gui()
 	$nas_gui = GUICreate("NAS Záloha - Kardio Jan Skoda v1.0", 527, 74 + $dirlist * 32, Default, Default)
 
 	$nas_gui_user_label
