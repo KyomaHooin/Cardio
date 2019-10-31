@@ -13,9 +13,9 @@
 
 ;VAR
 
-$ini = @ScriptDir & '\' & 'NASBackup.ini;
+$ini = @ScriptDir & '\' & 'NASBackup.ini
 $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
-$ssh = @ScriptDir & '\bin\' & 'rsync.exe'
+$ssh = @ScriptDir & '\bin\' & 'ssh.exe'
 
 global $configuration[2][0], $component[4][10], $dirlist
 
@@ -140,6 +140,8 @@ while 1
 						GUICtrlSetData($gui_progress, round(($i + 1) * 100/ $dirlist))
 						; enable input
 						GUICtrlSetState($component[$i][1], $GUI_ENABLE)
+						; logging
+						logger("Adresar " & $i + 1 & " byl zalohovan!")
 					else
 						GUICtrlSetData($gui_error, 'E: Adresar [' & $i & '] neexistuje.')
 						exitloop
@@ -170,13 +172,14 @@ while 1
 		next
 		FileClose($f)
 		; exit
-		logger("Program exit: " & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 		exitloop
 	endif
 wend
-; end log
-FileClose($log)
+
 ; exit
+logger("Program exit: " & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
+logger("------------------------------------")
+FileClose($log)
 exit
 
 ; FUNC
