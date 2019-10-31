@@ -67,13 +67,13 @@ elseif not FileExists($configuration[get_index('key')][1]) then
 else
 	for $i = 0 to $dirlist - 1
 		; rsync
-		RunWait($rsync & ' -az -e "' & $ssh & ' -p ' &_
+		RunWait($rsync & ' -az -e "' & $ssh & ' -o "StrictHostKeyChecking no" -p ' &_
 		$configuration[get_index('port')][1] & ' -i ' &_
 		$configuration[get_index('key')][1] & '" '&_
+		$configuration[get_index('dir' & ($i + 1))][1] & ' ' &_
 		$configuration[get_index('user')][1] & '@' &_
 		$configuration[get_index('remote')][1] & ':/' &_
-		$configuration[get_index('target')][1] & ' ' &_
-		$configuration[get_index('dir' & ($i + 1))][1], @ScriptDir & '\cygwin', @SW_HIDE)
+		$configuration[get_index('target')][1])
 		logger('Directory ' & $i + 1 & ' backed up!')
 	next
 endif

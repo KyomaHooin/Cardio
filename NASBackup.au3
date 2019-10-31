@@ -129,13 +129,13 @@ while 1
 						; disable input
 						GUICtrlSetState($component[$i][1], $GUI_DISABLE)
 						; rsync
-						RunWait($rsync & ' -az -e "' & $ssh & ' -p ' &_
+						RunWait($rsync & ' -az -e "' & $ssh & ' -o "StrictHostKeyChecking no" -p ' &_
 						$configuration[get_index('port')][1] & ' -i ' &_
 						$configuration[get_index('key')][1] & '" '&_
+						GUICtrlRead($component[$i][1] & ' ' &_
 						$configuration[get_index('user')][1] & '@' &_
 						$configuration[get_index('remote')][1] & ':/' &_
-						$configuration[get_index('target')][1] & ' ' &_
-						GUICtrlRead($component[$i][1]), @ScriptDir & '\cygwin', @SW_HIDE)
+						$configuration[get_index('target')][1])
 						; update progress
 						GUICtrlSetData($gui_progress, round(($i + 1) * 100/ $dirlist))
 						; enable input
