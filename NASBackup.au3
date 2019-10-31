@@ -100,7 +100,7 @@ while 1
 		endif
 	next
 	; NAS config
-	if $event = $gui_button_confiG then nas_gui()
+	if $event = $gui_button_config then nas_gui()
 	; backup
 	if $event = $gui_button_backup then
 		logger("Backup begin.")
