@@ -31,6 +31,8 @@ WD MyCloud:
 ROUTER
 
 <pre>
+  - SSH port forward
+  - Static IP
 </pre>
 
 FILE

@@ -17,7 +17,7 @@ $ini = @ScriptDir & '\' & 'NASBackup.ini
 $rsync = @ScriptDir & '\cygwin\' & 'rsync.exe'
 $ssh = @ScriptDir & '\cygwin\' & 'ssh.exe'
 
-global $configuration[2][0], $component[4][10], $dirlist
+global $configuration[2][0], $component[4][5], $dirlist
 
 ;CONTROL
 
@@ -71,7 +71,7 @@ for $i = 0 to $dirlist - 1
 	$component[$1][3] = GUICtrlCreateButton("+", 500, 8 + $i * 32, 25, 25); add
 next
 
-$gui_button_config = GUICtrlCreateButton("NAS", 8, 14 + $dirlist * 32, 25, 25)
+$gui_button_config = GUICtrlCreateButton("NAS", 8, 14 + $dirlist * 32, 75, 25)
 $gui_progress = GUICtrlCreateProgress(130, 14 + $dirlist * 32, 352, 16)
 $gui_error = GUICtrlCreateLabel("", 8, 44 + $dirlist * 32, 136, 17)
 $gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 40  + $dirlist * 32, 75, 25)
@@ -83,7 +83,6 @@ GUISetState(@SW_SHOW)
 
 while 1
 	$event = GUIGetMsg()
-	
 	; update directory intput
 	for $i = 0 to $dirlist - 1
 		if $event = $component[$i][2] then
@@ -94,7 +93,7 @@ while 1
 	next
 	; add directory & update dirlist
 	for $i = 0 to $dirlist - 1
-		if $event = $component[$i][3] and $dirlist < 10 then
+		if $event = $component[$i][3] and $dirlist < 5 then
 			update_gui($configuration, $dirlist)
 			$dirlist += 1
 		endif
@@ -118,10 +117,10 @@ while 1
 		elseif $configuration[get_index('target')][1] == '' then
 			GUICtrlSetData($gui_error, "E: Neplatny cilovy adresar.")
 		elseif not FileExists($configuration[get_index('key')][1]) then
-			GUICtrlSetData($gui_error,"E: Klic neexistuje.")
+			GUICtrlSetData($gui_error, "E: Klic neexistuje.")
 		else
 			; disable backup button
-			GUICtrlSetState($gui_button_backup,$GUI_DISABLE)
+			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
 			; backup
 			for $i = 0 to $dirlist - 1
 				if GUICtrlRead($component[$i][1] <> '' then
@@ -131,13 +130,13 @@ while 1
 						; rsync
 						RunWait($rsync & ' -az -e "' & $ssh & ' -o "StrictHostKeyChecking no" -p ' &_
 						$configuration[get_index('port')][1] & ' -i ' &_
-						$configuration[get_index('key')][1] & '" '&_
+						$configuration[get_index('key')][1] & '" ' &_
 						GUICtrlRead($component[$i][1] & ' ' &_
 						$configuration[get_index('user')][1] & '@' &_
 						$configuration[get_index('remote')][1] & ':/' &_
 						$configuration[get_index('target')][1])
 						; update progress
-						GUICtrlSetData($gui_progress, round(($i + 1) * 100/ $dirlist))
+						GUICtrlSetData($gui_progress, round(($i + 1) * 100 / $dirlist))
 						; enable input
 						GUICtrlSetState($component[$i][1], $GUI_ENABLE)
 						; logging
@@ -149,12 +148,12 @@ while 1
 				endif
 			next
 			; enable backup button
-			GUICtrlSetState($gui_button_backup,$GUI_ENABLE)
+			GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
 		endif
 		logger("Backup end.")
 	endif
 	; exit
-	If $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
+	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		; update configuration
 		for $i = 0 to $dirlist - 1
 			if GUICtrlRead($component[$i][1] <> '' then
@@ -195,17 +194,17 @@ endfunc
 func update_gui($configuration, $dirlist)
 	; resize gui
 	WinMove($gui, Default, Default, Default, Default, 74 + ($dirlist + 1) * 32)
+	; move components
+	ControlMove($gui, Defaulat, $gui_button_config, Default, 14 + $dirlist * 32)
+	ControlMove($gui, Defaulat, $gui_progress, Default, 14 + $dirlist * 32)
+	ControlMove($gui, Defaulat, $gui_error, Default, 44 + $dirlist * 32)
+	ControlMove($gui, Defaulat, $gui_button_backup, Default, 40 + $dirlist * 32)
+	ControlMove($gui, Defaulat, $gui_button_exit, Default, 40 + $dirlist * 32)
 	; add dir
 	$component[$dirlist][0] = GUICtrlCreateLabel("Adresar:", 8, 14 + ($dirlist + 1) * 32, 44, 17); text
 	$component[$dirlist][1] = GUICtrlCreateInput('', 52, 10 + ($dirlist + 1) * 32, 345, 21); dir
 	$component[$dirlist][2] = GUICtrlCreateButton("Prochazet", 408, 8 + ($dirlist + 1) * 32, 75, 25); select
 	$component[$dirlist][3] = GUICtrlCreateButton("+", 500, 8 + ($dirlist + 1) * 32, 25, 25); add
-	; move components
-	ControlMove($gui, Defaulat, $gui_button_config, Default, 14 + ($dirlist + 1) * 32)
-	ControlMove($gui, Defaulat, $gui_progress, Default, 14 + ($dirlist + 1) * 32)
-	ControlMove($gui, Defaulat, $gui_error, Default, 44 + ($dirlist + 1) * 32)
-	ControlMove($gui, Defaulat, $gui_button_backup, Default, 40 + ($dirlist + 1) * 32)
-	ControlMove($gui, Defaulat, $gui_button_exit, Default, 40 + ($dirlist + 1) * 32)
 endfunc
 
 func nas_gui()
@@ -221,7 +220,6 @@ func nas_gui()
 	$nas_gui_key_label = GUICtrlCreateLabel("Klic:", 8, 42, 32 , 40)
 	$nas_gui_key_input = GUICtrlCreateInput($configuration[get_index('key')][1], 50, 42, 32, 150)
 	$nas_gui_key_button = GUICtrlCreateButton("Prochazet", 210, 42, 75, 25)
-	$nas_gui_error = GUICtrlCreateLabel('', 8, 74, 32 , 150)
 	$nas_gui_save_button = GUICtrlCreateButton("Ulozit", 225, 74, 75, 25)
 	$nas_gui_exit_button = GUICtrlCreateButton("Konec", 300, 74, 75, 25)
 
