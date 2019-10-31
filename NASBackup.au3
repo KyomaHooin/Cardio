@@ -2,45 +2,35 @@
 ; SSH Rsync backup WIN -> NAS GUI Setup
 ;
 
-
 #AutoIt3Wrapper_Icon=NASBackup.ico
 #NoTrayIcon
 
-
 ;INCLUDE
-
 
 #include <File.au3>
 #include <Array.au3>
 #include <GUIConstantsEx.au3>
 
-
 ;VAR
-
 
 $ini = @ScriptDir & '\' & 'NASBackup.ini;
 $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
 $ssh = @ScriptDir & '\bin\' & 'rsync.exe'
 
-
 global $configuration[2][0], $component[4][10], $dirlist, $user, $remote, $port, $target, $key
 
-
 ;CONTROL
-
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then exit
 	MsgBox(48,"NAS Záloha - Kardio Jan Skoda v1.0","Program byl jiz spusten. [R]")
 	exit
 endif
-
 ; 64-bit only
 ;if @OSArch <> 'X64' Then
 ;	MsgBox(48,"NAS Záloha - Kardio Jan Skoda v1.0","Tento system není podporován. [x64]")
 ;	Exit
 ;EndIf
-
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackup.log',1)
 if @error then
@@ -48,16 +38,12 @@ if @error then
 	exit
 endif
 
-
 ; INIT
 
-
 logger("Program Start :" & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
-
 ; read configuration
 if not FileExists($ini) then
-	; write template
-	$f = FileOpen($ini,1)
+	$f = FileOpen($ini, 1); append
 	FileWriteLine($f, '[dir1]')
 	FileWriteLine($f, '[user]')
 	FileWriteLine($f, '[remote]')
@@ -65,70 +51,65 @@ if not FileExists($ini) then
 	FileWriteLine($f, '[target]')
 	FileWriteLine($f, '[key]')
 	FileClose($f)
-	logger("Default configuration INI loaded.")
-else
-	_FileReadToArray($ini,$configuration, 0, ' ')
-	logger("Configuration INI loaded.")
 endif
-
+_FileReadToArray($ini, $configuration, 0, ' '); 0-based space split
+logger("Configuration INI loaded.")
 ; dirlist
-for $i = 0 to ubound($config) - 1
-	if StringRegExp($config[$i][0],'^[dir.*') then $dirlist += 1
+for $i = 0 to ubound($configuration) - 1
+	if StringRegExp($configuration[$i][0],'^[dir.*') then $dirlist += 1
 next
 
-; gui
+; GUI
+
 $gui = GUICreate("NAS Záloha - Kardio Jan Skoda v1.0", 527, 74 + $dirlist * 32, Default, Default)
-for $i = 0 to $dirlist
-	$component[$i][0] = GUICtrlCreateLabel("Adresár:", 8, 14 + $i * 32, 44, 17); text
+for $i = 0 to $dirlist - 1
+	$component[$i][0] = GUICtrlCreateLabel("Adresar:", 8, 14 + $i * 32, 44, 17); text
 	$component[$i][1] = GUICtrlCreateInput($configuration[$i][1], 52, 10 + $i * 32, 345, 21); dir
 	$component[$i][2] = GUICtrlCreateButton("Procházet", 408, 8 + $i * 32, 75, 25); select
 	$component[$1][3] = GUICtrlCreateButton("+", 500, 8 + $i * 32, 25, 25); add
 next
-$gui_button_config = GUICtrlCreateButton("NAS", 8, 14 + $dirlist * 32, 25, 25); add
+$gui_button_config = GUICtrlCreateButton("NAS", 8, 14 + $dirlist * 32, 25, 25)
 $gui_progress = GUICtrlCreateProgress(130, 14 + $dirlist * 32, 352, 16)
 $gui_error = GUICtrlCreateLabel("", 8, 44 + $dirlist * 32, 136, 17)
-$gui_button_exit = GUICtrlCreateButton("Konec", 408, 40 + $dirlist * 32, 75, 25)
 $gui_button_backup = GUICtrlCreateButton("Zálohovat", 320, 40  + $dirlist * 32, 75, 25)
-
+$gui_button_exit = GUICtrlCreateButton("Konec", 408, 40 + $dirlist * 32, 75, 25)
 
 GUISetState(@SW_SHOW)
 
-
 ; MAIN
-
 
 while 1
 	$event = GUIGetMsg()
-
-	; update directory
+	; update directory intput
 	for $i = 0 to $dirlist - 1
 		if $event = $component[$i][2] then
 			$dir_input = FileSelectFolder("Adresar", @HomeDrive)
 			GUICtrlSetData($component[$i][$2], $dir_input)
 			$configuration[$i][1] = $dir_input
 	next
-	; add directory
+	; add directory & update dirlist
 	for $i = 0 to $dirlist - 1
-		if $event = $component[$i][3] then
-			$dirlist += 1; ?
+		if $event = $component[$i][3] and $dirlist < 10 then
 			update_gui($configuration, $dirlist)
+		endif
 	next
+	$dirlist += 1
 	; NAS config
 	if $event = $component[$i][3] then nas_gui()
 	; backup
 	if $event = $gui_button_backup then
 		; reset error
 		GUICtrlSetData($gui_error,'')
-		; user/remote/port/target/key
-		if not $user = _ArraySearch($configuration,'[user]',0,0,0,1) then
-			GUICtrlSetData($gui_error,"E: Uzivatel neexistuje.")
-		elseif not $remote = _ArraySearch($configuration,'[remote]',0,0,0,1) then
-			GUICtrlSetData($gui_error,"E: Vzdaleny host neexistuje.")
-		elseif not $port = _ArraySearch($configuration,'[port]',0,0,0,1) then
-			GUICtrlSetData($gui_error,"E: Cislo portu neexistuje.")
-		elseif not $target = _ArraySearch($configuration,'[target]',0,0,0,1) then
-			GUICtrlSetData($gui_error,"E: Vzdaleny adresar neexistuje.")
-		elseif not $key = _ArraySearch($configuration,'[key]',0,0,0,1) then
+		;check user/remote/port/target/key
+		if $configuration[get_index('user')] == '' then
+			GUICtrlSetData($gui_error, "E: Neplatny uzivatel.")
+		elseif StringRegExp($configuration[get_index('remote'), '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) then
+			GUICtrlSetData($gui_error, "E: Neplatna IP adresa.")
+		elseif StringRegExp($configuration[get_index('port'), '\d{1,5}') then
+			GUICtrlSetData($gui_error, "E: Neplatne cislo portu.")
+		elseif $configuration[get_index('target')] == '' then
+			GUICtrlSetData($gui_error, "E: Neplatny cilovy adresar.")
+		elseif FileExists($configuration[get_index('key')]) then
 			GUICtrlSetData($gui_error,"E: Klic neexistuje.")
 		else
 			;reset progress
@@ -159,7 +140,6 @@ while 1
 		;re-enable backup
 		GUICtrlSetState($gui_button_backup,$GUI_ENABLE)
 	endif
-
 	; exit
 	If $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		; update configuration
@@ -183,25 +163,22 @@ while 1
 	endif
 wend
 
-
 ; FUNC
 
-
 func update_gui($configuration, $dirlist)
-	if $dirlist <= 10 then
-		; resize gui
-		WinMove($gui, Default, Default, Default, Default, 74 + $dirlist * 32)
-		; add dir
-		$component[$dirlist][0] = GUICtrlCreateLabel("Adresar:", 8, 14 + $i * 32, 44, 17); text
-		$component[$dirlist][1] = GUICtrlCreateInput('', 52, 10 + $i * 32, 345, 21); dir
-		$component[$dirlist][2] = GUICtrlCreateButton("Prochazet", 408, 8 + $i * 32, 75, 25); select
-		$component[$dirlist][3] = GUICtrlCreateButton("+", 500, 8 + $i * 32, 25, 25); add
-		; move components
-		ControlMove($gui, Defaulat, $gui_button_config, Default, 14 + $dirlist * 32)
-		ControlMove($gui, Defaulat, $gui_progress, Default, 14 + $dirlist * 32)
-		ControlMove($gui, Defaulat, $gui_error, Default, 44 + $dirlist * 32)
-		ControlMove($gui, Defaulat, $gui_button_backup, Default, 40 + $dirlist * 32)
-		ControlMove($gui, Defaulat, $gui_button_exit, Default, 40 + $dirlist * 32)
+	; resize gui
+	WinMove($gui, Default, Default, Default, Default, 74 + ($dirlist + 1) * 32)
+	; add dir
+	$component[$dirlist + 1][0] = GUICtrlCreateLabel("Adresar:", 8, 14 + ($dirlist + 1) * 32, 44, 17); text
+	$component[$dirlist + 1][1] = GUICtrlCreateInput('', 52, 10 + ($dirlist + 1) * 32, 345, 21); dir
+	$component[$dirlist + 1][2] = GUICtrlCreateButton("Prochazet", 408, 8 + ($dirlist + 1) * 32, 75, 25); select
+	$component[$dirlist + 1][3] = GUICtrlCreateButton("+", 500, 8 + ($dirlist + 1) * 32, 25, 25); add
+	; move components
+	ControlMove($gui, Defaulat, $gui_button_config, Default, 14 + ($dirlist + 1) * 32)
+	ControlMove($gui, Defaulat, $gui_progress, Default, 14 + ($dirlist + 1) * 32)
+	ControlMove($gui, Defaulat, $gui_error, Default, 44 + ($dirlist + 1) * 32)
+	ControlMove($gui, Defaulat, $gui_button_backup, Default, 40 + ($dirlist + 1) * 32)
+	ControlMove($gui, Defaulat, $gui_button_exit, Default, 40 + ($dirlist + 1) * 32)
 endfunc
 
 func logger($text)
@@ -221,6 +198,7 @@ func nas_gui()
 	$nas_gui_key_label = GUICtrlCreateLabel("Klic:", 8, 42, 32 , 40)
 	$nas_gui_key_input = GUICtrlCreateInput($key, 50, 42, 32, 150)
 	$nas_gui_key_button = GUICtrlCreateButton("Prochazet", 210, 42, 75, 25)
+	$nas_gui_error = GUICtrlCreateLabel('', 8, 74, 32 , 150)
 	$nas_gui_save_button = GUICtrlCreateButton("Ulozit", 225, 74, 75, 25)
 	$nas_gui_exit_button = GUICtrlCreateButton("Konec", 300, 74, 75, 25)
 
@@ -231,50 +209,27 @@ func nas_gui()
 
 		if $event = $gui_key_button then
 			$key_dir_update = FileSelectFolder("Adresar", @HomeDrive)
-			GUICtrlSetData($nas_gui_key_input,$key_dir_update)
+			GUICtrlSetData($nas_gui_key_input, $key_dir_update)
 		endif
 
 		if $event = $gui_save_button then
-			; update/write configuration
-			if $row = _ArraySearch($configuration,'[user]',0,0,0,1) then
-				$configuration[$row][1] = GUICtrlRead($nas_gui_user_input)
-			else
-				_ArrayAdd($configuration, '[user] ' & GUICtrlRead($nas_gui_user_input), Default, Default, ' ')
-			endif
-			;remote
-			if $row = _ArraySearch($configuration,'[remote]',0,0,0,1) then
-				$configuration[$row][1] = GUICtrlRead($nas_gui_remote_input)
-			else
-				_ArrayAdd($configuration, '[remote] ' & GUICtrlRead($nas_gui_remote_input), Default, Default, ' ')
-			endif
-			;port
-			if $row = _ArraySearch($configuration,'[port]',0,0,0,1) then
-				$configuration[$row][1] = GUICtrlRead($nas_gui_port_input)
-			else
-				_ArrayAdd($configuration, '[port] ' & GUICtrlRead($nas_gui_port_input), Default, Default, ' ')
-			endif
-			;target
-			if $row = _ArraySearch($configuration,'[target]',0,0,0,1) then
-				$configuration[$row][1] = GUICtrlRead($nas_gui_target_input)
-			else
-				_ArrayAdd($configuration, '[target] ' & GUICtrlRead($nas_gui_target_input), Default, Default, ' ')
-			endif
-			;key
-			if $row = _ArraySearch($configuration,'[key]',0,0,0,1) then
-				$configuration[$row][1] = GUICtrlRead($nas_gui_key_input)
-			else
-				_ArrayAdd($configuration, '[key] ' & GUICtrlRead($nas_gui_key_input), Default, Default, ' ')
-			endif
-			;exit
+			$configuration[get_index('user')][1] = GUICtrlRead($nas_gui_user_input)
+			$configuration[get_index('remote')][1] = GUICtrlRead($nas_gui_remote_input)
+			$configuration[get_index('port')][1] = GUICtrlRead($nas_gui_port_input)
+			$configuration[get_index('target')][1] = GUICtrlRead($nas_gui_target_input)
+			$configuration[get_index('key')][1] = GUICtrlRead($nas_gui_key_input)
+			; return
 			logger("Konfigurace byla aktualizovana.")
 			exitloop
 		endif
-		if $event = $GUI_EVENT_CLOSE or $event = $gui_exit_button then
-			exitloop
-		endif
+		; exit
+		if $event = $GUI_EVENT_CLOSE or $event = $gui_exit_button then exitloop
 	wend
-	;drop self
+	; remove self
 	GUIDelete($nas_gui)
+endfunc
 
+func get_index($variable)
+	return _ArraySearch($configuration, '[' & $variable &']', 0, 0, 0, 1)
 endfunc
 
