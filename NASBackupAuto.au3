@@ -13,8 +13,8 @@
 ;VAR
 
 $ini = @ScriptDir & '\' & 'NASBackup.ini
-$rsync = @ScriptDir & '\bin\' & 'rsync.exe'
-$ssh = @ScriptDir & '\bin\' & 'ssh.exe'
+$rsync = @ScriptDir & '\cygwin\' & 'rsync.exe'
+$ssh = @ScriptDir & '\cygwin\' & 'ssh.exe'
 
 global $configuration[2][0], $dirlist
 
@@ -73,7 +73,7 @@ else
 		$configuration[get_index('user')][1] & '@' &_
 		$configuration[get_index('remote')][1] & ':/' &_
 		$configuration[get_index('target')][1] & ' ' &_
-		$configuration[get_index('dir' & ($i + 1))][1], @ScriptDir & '\bin', @SW_HIDE)
+		$configuration[get_index('dir' & ($i + 1))][1], @ScriptDir & '\cygwin', @SW_HIDE)
 		logger('Directory ' & $i + 1 & ' backed up!')
 	next
 endif

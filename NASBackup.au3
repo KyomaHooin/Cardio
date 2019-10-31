@@ -14,8 +14,8 @@
 ;VAR
 
 $ini = @ScriptDir & '\' & 'NASBackup.ini
-$rsync = @ScriptDir & '\bin\' & 'rsync.exe'
-$ssh = @ScriptDir & '\bin\' & 'ssh.exe'
+$rsync = @ScriptDir & '\cygwin\' & 'rsync.exe'
+$ssh = @ScriptDir & '\cygwin\' & 'ssh.exe'
 
 global $configuration[2][0], $component[4][10], $dirlist
 
@@ -135,7 +135,7 @@ while 1
 						$configuration[get_index('user')][1] & '@' &_
 						$configuration[get_index('remote')][1] & ':/' &_
 						$configuration[get_index('target')][1] & ' ' &_
-						GUICtrlRead($component[$i][1]), @ScriptDir & '\bin', @SW_HIDE)
+						GUICtrlRead($component[$i][1]), @ScriptDir & '\cygwin', @SW_HIDE)
 						; update progress
 						GUICtrlSetData($gui_progress, round(($i + 1) * 100/ $dirlist))
 						; enable input
