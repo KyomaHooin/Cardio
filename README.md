@@ -27,11 +27,11 @@ ROUTER
 FILE
 <pre>
 NASBackupAuto.au3 - Source code CLI version.
-NASBackup.au3 - Source code GUI version.
-NASBackup.ico - Icon file.
-NASBackup.png - Application screen.
+    NASBackup.au3 - Source code GUI version.
+    NASBackup.ico - Icon file.
+    NASBackup.png - Application screen.
 
-      cygwin/ - <a href="https://cygwin.com">Cygwin</a> dll & binary.
+          cygwin/ - <a href="https://cygwin.com">Cygwin</a> dll & binary.
 </pre>
 SOURCE
 
