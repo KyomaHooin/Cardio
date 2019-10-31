@@ -1,12 +1,7 @@
 ;
 ; SSH Rsync backup WIN -> NAS GUI Setup
 ;
-; TODO:
-;
-; - NAS config
-; -SSH key MGMT
-; -rsync
-;
+
 
 #AutoIt3Wrapper_Icon=NASBackup.ico
 #NoTrayIcon
@@ -25,8 +20,10 @@
 
 $ini = @ScriptDir & '\' & 'NASBackup.ini;
 $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
+$ssh = @ScriptDir & '\bin\' & 'rsync.exe'
 
-global $configuration[2][0], $component[4][10], $dirlist
+
+global $configuration[2][0], $component[4][10], $dirlist, $user, $remote, $target, $port, $key
 
 
 ;CONTROL
@@ -118,10 +115,12 @@ while 1
 	next
 
 	; NAS config
-	if $event = $component[$i][3] then
+	if $event = $component[$i][3] then nas_gui()
 
 	; backup
 	if $event = $gui_button_backup Then; data path
+		;test port/key/user/remote/target
+		
 		;reset progress
 		GUICtrlSetData($gui_progress, 0)
 		;disable re-run
@@ -132,7 +131,10 @@ while 1
 				if FileExists(GUICtrlRead($component[$i][1]) then; exists
 					;disable input
 					GUICtrlSetState($component[$i][1], $GUI_DISABLE); disable change
-					RunWait(@ScriptDir & '\' & 'rsync.exe ' & GUICtrlRead($gui_dirpath1),@ScriptDir & '\bin', @SW_HIDE)
+					;rsync
+					RunWait($rsync & ' -az -e "' & $ssh & ' -p ' & $port & ' -i ' & $key & '" '&_
+					$user & '@' & $remote & ':/' & target & ' ' &_
+					GUICtrlRead($gui_dirpath1), @ScriptDir & '\bin', @SW_HIDE)
 					;update progress
 					GUICtrlSetData($gui_progress, round($j * 100/ $i))
 					;re-enable input
@@ -192,5 +194,75 @@ endfunc
 
 func logger($text)
 	FileWriteLine($log,$text)
+endfunc
+
+func nas_gui($dirlist)
+	$nas_gui = GUICreate("NAS Záloha - Kardio Jan Skoda v1.0", 527, 74 + $dirlist * 32, Default, Default)
+
+	$nas_gui_user_label
+	$nas_gui_user_input
+	$nas_gui_remote_label
+	$nas_gui_remote_input
+	$nas_gui_port_label
+	$nas_gui_port_input
+	$nas_gui_target_label
+	$nas_gui_target_input
+	$nas_gui_key_lable
+	$nas_gui_key_input
+	$nas_gui_key_button
+	$nas_gui_save_button
+
+	;update from configuration
+
+	GUISetState(@SW_SHOW,$nas_gui)
+
+	while 1
+		$event = GUIGetMsg($nas_gui)
+
+		if $event = $gui_key_button then
+			$key_dir_update = FileSelectFolder("Adresar", @HomeDrive)
+			GUICtrlSetData($nas_gui_key_input,$key_dir_update)
+		endif
+
+		if $event = $GUI_EVENT_CLOSE or $event = $gui_save_button then
+			; update/write configuration
+			; user
+			if $row = _ArraySearch($configuration,'[user]',0,0,0,1) then
+				$configuration[$row][1] = GUICtrlRead($nas_gui_user_input)
+			else
+				_ArrayAdd($configuration, '[user] ' & GUICtrlRead($nas_gui_user_input), Default, Default, ' ')
+			endif
+			;remote
+			if $row = _ArraySearch($configuration,'[remote]',0,0,0,1) then
+				$configuration[$row][1] = GUICtrlRead($nas_gui_remote_input)
+			else
+				_ArrayAdd($configuration, '[remote] ' & GUICtrlRead($nas_gui_remote_input), Default, Default, ' ')
+			endif
+			;port
+			if $row = _ArraySearch($configuration,'[port]',0,0,0,1) then
+				$configuration[$row][1] = GUICtrlRead($nas_gui_port_input)
+			else
+				_ArrayAdd($configuration, '[port] ' & GUICtrlRead($nas_gui_port_input), Default, Default, ' ')
+			endif
+			;target
+			if $row = _ArraySearch($configuration,'[target]',0,0,0,1) then
+				$configuration[$row][1] = GUICtrlRead($nas_gui_target_input)
+			else
+				_ArrayAdd($configuration, '[target] ' & GUICtrlRead($nas_gui_target_input), Default, Default, ' ')
+			endif
+			;key
+			if $row = _ArraySearch($configuration,'[key]',0,0,0,1) then
+				$configuration[$row][1] = GUICtrlRead($nas_gui_key_input)
+			else
+				_ArrayAdd($configuration, '[key] ' & GUICtrlRead($nas_gui_key_input), Default, Default, ' ')
+			endif
+			;exit
+			logger("Konfigurace byla aktualizovana.")
+			exitloop
+		endif
+	wend
+	;drop self
+	GUIDelete($nas_gui)
+
 endfunc
 
