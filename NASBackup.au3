@@ -23,7 +23,7 @@ $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
 $ssh = @ScriptDir & '\bin\' & 'rsync.exe'
 
 
-global $configuration[2][0], $component[4][10], $dirlist
+global $configuration[2][0], $component[4][10], $dirlist, $user, $remote, $port, $target, $key
 
 
 ;CONTROL
@@ -54,18 +54,20 @@ endif
 
 logger("Program Start :" & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
 
-; configuration
+; read configuration
 if not FileExists($ini) then
 	; write template
 	$f = FileOpen($ini,1)
 	FileWriteLine($f, '[dir1]')
 	FileWriteLine($f, '[user]')
 	FileWriteLine($f, '[remote]')
+	FileWriteLine($f, '[port')
 	FileWriteLine($f, '[target]')
+	FileWriteLine($f, '[key]')
 	FileClose($f)
 	logger("Default configuration INI loaded.")
 else
-	_FileReadToArray($ini,$configuration, 0, ' '); 0-based, split by space
+	_FileReadToArray($ini,$configuration, 0, ' ')
 	logger("Configuration INI loaded.")
 endif
 
@@ -115,6 +117,8 @@ while 1
 	if $event = $component[$i][3] then nas_gui()
 	; backup
 	if $event = $gui_button_backup then
+		; reset error
+		GUICtrlSetData($gui_error,'')
 		; user/remote/port/target/key
 		if not $user = _ArraySearch($configuration,'[user]',0,0,0,1) then
 			GUICtrlSetData($gui_error,"E: Uzivatel neexistuje.")
@@ -147,6 +151,7 @@ while 1
 						GUICtrlSetState($component[$i][1], $GUI_ENABLE)
 					else
 						GUICtrlSetData($gui_error,"E: Adresar [" & $i & "] neexistuje.")
+						exitloop
 					endif
 				endif
 			next
@@ -204,22 +209,20 @@ func logger($text)
 endfunc
 
 func nas_gui()
-	$nas_gui = GUICreate("NAS Záloha - Kardio Jan Skoda v1.0", 527, 74 + $dirlist * 32, Default, Default)
-
-	$nas_gui_user_label
-	$nas_gui_user_input
-	$nas_gui_remote_label
-	$nas_gui_remote_input
-	$nas_gui_port_label
-	$nas_gui_port_input
-	$nas_gui_target_label
-	$nas_gui_target_input
-	$nas_gui_key_lable
-	$nas_gui_key_input
-	$nas_gui_key_button
-	$nas_gui_save_button
-
-	;update from configuration
+	$nas_gui = GUICreate("NAS Záloha - Konfigurace NAS", 400, 150, Default, Default)
+	$nas_gui_user_label = GUICtrlCreateLabel("Uzivatel:", 8, 10, 32, 40)
+	$nas_gui_user_input = GUICtrlCreateInput($user, 50, 10 , 32, 40)
+	$nas_gui_remote_label = GUICtrlCreateLabel("NAS IP:", 100, 10, 32, 40)
+	$nas_gui_remote_input = GUICtrlCreateInput($remote, 150, 10, 32, 100)
+	$nas_gui_port_label = GUICtrlCreateLabel("Port",260, 10, 32, 20)
+	$nas_gui_port_input = GUICtrlCreateInput($port , 285, 10, 32, 20)
+	$nas_gui_target_label = GUICtrlCreateLabel("Cil:",305, 10, 32, 20)
+	$nas_gui_target_input = GUICtrlCreateInput($target, 330, 10, 32, 40)
+	$nas_gui_key_label = GUICtrlCreateLabel("Klic:", 8, 42, 32 , 40)
+	$nas_gui_key_input = GUICtrlCreateInput($key, 50, 42, 32, 150)
+	$nas_gui_key_button = GUICtrlCreateButton("Prochazet", 210, 42, 75, 25)
+	$nas_gui_save_button = GUICtrlCreateButton("Ulozit", 225, 74, 75, 25)
+	$nas_gui_exit_button = GUICtrlCreateButton("Konec", 300, 74, 75, 25)
 
 	GUISetState(@SW_SHOW,$nas_gui)
 
@@ -231,9 +234,8 @@ func nas_gui()
 			GUICtrlSetData($nas_gui_key_input,$key_dir_update)
 		endif
 
-		if $event = $GUI_EVENT_CLOSE or $event = $gui_save_button then
+		if $event = $gui_save_button then
 			; update/write configuration
-			; user
 			if $row = _ArraySearch($configuration,'[user]',0,0,0,1) then
 				$configuration[$row][1] = GUICtrlRead($nas_gui_user_input)
 			else
@@ -265,6 +267,9 @@ func nas_gui()
 			endif
 			;exit
 			logger("Konfigurace byla aktualizovana.")
+			exitloop
+		endif
+		if $event = $GUI_EVENT_CLOSE or $event = $gui_exit_button then
 			exitloop
 		endif
 	wend
