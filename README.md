@@ -26,7 +26,8 @@ ROUTER
 
 FILE
 <pre>
-NASBackup.au3 - Source code.
+NASBackupAuto.au3 - Source code CLI version.
+NASBackup.au3 - Source code GUI version.
 NASBackup.ico - Icon file.
 NASBackup.png - Application screen.
 
