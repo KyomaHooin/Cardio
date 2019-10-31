@@ -101,15 +101,15 @@ while 1
 		; reset error
 		GUICtrlSetData($gui_error,'')
 		;check user/remote/port/target/key
-		if $configuration[get_index('user')] == '' then
+		if $configuration[get_index('user')][1] == '' then
 			GUICtrlSetData($gui_error, "E: Neplatny uzivatel.")
-		elseif StringRegExp($configuration[get_index('remote'), '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) then
+		elseif StringRegExp($configuration[get_index('remote')][1], '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) then
 			GUICtrlSetData($gui_error, "E: Neplatna IP adresa.")
-		elseif StringRegExp($configuration[get_index('port'), '\d{1,5}') then
+		elseif StringRegExp($configuration[get_index('port')][1], '\d{1,5}') then
 			GUICtrlSetData($gui_error, "E: Neplatne cislo portu.")
-		elseif $configuration[get_index('target')] == '' then
+		elseif $configuration[get_index('target')][1] == '' then
 			GUICtrlSetData($gui_error, "E: Neplatny cilovy adresar.")
-		elseif FileExists($configuration[get_index('key')]) then
+		elseif FileExists($configuration[get_index('key')][1]) then
 			GUICtrlSetData($gui_error,"E: Klic neexistuje.")
 		else
 			;reset progress
@@ -117,7 +117,7 @@ while 1
 			;disable re-run
 			GUICtrlSetState($gui_button_backup,$GUI_DISABLE)
 			; test directory
-			for $i = 0 to $dirlist
+			for $i = 0 to $dirlist - 1
 				if GUICtrlRead($component[$i][1] <> '' then; not empty
 					if FileExists(GUICtrlRead($component[$i][1]) then; exists
 						;disable input
