@@ -17,7 +17,7 @@ $ini = @ScriptDir & '\' & 'NASBackup.ini;
 $rsync = @ScriptDir & '\bin\' & 'rsync.exe'
 $ssh = @ScriptDir & '\bin\' & 'rsync.exe'
 
-global $configuration[2][0], $component[4][10], $dirlist, $user, $remote, $port, $target, $key
+global $configuration[2][0], $component[4][10], $dirlist
 
 ;CONTROL
 
@@ -86,6 +86,7 @@ while 1
 			$dir_input = FileSelectFolder("Adresar", @HomeDrive)
 			GUICtrlSetData($component[$i][$2], $dir_input)
 			$configuration[$i][1] = $dir_input
+		endif
 	next
 	; add directory & update dirlist
 	for $i = 0 to $dirlist - 1
@@ -120,15 +121,19 @@ while 1
 			for $i = 0 to $dirlist - 1
 				if GUICtrlRead($component[$i][1] <> '' then; not empty
 					if FileExists(GUICtrlRead($component[$i][1]) then; exists
-						;disable input
-						GUICtrlSetState($component[$i][1], $GUI_DISABLE); disable change
-						;rsync
-						RunWait($rsync & ' -az -e "' & $ssh & ' -p ' & $port & ' -i ' & $key & '" '&_
-						$user & '@' & $remote & ':/' & target & ' ' &_
-						GUICtrlRead($gui_dirpath1), @ScriptDir & '\bin', @SW_HIDE)
-						;update progress
-						GUICtrlSetData($gui_progress, round($j * 100/ $i))
-						;re-enable input
+						; disable input
+						GUICtrlSetState($component[$i][1], $GUI_DISABLE)
+						; rsync
+						RunWait($rsync & ' -az -e "' & $ssh & ' -p ' &_
+						$configuration[get_index('port')][1] & ' -i ' &_
+						$configuration[get_index('key')][1] & '" '&_
+						$configuration[get_index('user')][1] & '@' &_
+						$configuration[get_index('remote')][1] & ':/' &_
+						$configuration[get_index('target')][1] & ' ' &_
+						GUICtrlRead($component[$i][1]), @ScriptDir & '\bin', @SW_HIDE)
+						; update progress
+						GUICtrlSetData($gui_progress, round($i * 100/ $dirlist))
+						; enable input
 						GUICtrlSetState($component[$i][1], $GUI_ENABLE)
 					else
 						GUICtrlSetData($gui_error,"E: Adresar [" & $i & "] neexistuje.")
