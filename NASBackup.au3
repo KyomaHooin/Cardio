@@ -40,7 +40,7 @@ endif
 
 ; INIT
 
-logger("Program Start :" & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
+logger("Program Start :" & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 ; read configuration
 if not FileExists($ini) then
 	$f = FileOpen($ini, 1); append
@@ -99,6 +99,7 @@ while 1
 	if $event = $component[$i][3] then nas_gui()
 	; backup
 	if $event = $gui_button_backup then
+		logger("Backup start.")
 		; reset error
 		GUICtrlSetData($gui_error,'')
 		;check user/remote/port/target/key
@@ -115,7 +116,7 @@ while 1
 		else
 			;reset progress
 			GUICtrlSetData($gui_progress, 0)
-			;disable re-run
+			;disable backup button
 			GUICtrlSetState($gui_button_backup,$GUI_DISABLE)
 			; test directory
 			for $i = 0 to $dirlist - 1
@@ -141,9 +142,10 @@ while 1
 					endif
 				endif
 			next
+			logger("Backup end.")
+			; enable backup button
+			GUICtrlSetState($gui_button_backup,$GUI_ENABLE)
 		endif
-		;re-enable backup
-		GUICtrlSetState($gui_button_backup,$GUI_ENABLE)
 	endif
 	; exit
 	If $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
@@ -163,7 +165,7 @@ while 1
 		next
 		FileClose($f)
 		; exit
-		logger("Program exit: " & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR
+		logger("Program exit: " & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 		exit
 	endif
 wend
@@ -213,10 +215,8 @@ func nas_gui()
 		$event = GUIGetMsg($nas_gui)
 
 		if $event = $gui_key_button then
-			$key_dir_update = FileSelectFolder("Adresar", @HomeDrive)
-			GUICtrlSetData($nas_gui_key_input, $key_dir_update)
+			GUICtrlSetData($nas_gui_key_input, FileSelectFolder("Adresar", @HomeDrive))
 		endif
-
 		if $event = $gui_save_button then
 			$configuration[get_index('user')][1] = GUICtrlRead($nas_gui_user_input)
 			$configuration[get_index('remote')][1] = GUICtrlRead($nas_gui_remote_input)
@@ -227,10 +227,8 @@ func nas_gui()
 			logger("Konfigurace byla aktualizovana.")
 			exitloop
 		endif
-		; exit
 		if $event = $GUI_EVENT_CLOSE or $event = $gui_exit_button then exitloop
 	wend
-	; remove self
 	GUIDelete($nas_gui)
 endfunc
 
