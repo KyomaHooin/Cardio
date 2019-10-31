@@ -9,10 +9,7 @@ TODO
 
 <pre>
 -screen
--rsync code => rsync.exe -az -e "ssh.exe -p 31415 -i kardio.key" kardio@xx.xx.xx.xx:/remote/ /local/
 -ssh keygen
--auto logic
--logging
 -NAS prep.
 -Router prep.
 </pre>
