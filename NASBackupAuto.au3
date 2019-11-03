@@ -17,26 +17,19 @@ $company = 'Your Company'
 $ini = @ScriptDir & '\NASBackup.ini'
 
 global $configuration[0][2]
-global $component[3][4]
 
 ;CONTROL
 
 ; one instance
-if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'Program byl již spuštěn. [R]')
-	exit
-endif
-; 64-bit only
-;if @OSArch <> 'X64' then
-;	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'Tento systém není podporován. [x64]')
-;	exit
-;endif
+if UBound(ProcessList(@ScriptName)) > 2 then exit
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackupAuto.log', 1)
-if @error then
-	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'System je připojen pouze pro čtení. [RO]')
-	exit
-endif
+if @error then exit
+; 64-bit only
+;if @OSArch <> 'X64' then
+;	logger('Tento systém není podporován. [x64]')
+;	exit
+;endif
 
 ; INIT
 
