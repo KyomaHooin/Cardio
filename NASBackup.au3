@@ -14,7 +14,6 @@
 ;VAR
 
 $version = '1.3'
-$company = 'Your Company'
 $ini = @ScriptDir & '\NASBackup.ini'
 
 global $configuration[0][2]
@@ -24,18 +23,18 @@ global $component[3][4]
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'NAS Záloha v' & $version, 'Program byl již spuštěn. [R]')
+	MsgBox(48, 'NAS Záloha v ' & $version, 'Program byl již spuštěn. [R]')
 	exit
 endif
 ; 64-bit only
 ;if @OSArch <> 'X64' then
-;	MsgBox(48, 'NAS Záloha v' & $version, 'Tento systém není podporován. [x64]')
+;	MsgBox(48, 'NAS Záloha v ' & $version, 'Tento systém není podporován. [x64]')
 ;	exit
 ;endif
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackup.log', 1)
 if @error then
-	MsgBox(48, 'NAS Záloha v' & $version, 'System je připojen pouze pro čtení. [RO]')
+	MsgBox(48, 'NAS Záloha v ' & $version, 'System je připojen pouze pro čtení. [RO]')
 	exit
 endif
 
@@ -67,7 +66,7 @@ endif
 
 ; GUI
 
-$gui = GUICreate('NAS Záloha v' & $version, 488, 140, Default, Default)
+$gui = GUICreate('NAS Záloha v ' & $version, 488, 140, Default, Default)
 
 for $i = 0 to 2
 	$component[$i][0] = GUICtrlCreateLabel('Adresář:', 8, 14 + $i * 33, 44, 17); text
@@ -216,7 +215,7 @@ func get_index($variable)
 endfunc
 
 func nas_gui()
-	global $nas_gui = GUICreate('NAS Záloha - Konfigurace', 346, 310, Default, Default)
+	global $nas_gui = GUICreate('NAS Záloha v ' & $version & ' - Konfigurace', 346, 310, Default, Default)
 	global $nas_gui_remote_group = GUICtrlCreateGroup('', 10, 8, 327, 185)
 	global $nas_gui_remote = GUICtrlCreateRadio('Vzdálená záloha', 24, 8, 100, 17)
 	global $nas_gui_user = GUICtrlCreateLabel('Uživatel:', 18, 32, 45, 17)
