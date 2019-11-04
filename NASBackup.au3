@@ -24,18 +24,18 @@ global $component[3][4]
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'Program byl již spuštěn. [R]')
+	MsgBox(48, 'NAS Záloha v' & $version, 'Program byl již spuštěn. [R]')
 	exit
 endif
 ; 64-bit only
 ;if @OSArch <> 'X64' then
-;	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'Tento systém není podporován. [x64]')
+;	MsgBox(48, 'NAS Záloha v' & $version, 'Tento systém není podporován. [x64]')
 ;	exit
 ;endif
 ; logging
 $log = FileOpen(@ScriptDir & '\' & 'NASBackup.log', 1)
 if @error then
-	MsgBox(48, 'NAS Záloha - ' & $company & ' v' & $version, 'System je připojen pouze pro čtení. [RO]')
+	MsgBox(48, 'NAS Záloha v' & $version, 'System je připojen pouze pro čtení. [RO]')
 	exit
 endif
 
@@ -67,7 +67,7 @@ endif
 
 ; GUI
 
-$gui = GUICreate('NAS Záloha - ' & $company & ' v' & $version, 488, 140, Default, Default)
+$gui = GUICreate('NAS Záloha v' & $version, 488, 140, Default, Default)
 
 for $i = 0 to 2
 	$component[$i][0] = GUICtrlCreateLabel('Adresář:', 8, 14 + $i * 33, 44, 17); text

@@ -13,7 +13,6 @@
 ;VAR
 
 $version = '1.3'
-$company = 'Your Company'
 $ini = @ScriptDir & '\NASBackup.ini'
 
 global $configuration[0][2]
