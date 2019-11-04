@@ -215,7 +215,7 @@ func get_index($variable)
 endfunc
 
 func nas_gui()
-	global $nas_gui = GUICreate('NAS Záloha v ' & $version & ' - Konfigurace', 346, 310, Default, Default)
+	global $nas_gui = GUICreate('NAS Záloha v ' & $version & ' - Nastavení', 346, 310, Default, Default)
 	global $nas_gui_remote_group = GUICtrlCreateGroup('', 10, 8, 327, 185)
 	global $nas_gui_remote = GUICtrlCreateRadio('Vzdálená záloha', 24, 8, 100, 17)
 	global $nas_gui_user = GUICtrlCreateLabel('Uživatel:', 18, 32, 45, 17)
