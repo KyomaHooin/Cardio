@@ -5,7 +5,7 @@ DESCRIPTION
 
 Secure NAS rsync backup GUI for Win64-bit OS.
 
-CONFIGURATION
+SETUP
 
 ![NASBackupConfiguration](https://github.com/KyomaHooin/NASBackup/raw/master/NASBackupSetting.png "screenshot")
 
