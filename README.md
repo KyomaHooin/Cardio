@@ -1,25 +1,14 @@
 
-![NASBackup](https://github.com/KyomaHooin/NASBackup/raw/master/NASBackup.png "screenshot")
-
 DESCRIPTION
 
-Secure NAS rsync backup GUI for Win64-bit OS.
-
-SETUP
-
-![NASBackupConfiguration](https://github.com/KyomaHooin/NASBackup/raw/master/NASBackupSetting.png "screenshot")
+Cardiology support software.
 
 FILE
 <pre>
-   NASBackupAuto.au3 - Source code CLI version.
-       NASBackup.au3 - Source code GUI version.
-       NASBackup.ico - Icon file.
-NASBackupSetting.png - Application settings screen.
-       NASBackup.png - Application main screen.
-
-             cygwin/ - <a href="https://cygwin.com">Cygwin</a> dll & binary.
+NASBackup/ - Secure NAS Rsync backup for Win64.
+      S70/ - Convert GE Vivid S70 PDF export to XLSL.
 </pre>
 SOURCE
 
-https://github.com/KyomaHooin/NASBackup
+https://github.com/KyomaHooin/Cardio
 
