@@ -1,3 +1,4 @@
+
 ; TODO
 ;
 ; - read INI
@@ -8,3 +9,6 @@
 ; - construct XSL
 ; - write FILE
 ;
+
+$pdfimages = @ScriptDir & '\pdfimages.exe'
+$pdftotext = @ScriptDir & '\pdftotext.exe'
