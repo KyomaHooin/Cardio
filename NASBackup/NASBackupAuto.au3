@@ -85,7 +85,7 @@ else
 		if $configuration[get_index('dir' & $i + 1)][1] <> '' then
 			if FileExists($configuration[get_index('dir' & $i + 1)][1]) then
 				if $configuration[get_index('default')][1] = 0 then
-					$cygwin_src_path = get_cygpwin_path($configuration[get_index('dir' & $i + 1)][1])
+					$cygwin_src_path = get_cygwin_pathget_cygwin_path($configuration[get_index('dir' & $i + 1)][1])
 					;remote rsync
 					$rsync = RunWait(@ComSpec & ' /c ' & 'rsync.exe -avz -e ' _
 						& "'" & 'ssh.exe -o "StrictHostKeyChecking no" -p ' _
@@ -98,8 +98,8 @@ else
 						& ' > auto_rsync.log 2> auto_error.log' _
 						, @ScriptDir & '\cygwin', @SW_HIDE)
 				ElseIf $configuration[get_index('default')][1] = 1 then
-					$cygwin_src_path = get_cygpwin_path($configuration[get_index('dir' & $i + 1)][1])
-					$cygwin_dst_path = get_cygpwin_path($configuration[get_index('local')][1])
+					$cygwin_src_path = get_cygwin_path($configuration[get_index('dir' & $i + 1)][1])
+					$cygwin_dst_path = get_cygwin_path($configuration[get_index('local')][1])
 					;local rsync
 					$rsync = RunWait(@ComSpec & ' /c ' & 'rsync.exe -avz ' _
 						& "'" &  $cygwin_src_path & "'" & ' ' _
@@ -133,7 +133,7 @@ func logger($text)
 	FileWriteLine($log, $text)
 endfunc
 
-func get_cygpwin_path($path)
+func get_cygwin_path($path)
 	$cygwin_path = StringRegExpReplace($path , '\\', '\/'); convert backslash -> slash
 	$cygwin_path = StringRegExpReplace($cygwin_path ,'^(.)\:(.*)', '\/cygdrive\/$1$2'); convert drive colon
 	return StringRegExpReplace($cygwin_path ,'(.*)', '$1'); catch space by doublequote
