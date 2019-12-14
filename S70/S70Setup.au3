@@ -130,12 +130,12 @@ func setup($configuration)
 
 	$setup = GUICreate('Nastavení překladu', 370, 460, Default, Default)
 	$setup_store_button = GUICtrlCreateButton('Uložit', 288, 135, 75, 25)
-	$setup_edit_label = GUICtrlCreateLabel("Hodnota:", 242, 30, 45, 20)
+	$setup_edit_label = GUICtrlCreateLabel('Hodnota:', 242, 30, 45, 20)
 	$setup_edit_label_input = GUICtrlCreateInput('', 242, 50, 120, 25)
-	$setup_edit_label_traslate = GUICtrlCreateLabel("Překlad:", 242, 80, 45, 20)
-	$setup_edit_label_traslate_input = GUICtrlCreateInput('', 242, 100, 120, 25)
+	$setup_edit_label_translate = GUICtrlCreateLabel('Překlad:', 242, 80, 45, 20)
+	$setup_edit_label_translate_input = GUICtrlCreateInput('', 242, 100, 120, 25)
 	$setup_tab = GUICtrlCreateTab(8,8,225,445)
-	$setup_tab_2d = GUICtrlCreateTabItem("2-D parametry")
+	$setup_tab_2d = GUICtrlCreateTabItem('2-D parametry')
 	$setup_tab_2d_list = GUICtrlCreateListView('Hodnota|Překlad', 15, 35, 210, 410, Default, BitOR(0x00000001, 0x00000020))
 	_GUICtrlListView_SetColumnWidth($setup_tab_2d_list, 0, 103)
 	_GUICtrlListView_SetColumnWidth($setup_tab_2d_list, 1, 103)
@@ -145,13 +145,13 @@ func setup($configuration)
 	_GUICtrlListView_SetColumnWidth($setup_tab_2d_calc_list, 0, 103)
 	_GUICtrlListView_SetColumnWidth($setup_tab_2d_calc_list, 1, 103)
 	GUICtrlCreateTabItem('')
-	$setup_tab_doppler = GUICtrlCreateTabItem("Doppler+Mmode")
+	$setup_tab_doppler = GUICtrlCreateTabItem('Doppler+Mmode')
 	$setup_tab_doppler_list = GUICtrlCreateListView('Hodnota|Překlad', 15, 35, 210, 410, Default, BitOR(0x00000001, 0x00000020))
 	_GUICtrlListView_SetColumnWidth($setup_tab_doppler_list, 0, 103)
 	_GUICtrlListView_SetColumnWidth($setup_tab_doppler_list, 1, 103)
 	GUICtrlCreateTabItem('')
-	$setup_button_ok = GUICtrlCreateButton("Ok", 288, 396, 75, 25)
-	$setup_button_exit = GUICtrlCreateButton("Storno", 288, 428, 75, 25)
+	;$setup_button_ok = GUICtrlCreateButton('Ok', 288, 396, 75, 25)
+	$setup_button_exit = GUICtrlCreateButton('Storno', 288, 428, 75, 25)
 
 	for $i=0 to UBound($D2) - 1
 		GUICtrlCreateListViewItem($D2[$i][0] & '|' & $D2[$i][1], $setup_tab_2d_list)
@@ -168,7 +168,7 @@ func setup($configuration)
 
 	GUISetState(@SW_SHOW, $setup)
 
-	local $selected = -1, $current = -1, $current_tab = 0
+	local $next = -1, $prev = -1, $next_tab = 0
 
 	while 1
 		;event collector
@@ -176,64 +176,61 @@ func setup($configuration)
 		;get selection
 		switch GUICtrlRead($setup_tab)
 			case 0
-;				if $current_tab <> 0 Then
-;					$current = -1
-;					GUICtrlSetData($setup_edit_label_input,'')
-;					GUICtrlSetData($setup_edit_label_traslate_input, '')
-;				endif
-;				_GUICtrlListView_SetItemSelected($setup_tab_2d_calc_list, -1, False)
-;				_GUICtrlListView_SetItemSelected($setup_tab_doppler_list, -1, False)
-				$selected = _GUICtrlListView_GetNextItem($setup_tab_2d_list)
-				if $selected > -1 then
-					if  $selected <> $current Then
-						GUICtrlSetData($setup_edit_label_input, $D2[$selected][0])
-						GUICtrlSetData($setup_edit_label_traslate_input, $D2[$selected][1])
-						$current = $selected
-					endif
-;				else
-;					GUICtrlSetData($setup_edit_label_input,'')
-;					GUICtrlSetData($setup_edit_label_traslate_input, '')
+				if $next_tab <> 0 Then
+					$next_tab = 0, $next -1, $prev = -1
+					GUICtrlSetData($setup_edit_label_input,'')
+					GUICtrlSetData($setup_edit_label_translate_input, '')
+					_GUICtrlListView_SetItemSelected($setup_tab_2d_list, -1, False)
+				endif
+				$next = _GUICtrlListView_GetNextItem($setup_tab_2d_list)
+				if $next <> $prev Then; update input
+					GUICtrlSetData($setup_edit_label_input, $D2[$next][0])
+					GUICtrlSetData($setup_edit_label_traslate_input, $D2[$next][1])
+					$prev = $next
 				endif
 			case 1
-;				_GUICtrlListView_SetItemSelected($setup_tab_2d_list, -1, False)
-;				_GUICtrlListView_SetItemSelected($setup_tab_doppler_list, -1, False)
-				$selected = _GUICtrlListView_GetNextItem($setup_tab_2d_calc_list)
-				if $selected > -1 Then
-					if  $selected <> $current Then
-						GUICtrlSetData($setup_edit_label_input, $D2Calc[$selected][0])
-						GUICtrlSetData($setup_edit_label_traslate_input, $D2Calc[$selected][1])
-						$current = $selected
-					endif
-;				Else
-;					GUICtrlSetData($setup_edit_label_input,'')
-;					GUICtrlSetData($setup_edit_label_traslate_input, '')
+				if $next_tab <> 1 Then
+					$next_tab = 1, $next -1, $prev = -1
+					GUICtrlSetData($setup_edit_label_input,'')
+					GUICtrlSetData($setup_edit_label_translate_input, '')
+					_GUICtrlListView_SetItemSelected($setup_tab_2d_calc_list, -1, False)
+				endif
+				$next = _GUICtrlListView_GetNextItem($setup_tab_2d_calc_list)
+				if $next <> $prev Then
+					GUICtrlSetData($setup_edit_label_input, $D2Calc[$next][0])
+					GUICtrlSetData($setup_edit_label_traslate_input, $D2Calc[$next][1])
+					$prev = $next
 				endif
 			case 2
-				_GUICtrlListView_SetItemSelected($setup_tab_2d_list, -1, False); deselect all
-				_GUICtrlListView_SetItemSelected($setup_tab_2d_calc_list, -1, False); deselect all
-				$selected = _GUICtrlListView_GetNextItem($setup_tab_doppler_list)
-				if $selected > -1 Then
-					if  $selected <> $current Then
-						GUICtrlSetData($setup_edit_label_input, $Doppler[$selected][0])
-						GUICtrlSetData($setup_edit_label_traslate_input, $Doppler[$selected][1])
-						$current = $selected
-					endif
-;				Else
-;					GUICtrlSetData($setup_edit_label_input,'')
-;					GUICtrlSetData($setup_edit_label_traslate_input, '')
+				if $next_tab <> 2 Then
+					$next_tab = 2, $next -1, $prev = -1
+					GUICtrlSetData($setup_edit_label_input,'')
+					GUICtrlSetData($setup_edit_label_translate_input, '')
+					_GUICtrlListView_SetItemSelected($setup_tab_dopppler_list, -1, False)
+				endif
+				$next = _GUICtrlListView_GetNextItem($setup_tab_doppler_list)
+				if $next <> $prev Then
+					GUICtrlSetData($setup_edit_label_input, $Doppler[$next][0])
+					GUICtrlSetData($setup_edit_label_traslate_input, $Doppler[$next][1])
+					$prev = $next
 				endif
 		EndSwitch
 		;update configuration
-		;......
+		if $setup_event = $setup_store_button then
+			switch $next_tab
+				case 0
+					$D2[$next][1] = GUICtrlRead($setup_edit_label_traslate_input)
+					GUICtrlUpdateListViewItem($setup_tab_2d_list, GUICtrlRead($setup_edit_label_traslate_input))
+				case 1
+					$D2Calc[$next][1] = GUICtrlRead($setup_edit_label_traslate_input)
+					GUICtrlUpdateListViewItem($setup_tab_2d_calc_list, GUICtrlRead($setup_edit_label_traslate_input))
+				case 2
+					$Doppler[$next][1] = GUICtrlRead($setup_edit_label_traslate_input)
+					GUICtrlUpdateListViewItem($setup_tab_doppler_list, GUICtrlRead($setup_edit_label_traslate_input))
+			endswitch
 		;exit
-		if $setup_event = $GUI_EVENT_CLOSE or $setup_event = $setup_button_exit then
-		; update input configuration
-		;......
-		; write configuration
-		;......
-		; exit
-			exitloop
-		endif
+		if $setup_event = $GUI_EVENT_CLOSE or $setup_event = $setup_button_exit then exitloop
 	WEnd
 	GUIDelete($setup)
 EndFunc
+
