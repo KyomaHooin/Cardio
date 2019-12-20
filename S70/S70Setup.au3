@@ -13,8 +13,8 @@
 ;VAR
 
 $version = '1.2'
-$ini = @ScriptDir & '\S70.ini'
-$logfile = @ScriptDir & '\S70Setup.log'
+$ini = @ScriptDir & '\' & 'S70.ini'
+$logfile = @ScriptDir & '\' & 'S70Setup.log'
 
 global $configuration[0][2]
 global $2D[0][2]
@@ -43,7 +43,7 @@ if not FileExists($ini) then
 	$f = FileOpen($ini, 1)
 	FileWriteLine($f, 'path=')
 	FileWriteLine($f, '2D=RS Major|RS Major|LVSd|LVSd|LVIDd|LVIDd|LVPWd|LVPWd|LVIDs|LVIDs|LA Diam|LA Diam|Ao Diam Svals|Ao Diam Svals|RVIDd|RVIDd|RA Minor|RA Minor|RA Major|RA Major|LA Minor|LA Minor|LA Major|LA Major|LAAd A4C|LAAd A4C|LALd A4C|LALd A4C|LAEDV A-L A4C|LAEDV A-L A4C|LAEDV MOD A4C|LAEDV MOD A4C|MR Rad|MR Rad|MR Als.Vel|MR Als.Vel|MR Flow|MR Flow')
-	FileWriteLine($f, '2DCalc=LVIDd Index|LVIDd Index|EDV(Teich)|EDV(Teich)|EDV(Cube)|EDV(Cube)|LVd Mass|LVd Mass|LVd Mass Index|LVd Mass Index|LVd Mass (ASE)|LVd Mass (ASE)|LVd Mass Ind|LVd Mass Ind|(ASE)|(ASE)|LVIDs Index|LVIDs Index|ESV (Teich)|ESV (Teich)|EF (Teich|EF (Teich)|ESV (Cube)|ESV (Cube)|EF (Cube)|EF (Cube)|%FS|%FS|SV(Teich)|SV(Teich)|SI(Teich)|SI(Teich)|SV(Cube)|SV(Cube)|SI(Cube)|SI(Cube)|LAVi|LAVi')
+	FileWriteLine($f, '2DCalc=LVIDd Index|LVIDd Index|EDV(Teich)|EDV(Teich)|EDV(Cube)|EDV(Cube)|LVd Mass|LVd Mass|LVd Mass Index|LVd Mass Index|LVd Mass (ASE)|LVd Mass (ASE)|LVd Mass Ind (ASE)|LVd Mass Ind (ASE)|LVIDs Index|LVIDs Index|ESV (Teich)|ESV (Teich)|EF (Teich|EF (Teich)|ESV (Cube)|ESV (Cube)|EF (Cube)|EF (Cube)|%FS|%FS|SV(Teich)|SV(Teich)|SI(Teich)|SI(Teich)|SV(Cube)|SV(Cube)|SI(Cube)|SI(Cube)|LAVi|LAVi')
     FileWriteLine($f, 'Doppler=Ao Diam|Ao Diam|TV maxPG|TV maxPG|MV E Vel|MV E Vel|MV A Vel|MV A Vel|MV E/A Ratio|MV E/A Ratio|MV DecT|MV DecT|MV PHT|MV PHT|EmSept|EmSept|EmLat|EmLat|EmAver|EmAver|E/Em|E/Em|MR Vmax|MR Vmax|MR Vmean|MR Vmean|MR maxPG|MR maxPG|MR meanPG|MR meanPG|MR VTI|MR VTI|AV Vmax|AV Vmax|AV Vmean|AV Vmean|AV maxPG|AV maxPG|AV meanPG|AV meanPG|AV Env.Ti|AV env.Ti|AV VTI|AV VTI|MR Vmax|MR Vmax|MR VTI|MR VTI|MR ERO|MR ERO|MR RV|MR RV')
 	FileClose($f)
 endif
@@ -92,9 +92,9 @@ while 1
 	if $event = -3 or $event = $gui_button_exit then; event close
 		; update configuration
 		$configuration[0][1] = GUICtrlRead($gui_dir_input)
-		$configuration[1][1] = _ArrayToString($D2, '|', Default, Default, '|')
-		$configuration[2][1] = _ArrayToString($D2Calc, '|', Default, Default, '|')
-		$configuration[3][1] = _ArrayToString($Doppler, '|', Default, Default, '|')
+		if UBound($D2) > 0 then $configuration[1][1] = _ArrayToString($D2, '|', Default, Default, '|')
+		if UBound($D2Calc) > 0 then $configuration[2][1] = _ArrayToString($D2Calc, '|', Default, Default, '|')
+		if UBound($Doppler) > 0 then $configuration[3][1] = _ArrayToString($Doppler, '|', Default, Default, '|')
 		; write configuration
 		$f = FileOpen($ini, 2); overwrite
 		for $i = 0 to ubound($configuration) - 1
