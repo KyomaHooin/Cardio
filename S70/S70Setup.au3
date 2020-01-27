@@ -14,7 +14,7 @@
 
 $version = '1.2'
 $ini = @ScriptDir & '\' & 'S70.ini'
-$logfile = @ScriptDir & '\' & 'S70Setup.log'
+$logfile = @ScriptDir & '\' & 'S70.log'
 
 global $configuration[0][2]
 global $2D[0][2]
