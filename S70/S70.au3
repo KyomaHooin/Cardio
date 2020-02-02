@@ -19,15 +19,15 @@ $version = '1.2'
 
 $ini = @ScriptDir & '\' & 'S70.ini'
 $logfile = @ScriptDir & '\' & 'S70.log'
+$template = @ScriptDir & '\' & 'S70_template.xlsx'
 
 $medicus_out = @ScriptDir & '\' & 'S70_medicus_out.dat'
 $medicus_in = @ScriptDir & '\' & 'S70_meducus_in.dat'
 
-$template = @ScriptDir & '\' & 'S70_template.xlsx'
-$archive_dir = @ScriptDir & '\' & 'archive'
+$archive_path = @ScriptDir & '\' & 'archive'
 
 global $configuration[0][2]
-global $patient_id[0]
+global $medicus_id[0]
 
 global $map[], $d2[], $d2calc[], $doppler[]
 
@@ -35,23 +35,23 @@ global $map[], $d2[], $d2calc[], $doppler[]
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'S70 v ' & $version, 'Program byl již spuštěn.')
+	MsgBox(48, 'S70 Echo v' & $version, 'Program byl již spuštěn.')
 	exit
 endif
 
 ; logging
 $log = FileOpen($logfile, 1)
 if @error then
-	MsgBox(48, 'S70 v ' & $version, 'System je připojen pouze pro čtení.')
+	MsgBox(48, 'S70 Echo v' & $version, 'System je připojen pouze pro čtení.')
 	exit
 endif
 
 ; create archive
-DirCreate($archive)
+DirCreate($archive_path)
 
 ; INIT
 
-logger('Program begin: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
+logger('Program begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
 ; test file
 if not FileExists($ini) then
@@ -75,14 +75,14 @@ if @error then
 endif
 
 ; test export setup
-$txtpath = StringRegExpReplace($configuration[0][1],'\\+$',''); remove trailing slash
-if not $txtpath or not FileExists($txtpath) then
+$txt_path = StringRegExpReplace($configuration[0][1],'\\+$', ''); remove trailing slash
+if not $txt_path or not FileExists($txt_path) then
 	logger('Neplatný adresář pro export.')
 	exit
 endif
 
-; test partient ID
-_FileReadToArray($medicus_in, $patient_id, 0)
+; test medicus ID
+_FileReadToArray($medicus_in, $medicus_id, 0)
 if @error then
 	logger('Načtení ID pacienta selhalo.')
 	exit
@@ -96,49 +96,47 @@ $d2calc = get_map(StringSplit($configuration[2][1], '|', 2))
 $doppler = get_map(StringSplit($configuration[3][1], '|', 2))
 
 ; get filename
-$filename = $medicus_in[1] & @YEAR & @MON & @MDAY & '_' & @HOUR & @MIN & @SEC
+$filename = @ScriptDir & '\' & $medicus_id[0] & '_' & @YEAR & @MON & @MDAY & '_' & @HOUR & @MIN & @SEC & '.xlsx'
 
 ; check export
-$txtfile = file_from_export($patient_id[0])
+$txt_file = file_from_export($medicus_id[0], $txt_path)
 
 ; check archive
-$archive_file = file_from_archive($patient_id[0])
+$archive_file = file_from_archive($medicus_id[0], $archive_path)
 
-if not $txtfile then
+if not $txt_file then
 	; load archive ?
-	if msgbox(4,"Historie", "Načíst poslední záznam?") = 6 then; OK
+	if msgbox(4, 'S70 - Historie', 'Načíst poslední záznam?') = 6 then; OK
 		if $archive_file then; archived ?
-			FileCopy($archive & '\' & $archive_file, @ScriptDir & '\' & $filename)
+			FileCopy($archive & '\' & $archive_file, $filename)
 			if @error then
 				logger('Načtení z archivu selhalo.')
-				FileCopy($template, $ScriptDir & '\' & $filename)
+				FileCopy($template, $filename)
 			endif
 		else
-			FileCopy($template, $ScriptDir & '\' & $filename)
+			FileCopy($template, $filename)
 		endif
 	else
-		FileCopy($template, $ScriptDir & '\' & $filename)
+		FileCopy($template, $filename)
 	endif
 else
 	; load export
-	$raw = FileReadToArray($txtpath & '\' & $txtfile, 0)
+	$raw = FileReadToArray($txtpath & '\' & $txt_file, 0)
 	if @error then
-		logger('Načtení exportu: ' & txtlist  & 'selhalo.')
-		FileCopy($template, $ScriptDir & '\' & $filename)
+		logger('Načtení exportu ' & txt_file  & ' selhalo.')
+		FileCopy($template, $filename)
 	else
-		; update filename
-		$filename = StringRegExpReplace($txtlist[1], '.txt', '.xlsx'); update filename 
 		; parse export
-		$data = parse_export($raw); parse export
+		$data = parse_export($raw)
 		; write export
 		if $archive_file then
-			templete_update_data($data, $filenamem, 0)
+			templete_update_data($data, $filename, 0)
 		else
-			templete_update_data($data, $filenamem, 1)
+			templete_update_data($data, $filename, 1)
 		endif
 	endif
 	;export cleanup
-	FileDelete($txtpath & '\*.txt')
+	FileDelete($txt_path & '\*.txt')
 endIf
 
 ; update temeplate header
@@ -156,14 +154,14 @@ $new = templete_read_data($filename)
 ;write_medicus
 write_medicus($new, $medicus_out)
 
-;archive
-if FileExists(@ScriptDir & '\' & $filename) then 
-	FileMove(@ScriptDir & '\' & $filename, $archive & '\' & $filename)
-	FileDelete($archive_file)
+;update archive
+if FileExists($filename) then
+	if $archive_file then FileDelete($archive_file)
+	FileMove($filename, $archive_path)
 endif
 
 ; exit
-logger('Program exit: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
+logger('Program exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 logger('------------------------------------')
 FileClose($log)
 exit
@@ -174,17 +172,17 @@ func logger($text)
 	FileWriteLine($log, $text)
 endfunc
 
-func file_from_archive($id)
-	$list = _FileListToArray($archive, '*.xlsx')
+func file_from_archive($id, $path)
+	$list = _FileListToArray($path, '*.xlsx')
 	for $i = 0 to ubound($list)
-		if StringRegExp($$list[$i], "$id_.*") then return $list[$i]
+		if StringRegExp($list[$i], "$id_.*") then return $list[$i]
 	next
 endfunc
 
-func file_from_export($id)
-	$list = _FileListToArray($txtpath, '*.txt')
+func file_from_export($id, $path)
+	$list = _FileListToArray($path, '*.txt')
 	for $i = 0 to ubound($list)
-		if StringRegExp($$list[$i], "$id_.*") then return $list[$i]
+		if StringRegExp($list[$i], "$id_.*") then return $list[$i]
 	next
 endfunc
 
