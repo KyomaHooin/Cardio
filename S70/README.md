@@ -3,7 +3,7 @@
 
 DESCRIPTION
 
-Convert GE Vivid S70 PDF export to XLSL document.
+GE Vivid S70 Meducus 3 intergration & convert TXT export to XLSL template.
 
 TRANSLATION
 
@@ -18,9 +18,6 @@ FILE
  S70Setup.png - Setup translationn GUI screen.
       S70.ico - Program icon.
      gear.ico - Program GUI icon.
-
-pdftotext.exe - Get text from PDF by <a href="https://www.xpdfreader.com">XpdfReader</a> (c) 2019.
-pdfimages.exe - Get image from PDF by <a href="https://www.xpdfreader.com">XpdfReader</a> (c) 2019.
 </pre>
 SOURCE
 
