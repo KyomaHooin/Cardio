@@ -106,7 +106,7 @@ $archive_file = file_from_archive($medicus_id[0], $archive_path)
 
 if not $txt_file then
 	; load archive ?
-	if msgbox(4, 'S70 - Historie', 'Načíst poslední záznam?') = 6 then; OK
+	if msgbox(4, 'S70 Echo - Historie', 'Načíst poslední záznam?') = 6 then; OK
 		if $archive_file then; archived ?
 			FileCopy($archive & '\' & $archive_file, $filename)
 			if @error then
