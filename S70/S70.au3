@@ -5,7 +5,6 @@
 ; filename = RC_YYYYMMDD_HHMMSS.txt
 ;
 
-
 #AutoIt3Wrapper_Icon=S70.ico
 #NoTrayIcon
 
@@ -20,19 +19,17 @@ $version = '1.2'
 
 $ini = @ScriptDir & '\' & 'S70.ini'
 $logfile = @ScriptDir & '\' & 'S70.log'
-$medicus_out = @ScriptDir & '\' & 'S70out.dat'
-$medicus_in = @ScriptDir & '\' & 'S70in.dat'
-$template = @ScriptDir & '\' & 'S70_template.xlsx'
 
+$medicus_out = @ScriptDir & '\' & 'S70_medicus_out.dat'
+$medicus_in = @ScriptDir & '\' & 'S70_meducus_in.dat'
+
+$template = @ScriptDir & '\' & 'S70_template.xlsx'
 $archive_dir = @ScriptDir & '\' & 'archive'
 
-global $header = ['name', 'id', 'bsa', 'height', 'weight', 'date']
 global $configuration[0][2]
 global $patient_id[0]
 
-global $2D[0][2]
-global $2DCalc[0][2]
-global $Doppler[0][2]
+global $map[], $d2[], $d2calc[], $doppler[]
 
 ;CONTROL
 
@@ -49,8 +46,7 @@ if @error then
 	exit
 endif
 
-; create data structure
-DirCreate($export)
+; create archive
 DirCreate($archive)
 
 ; INIT
@@ -67,7 +63,7 @@ if not FileExists($template) then
 	exit
 endif
 if not FileExits($medicus_in) the
-	logger('Nelze nalézt Medicus soubor.')
+	logger('Nelze nalézt vstupní Medicus soubor.')
 	exit
 endif
 
@@ -85,7 +81,7 @@ if not $txtpath or not FileExists($txtpath) then
 	exit
 endif
 
-; test ID load
+; test partient ID
 _FileReadToArray($medicus_in, $patient_id, 0)
 if @error then
 	logger('Načtení ID pacienta selhalo.')
@@ -94,23 +90,24 @@ endif
 
 ; MAIN
 
-;load configuration
-$d2 = A1toA2(StringSplit($configuration[1][1], '|', 2))
-$d2calc = A1toA2(StringSplit($configuration[2][1], '|', 2))
-$doppler = A1toA2(StringSplit($configuration[3][1], '|', 2))
+; load config
+$d2 = get_map(StringSplit($configuration[1][1], '|', 2))
+$d2calc = get_map(StringSplit($configuration[2][1], '|', 2))
+$doppler = get_map(StringSplit($configuration[3][1], '|', 2))
 
 ; get filename
 $filename = $medicus_in[1] & @YEAR & @MON & @MDAY & '_' & @HOUR & @MIN & @SEC
 
 ; check export
-$txtlist = _FileListToArray($txtpath, '*.txt')
+$txtfile = file_from_export($patient_id[0])
 
 ; check archive
 $archive_file = file_from_archive($patient_id[0])
 
-if ubound($txtlist) < 2 then
+if not $txtfile then
+	; load archive ?
 	if msgbox(4,"Historie", "Načíst poslední záznam?") = 6 then; OK
-		if $archive_file then; archived?
+		if $archive_file then; archived ?
 			FileCopy($archive & '\' & $archive_file, @ScriptDir & '\' & $filename)
 			if @error then
 				logger('Načtení z archivu selhalo.')
@@ -118,36 +115,41 @@ if ubound($txtlist) < 2 then
 			endif
 		else
 			FileCopy($template, $ScriptDir & '\' & $filename)
-			if $archive_file then temeplate_update_header($archive_file, $filename)
 		endif
 	else
 		FileCopy($template, $ScriptDir & '\' & $filename)
-		if $archive_file then temeplate_update_header($archive_file, $filename)
 	endif
 else
-	;load export
-	$raw = FileReadToArray($txtpath & '\' & $txtlist[1], 0)
+	; load export
+	$raw = FileReadToArray($txtpath & '\' & $txtfile, 0)
 	if @error then
 		logger('Načtení exportu: ' & txtlist  & 'selhalo.')
 		FileCopy($template, $ScriptDir & '\' & $filename)
-		if $archive_file then temeplate_update_header($archive_file, $filename)
 	else
+		; update filename
 		$filename = StringRegExpReplace($txtlist[1], '.txt', '.xlsx'); update filename 
+		; parse export
 		$data = parse_export($raw); parse export
-		if $archive_file then temeplate_update_header($archive_file, $filename)
-		templete_update_data($data, $filename)
+		; write export
+		if $archive_file then
+			templete_update_data($data, $filenamem, 0)
+		else
+			templete_update_data($data, $filenamem, 1)
+		endif
 	endif
-	;export leanup
+	;export cleanup
 	FileDelete($txtpath & '\*.txt')
 endIf
 
+; update temeplate header
+if $archive_file then template_update_header($archive_file, $filename)
+
 ; run temeplate
 $excel = _Excel_Open()
-$book = _ExcelBookOpen($excel, @ScriptDir & '\' & $filename)
-while check_booklist($book)
+$book = _Excel_BookOpen($filename)
+while _ArraySearch(_ExcelBookList(), $book)
 	sleep(5000)
 wend
-
 ;parse new data
 $new = templete_read_data($filename)
 
@@ -173,53 +175,67 @@ func logger($text)
 endfunc
 
 func file_from_archive($id)
-	for $f in  _FileListToArray($archive, '*.xlsx')
-		if StringRegExp($f, "$id_.*") then return $f
+	$list = _FileListToArray($archive, '*.xlsx')
+	for $i = 0 to ubound($list)
+		if StringRegExp($$list[$i], "$id_.*") then return $list[$i]
 	next
 endfunc
 
-func A1toA2($A1)
-	local $A2[0][2]
+func file_from_export($id)
+	$list = _FileListToArray($txtpath, '*.txt')
+	for $i = 0 to ubound($list)
+		if StringRegExp($$list[$i], "$id_.*") then return $list[$i]
+	next
+endfunc
+
+func get_map($list)
+	local $map[]
+	; valid touples
 	if Mod(UBound($A1), 2) <> 0 then return
 	for $i=0 to UBound($A1) / 2 - 1
-		_ArrayAdd($A2, $A1[2 * $i] & '|' & $A1[2 * $i + 1])
+		$map[$list[2 * $i]] =  $list[2 * $i + 1]
 	next
-	return $A2
+	return $map
 EndFunc
 
-func check_booklist($instance)
-	return _ArraySearch(_ExcelBookList(), $instance)
-endfunc
-
 func parse_export($raw)
-	local $data[0][2]
-	$index = 0
-	;header
-	for $i = 0 to ubound($header)
-		$data[$index][$heaer[$i]] = $raw[_ArraySearch($raw, $heaer[$i])]
-		$index=+1
+	local $map[]
+	; header
+	$map['name'] = StringRegExpReplace($raw[8], 'Name ', '')
+	$map['id'] = StringRegExpReplace($raw[9], 'Patient Id ', '')
+	$map['bsa'] = StringRegExpReplace($raw[10], 'BSA ', '')
+	$map['height'] = StringRegExpReplace($raw[11], 'Height ', '')
+	$map['weight'] = StringRegExpReplace($raw[12], 'Weight ', '')
+	$map['date'] = StringRegExpReplace($raw[13], 'Date ', '')
+	; index
+	for $i = 0 to ubound($raw)
+		if $raw[$i] = '2-D parametry' then $d2_index = $i + 2 
+		if $raw[$i] = '2-D kalkulace' then $d2calc_index = $i + 2 
+		if $raw[$i] = 'Doppler+Mmode' then $doppler_index = $i + 2 
+		if $raw[$i] = 'Souhrn:' then $end_index = $i - 2
 	next
-	;data
-	for $i = 0 to ubound($d2)
-		$data[$index][$d2[$i]] = $raw[_ArraySearch($raw, $d2[$i])]
-		$index=+1
-	next
-	for $i = 0 to ubound($d2calc)
-		$data[$index][$d2calc[$i]] = $raw[_ArraySearch($raw, $d2calc[$i])]
-		$index=+1
-	next
-	for $i = 0 to ubound($doppler)
-		$data[$index][$doppler[$i]] = $raw[_ArraySearch($raw, $doppler[$i])]
-		$index=+1
-	next
-	return $data
+	; data
+	for $i = $d2_index to $d2calc_index - 2
+		$map[StringRegExpReplace($raw[$i], ' +\d+.*', '')] = StringRegExpReplace($raw[$i], '.*(\d+.?\d+).*', '\\1')
+	next 
+	for $i = $d2calc_index to $doppler_index - 2
+		$map[StringRegExpReplace($raw[$i], ' +\d+.*', '')] = StringRegExpReplace($raw[$i], '.*(\d+.?\d+).*', '\\1')
+	next 
+	for $i = $doppler to $end_index
+		$map[StringRegExpReplace($raw[$i], ' +\d+.*', '')] = StringRegExpReplace($raw[$i], '.*(\d+.?\d+).*', '\\1')
+	next 
+	return $map
 endfunc
 
-func template_update_data($data, $file)
+func template_update_data($data, $file, $header)
 	$excel = _Excel_Open(False, False, False, False, True)
 	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookOpen($excel, $file, False, False)
 	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $out)
+
+	if $header then
+
+	
 
 	;_Excel_RangeWrite($book, $excel.ActiveSheet, $name, 'B2')
 	
