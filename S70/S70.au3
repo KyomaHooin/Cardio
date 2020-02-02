@@ -26,6 +26,7 @@ $template = @ScriptDir & '\' & 'S70_template.xlsx'
 
 $archive_dir = @ScriptDir & '\' & 'archive'
 
+global $header = ['name', 'id', 'bsa', 'height', 'weight', 'date']
 global $configuration[0][2]
 global $patient_id[0]
 
@@ -98,10 +99,12 @@ $d2 = A1toA2(StringSplit($configuration[1][1], '|', 2))
 $d2calc = A1toA2(StringSplit($configuration[2][1], '|', 2))
 $doppler = A1toA2(StringSplit($configuration[3][1], '|', 2))
 
-;get filename
+; get filename
 $filename = $medicus_in[1] & @YEAR & @MON & @MDAY & '_' & @HOUR & @MIN & @SEC
-;check export
+
+; check export
 $txtlist = _FileListToArray($txtpath, '*.txt')
+
 ; check archive
 $archive_file = file_from_archive($patient_id[0])
 
@@ -115,37 +118,48 @@ if ubound($txtlist) < 2 then
 			endif
 		else
 			FileCopy($template, $ScriptDir & '\' & $filename)
+			if $archive_file then temeplate_update_header($archive_file, $filename)
 		endif
 	else
 		FileCopy($template, $ScriptDir & '\' & $filename)
-		; write header from archive
-		if $archive_file then
-			update_header(@ScriptDir & '\' & archive_file, @ScriptDir & '\' & $filename)
-		endif
+		if $archive_file then temeplate_update_header($archive_file, $filename)
 	endif
 else
 	;load export
-	$data = FileReadToArray($txtpath & '\' & $txtlist[1])
+	$raw = FileReadToArray($txtpath & '\' & $txtlist[1], 0)
 	if @error then
 		logger('Načtení exportu: ' & txtlist  & 'selhalo.')
 		FileCopy($template, $ScriptDir & '\' & $filename)
+		if $archive_file then temeplate_update_header($archive_file, $filename)
 	else
-		$filename = StringRegExpReplace($txtlist[1], '.txt', '.xlsx'); updat filename by export
-		;parse_export
-		; write temeplate header
-		if $archive_file then update_header(@ScriptDir & '\' & archive_file, @ScriptDir & '\' & $filename)
-		; write texport
+		$filename = StringRegExpReplace($txtlist[1], '.txt', '.xlsx'); update filename 
+		$data = parse_export($raw); parse export
+		if $archive_file then temeplate_update_header($archive_file, $filename)
+		templete_update_data($data, $filename)
 	endif
-	;cleanup
+	;export leanup
 	FileDelete($txtpath & '\*.txt')
 endIf
 
-; run excel
-$excel = _Excel_Open(False, False, False, False, True)
+; run temeplate
+$excel = _Excel_Open()
 $book = _ExcelBookOpen($excel, @ScriptDir & '\' & $filename)
-;parse_xlsx_back
+while check_booklist($book)
+	sleep(5000)
+wend
+
+;parse new data
+$new = templete_read_data($filename)
+
 ;write_medicus
+write_medicus($new, $medicus_out)
+
 ;archive
+if FileExists(@ScriptDir & '\' & $filename) then 
+	FileMove(@ScriptDir & '\' & $filename, $archive & '\' & $filename)
+	FileDelete($archive_file)
+endif
+
 ; exit
 logger('Program exit: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 logger('------------------------------------')
@@ -173,41 +187,109 @@ func A1toA2($A1)
 	return $A2
 EndFunc
 
-func write_temeplate($data, $file)
-	$excel = _Excel_Open(False, False, False, False, True)
-	if @error Then Return SetError(1, 0, "Nelze spustit aplikaci Excel.")
-	$book = _Excel_BookNew($excel, 1)
-	if @error Then return SetError(1, 0, "Nelze vytvořit Excel sešit.")
-	$excel.ActiveSheet.Name = 'S70'
-	;HEADER
+func check_booklist($instance)
+	return _ArraySearch(_ExcelBookList(), $instance)
+endfunc
 
-	_Excel_RangeWrite($book, $excel.ActiveSheet, $dump[0], 'A2'); examination
-	$book.ActiveSheet.Range("A2").Font.Bold = True;
-	$book.ActiveSheet.Range("A2").Font.Size = 18;
-	_Excel_RangeWrite($book, $excel.ActiveSheet, $dump[2], 'G2'); device
-;	_Excel_RangeWrite($book, $excel.ActiveSheet, $dump[1], 'A3'); address
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'Kardiologie Praha 17-Řepy s.r.o.               ', 'A3'); address
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'Jméno', 'A5'); name
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[4],'Name ',''), 'B5')
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'ID Pacienta', 'A6'); ID
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[5],'Patient Id ',''), 'B6')
-	$book.ActiveSheet.Range("B6").HorizontalAlignment = -4131; xlLeft
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'BSA', 'A7'); BSA
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[6],'BSA ',''), 'B7')
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'Výška', 'A8'); Height
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[7],'Height ',''), 'B8')
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'Váha', 'A9'); Weight
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[8],'Weight ',''), 'B9')
-	_Excel_RangeWrite($book, $excel.ActiveSheet, 'Datum', 'A10'); Date
-	_Excel_RangeWrite($book, $excel.ActiveSheet, StringReplace($dump[9],'Date ',''), 'B10')
-	; DATA
-	; FOOTER
-	;WRITE FILE
-	_Excel_BookSaveAs($book, StringRegExpReplace($export & '\' & $filename,'txt','xlsx'))
-	if @error Then return SetError(1, 0, "Nelze zapsat Excel sešit.")
-	; EXIT
+func parse_export($raw)
+	local $data[0][2]
+	$index = 0
+	;header
+	for $i = 0 to ubound($header)
+		$data[$index][$heaer[$i]] = $raw[_ArraySearch($raw, $heaer[$i])]
+		$index=+1
+	next
+	;data
+	for $i = 0 to ubound($d2)
+		$data[$index][$d2[$i]] = $raw[_ArraySearch($raw, $d2[$i])]
+		$index=+1
+	next
+	for $i = 0 to ubound($d2calc)
+		$data[$index][$d2calc[$i]] = $raw[_ArraySearch($raw, $d2calc[$i])]
+		$index=+1
+	next
+	for $i = 0 to ubound($doppler)
+		$data[$index][$doppler[$i]] = $raw[_ArraySearch($raw, $doppler[$i])]
+		$index=+1
+	next
+	return $data
+endfunc
+
+func template_update_data($data, $file)
+	$excel = _Excel_Open(False, False, False, False, True)
+	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	$book = _Excel_BookOpen($excel, $file, False, False)
+	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $out)
+
+	;_Excel_RangeWrite($book, $excel.ActiveSheet, $name, 'B2')
+	
+	_Excel_BookSave($book)
 	_Excel_BookClose($book)
 	_Excel_Close($excel)
-	return
+endfunc
+
+func template_read_data($file)
+	$excel = _Excel_Open(False, False, False, False, True)
+	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	$book = _Excel_BookOpen($excel, $file, True, False)
+	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $out)
+
+	;_Excel_RangeWrite($book, $excel.ActiveSheet, $name, 'B2')
+	
+	_Excel_BookClose($book)
+	_Excel_Close($excel)
+endfunc
+
+func temeplate_update_header($in, $out)
+	$excel = _Excel_Open(False, False, False, False, True)
+	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	$book = _Excel_BookOpen($excel, $in, True, False)
+	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $in & ' z archivu.')
+
+	;read header
+	$name =	_Excel_RangeRead($book, $excel.ActiveSheet, 'B2'); name
+	$rc = _Excel_RangeRead($book, $excel.ActiveSheet, 'G2'); RC
+	$poj = _Excel_RangeRead($book, $excel.ActiveSheet, 'J2'); poj.
+	$tf = _Excel_RangeRead($book, $excel.ActiveSheet, 'B4'); TF
+	$height = _Excel_RangeRead($book, $excel.ActiveSheet, 'E4'); height
+	$weight = _Excel_RangeRead($book, $excel.ActiveSheet, 'H4'); weight
+	$rhythm = _Excel_RangeRead($book, $excel.ActiveSheet, 'L2'); rhythm
+
+	_Excel_BookClose($book)
+	_Excel_Close($excel)
+
+	$excel = _Excel_Open(False, False, False, False, True)
+	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	$book = _Excel_BookOpen($excel, $out, False, False)
+	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $out)
+
+	;write header
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $name, 'B2')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $rc, 'G2')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $poj, 'J2')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $tf, 'B4')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $height, 'E4')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $weight, 'H4')
+	_Excel_RangeWrite($book, $excel.ActiveSheet, $rhythm, 'L2')
+
+	_Excel_BookSave($book)
+	_Excel_BookClose($book)
+	_Excel_Close($excel)
 EndFunc
+
+func template_update_data($data, $file)
+	$excel = _Excel_Open(False, False, False, False, True)
+	if @error Then Return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	$book = _Excel_BookOpen($excel, $file, True, False)
+	if @error Then return SetError(1, 0, 'Nelze načíst soubor: ' & $out)
+
+	;_Excel_RangeWrite($book, $excel.ActiveSheet, $name, 'B2')
+	
+	_Excel_BookSave($book)
+	_Excel_BookClose($book)
+	_Excel_Close($excel)
+endfunc
+
+func rite_medicus($data,$out)
+endfunc
 
