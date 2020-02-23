@@ -1,8 +1,7 @@
-;
 ; GE Vivid S70 - Medicus 3 integration
+; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
 ;
-;Copyright (c) 2020  Kyoma Hooin
-;--------------------------------------------------------------------------
+; Copyright (c) 2020  Kyoma Hooin
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -16,9 +15,6 @@
 ;
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-;--------------------------------------------------------------------------
-;
-; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
 ;
 
 #AutoIt3Wrapper_Icon=S70.ico
