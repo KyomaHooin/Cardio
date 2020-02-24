@@ -24,13 +24,13 @@
 ; INCLUDE
 
 #include <GUIConstantsEx.au3>
-;#include <Clipboard.au3>
+#include <Clipboard.au3>
 #include <Excel.au3>
 #include <File.au3>
 
 ; VAR
 
-$version = '1.2'
+$version = '1.3'
 $logfile = @ScriptDir & '\' & 'S70.log'
 $archive_path = @ScriptDir & '\' & 'archive'
 $export_path = @ScriptDir & '\' & 'export'
@@ -71,7 +71,7 @@ if @error then
 endif
 ; cmdline
 if UBound($cmdline) <> 5 then
-	MsgBox(48, 'S70 Echo v' & $version, 'Načtení dat Medicus selhalo.')
+	MsgBox(48, 'S70 Echo v' & $version, 'Načtení kompletních dat Medicus selhalo.')
 	exit
 endif
 
@@ -230,7 +230,7 @@ GUICtrlSetData($label_datetime, $current_date)
 ; MAIN
 
 ; logging
-logger('Program begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('Begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
 ; cmdline
 if UBound($cmdline) == 5 then
@@ -242,8 +242,8 @@ endif
 ; export / history
 $export_file = file_from_export($export_path, $cmdline[1])
 if $export_file then
-	export_parse($export_path & '\' & $export_file, $buffer)
-	if @error Then logger('Nepodařilo se zpracovat export: ' & $export_file)
+	$export = export_parse($export_path & '\' & $export_file, $buffer)
+	if @error then logger($export_file & ': ' & $export)
 	;FileDelete($export_path & '\' & $export_file)
 elseif FileExists($archive_path & '\' & $cmdline[1] & '.dat') Then
 	if msgbox(4, 'S70 Echo ' & $version & ' - Historie', 'Načíst poslední záznam?') = 6 then
@@ -258,19 +258,19 @@ endif
 if $buffer.Exists('IVSd') then GUICtrlSetData($input_lk_ivs, $buffer.Item('IVSd'))
 GUICtrlSetData($edit_dekurz, 'Levá komora nedilatovaná, není hypertrofická, s normální celkovou systolickou funkcí (EFLK odhad >65%), bez  hrubší regionální poruchy kinetiky, diastolická funkce v normě,levá síň nedilatovaná, mitrální chlopeň jemná, stopová  mitrální regurgitace, aortální chlopeň trojcípá, jemná, bez vady, norm. vel. ascend. aorty, pravá komora nedilatovaná, s normální systolickou funkcí, pravá síň nedilatovaná, stopová pulmonální  a  trikuspidální regurgitace, odhadovaný systolický tlak v plicnici nezvýšen, VCI nedilatovaná, kolabuje nad 50% s respirací, perikard bez patologické separace.'& @CRLF & @CRLF & 'Závěr:  Dobrá syst. i diast. fce obou nedil. komor, ost. srd. oddíly nedilat, chlopenní aparát bez významnější valvulopatie, tenze v plicnici nezvýšena.')
 
-; GUI
+; display GUI
 
 GUISetState(@SW_SHOW)
 
 While 1
 	$msg = GUIGetMsg()
 	if $msg = $button_dekurz then
-		dekurz()
-		if @error then logger('Nepodařolo se vygenerovat dekurz.')
+		$dekurz = dekurz()
+		if @error then logger($dekurz)
 	EndIf
 	if $msg = $button_tisk Then
-		dekurz_print(StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'), $cmdline[3] & ' ' & $cmdline[2], $current_date)
-		if @error then logger('Nepodařolo se vytisknout dekurz.')
+		$print = dekurz_print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
+		if @error then logger($print)
 	endif
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
 		; close dekurz
@@ -289,8 +289,11 @@ While 1
 	endif
 wend
 
-logger('Program exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+;exit
+logger('Exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('----')
 FileClose($log)
+
 exit
 
 ; FUNC
@@ -301,10 +304,18 @@ endfunc
 
 func file_from_export($path, $id)
 	local $list = _FileListToArray($path, '*.txt')
-	if not @error then
+	if not @error then; _ArraySearch()
 		for $i = 1 to ubound($list) - 1
 			if StringRegExp($list[$i], '^' & $id & '_.*') then return $list[$i]
 		next
+	endif
+endfunc
+
+func space_align($str, $cnt, $right = True)
+	if $right then
+		return $str & _StringRepeat(' ', $cnt)
+	else
+		return _StringRepeat(' ', $cnt) & $str
 	endif
 endfunc
 
@@ -315,8 +326,7 @@ func list_to_dict($list, $buffer)
 endfunc
 
 func dict_to_file($file, $buffer)
-	local $keys = $buffer.keys
-	local $str
+	local $str, $keys = $buffer.keys
 	for $i = 0 to UBound($keys) - 1
 		$str &= '|' & $keys[$i] & '|' & $buffer($keys[$i])
 	next
@@ -325,31 +335,30 @@ func dict_to_file($file, $buffer)
 endfunc
 
 func export_parse($file, $buffer)
-		local $raw
-		_FileReadToArray($file, $raw, 0)
-		if @error then return SetError(1, 0, 'Nelze načíst soubor exportu.')
-		for $i = 0 to UBound($varlist) - 1
-			for $j = 0 to UBound($raw) - 1
-				if StringRegExp($raw[$j], '^' & $varlist[$i] & '\t.*') then
-					$key = String($varlist[$i])
-					if $buffer.Exists($varlist[$i]) Then $buffer.Remove($varlist[$i])
-					$buffer.Add($varlist[$i], StringRegExpReplace($raw[$j], '.*\t(.*)\t.*', '$1'))
-				EndIf
-			next
+	local $raw
+	_FileReadToArray($file, $raw, 0); no count
+	if @error then return SetError(1, 0, 'Nelze načíst soubor exportu.')
+	for $i = 0 to UBound($varlist) - 1
+		for $j = 0 to UBound($raw) - 1
+			if StringRegExp($raw[$j], '^' & $varlist[$i] & '\t.*') then
+				if $buffer.Exists($varlist[$i]) then $buffer.Remove($varlist[$i])
+				$buffer.Add($varlist[$i], StringRegExpReplace($raw[$j], '.*\t(.*)\t.*', '$1'))
+			EndIf
 		next
+	next
 endfunc
 
 func dekurz()
 	;clear the clip
-	;_ClipBoard_Open(0)
-	;_ClipBoard_Empty()
-	;_ClipBoard_Close()
+	_ClipBoard_Open(0)
+	_ClipBoard_Empty()
+	_ClipBoard_Close()
 	; excel
 	$excel = _Excel_Open(False, False, False, False, False)
 	;$excel = _Excel_Open()
-	if @error then logger('Nelze spustit aplikaci Excel.')
+	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
-	if @error Then logger('Nelze vytvořit book.')
+	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
 	; style
 	$book.Activesheet.Range('B1').ColumnWidth = 15
 	; aorta
@@ -366,27 +375,42 @@ func dekurz()
 	; clip
 	$range = $book.ActiveSheet.Range('A1:C2')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
-	if @error Then logger('Nelze kopirovat data.')
+	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 EndFunc
 
-func dekurz_print($rc,$name,$date)
+func dekurz_print($rc, $name, $date)
 	$f = FileOpen($dekurz, 256 + 2); UTF no BOM overwrite
-	if @error then logger('Nemuzu otevrit dekurz.txt.')
-	FileWriteLine($f, 'Pacient:      Tomas Okurka')
-	FileWriteLine($f, 'Rodne cislo: 123456/1234')
+	if @error then return SetError(1, 0, 'Nemuzu otevrit dekurz.txt.')
+	FileWriteLine($f, '                                                Kardiologie - Na Poříčí 23 Praha 4')
+	FileWriteLine($f, 'Echokardiografické vyšetření')
+	FileWriteLine($f, '----------------------------')
+	FileWriteLine($f, '')
+	FileWriteLine($f, '      Jméno: ' & $name)
+	FileWriteLine($f, 'Rodné číslo: ' & StringRegExpReplace($rc, '(^\d{6})(.*)', '$1 \/ $2'))
+	FileWriteLine($f, '')
 	FileWriteLine($f, '----------------------------------------------------------------------------------')
 	FileWriteLine($f, 'Aorta')
 	FileWriteLine($f, '               Koren Auroty: 15 mm          Index: 14')
 	FileWriteLine($f, '               Popis: Je to v pohode.')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '')
 	FileWriteLine($f, 'Mitrálni chlopeň')
 	FileWriteLine($f, '               LVEDD: 13 (< 25 mm/m2)   LVDi: 14 (cm)     Index: 16')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
-	FileWriteLine($f, 'Pulmonárni')
+	FileWriteLine($f, '')
+	FileWriteLine($f, 'Pulmonárni chlopeň')
 	FileWriteLine($f, '               LVEDD: 13 (< 25 mm/m2)   LVDi: 14 (cm)     Index: 16')
+	FileWriteLine($f, '')
 	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, 'Závěr:')
+	FileWriteLine($f, '               Všechno je v pořádku.')
+	FileWriteLine($f, '')
+	FileWriteLine($f, 'Datum:' & $date & '                                   Podpis:')
+	FileWriteLine($f, '')
+	FileWriteLine($f, '')
+	FileWriteLine($f, '')
+	FileWriteLine($f, '')
 	FileClose($f)
 	_FilePrint($dekurz)
-	if @error then logger('Nemuzu tisknout..')
+	if @error then return SetError(1, 0 , 'Tisk se nezdařil.')
 	FileDelete($dekurz)
 EndFunc
+
