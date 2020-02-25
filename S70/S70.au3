@@ -375,7 +375,7 @@ func dekurz()
 	$book.Activesheet.Range('F1').ColumnWidth = 9
 	$book.Activesheet.Range('G1').ColumnWidth = 3.5
 	$book.Activesheet.Range('H1').ColumnWidth = 3.5
-	$book.Activesheet.Range('A1:25').RowHeight = 13
+	$book.Activesheet.Range('A1:A20').RowHeight = 13
 	; aorta
 	_Excel_RangeWrite($book, $book.Activesheet, 'Aorta', 'A1')
 	$book.Activesheet.Range('A1').Font.Bold = True
