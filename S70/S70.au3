@@ -18,6 +18,7 @@
 ;
 
 #AutoIt3Wrapper_Icon=S70.ico
+;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
 ;#AutoIt3Wrapper_UseX64=y
 #NoTrayIcon
 
@@ -87,7 +88,7 @@ $input_rc = GUICtrlCreateInput('', 290, 6, 105, 21, 1)
 $label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
 $input_poj = GUICtrlCreateInput('', 476, 6, 41, 21, 1)
 ; aorta
-$group_aorta = GUICtrlCreateGroup("Aorta", 8, 32, 610, 65)
+$group_aorta = GUICtrlCreateGroup('Aorta', 8, 32, 610, 65)
 $label_ao_root = GUICtrlCreateLabel('Kořen aorty:', 108, 46, 65, 17)
 $input_ao_root = GUICtrlCreateInput('', 172, 44, 41, 21, 1)
 $label_ao_root_unit = GUICtrlCreateLabel('(M<37, Z<33 mm)', 218, 46, 100, 17)
@@ -98,7 +99,7 @@ $label_ao_note = GUICtrlCreateLabel('Popis:', 70, 74, 30, 17)
 $input_ao_note = GUICtrlCreateInput('', 106, 70, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; leva komora
-$group_lk = GUICtrlCreateGroup("Levá komora", 8, 100, 610, 113)
+$group_lk = GUICtrlCreateGroup('Levá komora', 8, 100, 610, 113)
 $label_lk_lvedd = GUICtrlCreateLabel('LVEDD:', 128, 116, 45, 17)
 $input_lk_lvedd = GUICtrlCreateInput('', 172, 112, 41, 21, 1)
 $label_lk_lvedd_unit = GUICtrlCreateLabel('(M<58, Z<52 mm)', 218, 116, 100, 17)
@@ -123,7 +124,7 @@ $label_lk_note = GUICtrlCreateLabel('Popis:', 70, 190, 30, 17)
 $input_lk_note = GUICtrlCreateInput('', 106, 185, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; leva sin
-$group_ls = GUICtrlCreateGroup("Levá síň", 8, 216, 610, 38)
+$group_ls = GUICtrlCreateGroup('Levá síň', 8, 216, 610, 38)
 $label_ls_laplax = GUICtrlCreateLabel('LA-PLAX:', 120, 232, 50, 17)
 $input_ls_laplax = GUICtrlCreateInput('', 172, 228, 41, 21, 1)
 $label_ls_laplax_unit = GUICtrlCreateLabel('(<41 mm)', 218, 232, 100, 17)
@@ -135,7 +136,7 @@ $input_ls_lavi = GUICtrlCreateInput('', 476, 228, 41, 21, 1)
 $label_ls_lavi_unit = GUICtrlCreateLabel('(<34 ml/m2)', 524, 232, 80, 17)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; prava komora
-$group_pk = GUICtrlCreateGroup("Pravá komora", 8, 257, 610, 38)
+$group_pk = GUICtrlCreateGroup('Pravá komora', 8, 257, 610, 38)
 $label_pk_rveddplax = GUICtrlCreateLabel('RVEDD-PLAX:', 94, 273, 70, 17)
 $input_pk_rveddplax = GUICtrlCreateInput('', 172, 269, 41, 21, 1)
 $label_pk_rveddplax_unit = GUICtrlCreateLabel('(<31 mm)', 218, 273, 100, 17)
@@ -147,18 +148,18 @@ $input_pk_rvd1 = GUICtrlCreateInput('', 476, 269, 41, 21, 1)
 $label_pk_rvd1_unit = GUICtrlCreateLabel('(mm)', 524, 273, 80, 17)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; prava sin
-$group_ps = GUICtrlCreateGroup("Pravá síň", 8, 298, 610, 38)
+$group_ps = GUICtrlCreateGroup('Pravá síň', 8, 298, 610, 38)
 $label_ps_raa4c = GUICtrlCreateLabel('RA-A4C:', 124, 314, 50, 17)
 $input_ps_raa4c = GUICtrlCreateInput('', 172, 310, 41, 21, 1)
 $label_ps_raa4c_unit = GUICtrlCreateLabel('(<50 mm)', 218, 314, 100, 17)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; aortalni chlopen
-$group_ach = GUICtrlCreateGroup("Aortální chlopeň", 8, 339, 610, 40)
+$group_ach = GUICtrlCreateGroup('Aortální chlopeň', 8, 339, 610, 40)
 $label_ach_note = GUICtrlCreateLabel('Popis:', 70, 355, 30, 17)
 $input_ach_note = GUICtrlCreateInput('', 106, 352, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; mitralni chlopen
-$group_mch = GUICtrlCreateGroup("Mitrální chlopeň", 8, 382, 610, 113)
+$group_mch = GUICtrlCreateGroup('Mitrální chlopeň', 8, 382, 610, 113)
 $label_mch_es = GUICtrlCreateLabel("E':", 152, 398, 15, 17)
 $input_mch_es = GUICtrlCreateInput('', 172, 394, 41, 21, 1)
 $label_mch_es_unit = GUICtrlCreateLabel('(cm/s)', 218, 398, 30, 17)
@@ -181,7 +182,7 @@ $label_mch_note = GUICtrlCreateLabel('Popis:', 70, 468, 30, 17)
 $input_mch_note = GUICtrlCreateInput('', 106, 467, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; trikuspidalni chlopen
-$group_trikuspidal = GUICtrlCreateGroup("Trikuspidální chlopeň", 8, 498, 610, 65)
+$group_trikuspidal = GUICtrlCreateGroup('Trikuspidální chlopeň', 8, 498, 610, 65)
 $label_tch_pg = GUICtrlCreateLabel('PGmax-reg:', 110, 512, 65, 17)
 $input_tch_pg = GUICtrlCreateInput('', 172, 509, 41, 21, 1)
 $label_tch_pg_unit = GUICtrlCreateLabel('(mmHg)', 218, 512, 100, 17)
@@ -192,7 +193,7 @@ $label_tch_note = GUICtrlCreateLabel('Popis:', 70, 538, 30, 17)
 $input_tch_note = GUICtrlCreateInput('', 106, 535, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; pulmonalni chlopen
-$group_pulmonal = GUICtrlCreateGroup("Pulmonární chlopeň", 8, 566, 610, 65)
+$group_pulmonal = GUICtrlCreateGroup('Pulmonární chlopeň', 8, 566, 610, 65)
 $label_pch_vmax = GUICtrlCreateLabel('V max:', 134, 581, 40, 17)
 $input_pch_vmax = GUICtrlCreateInput('', 172, 577, 41, 21, 1)
 $label_pch_vmax_unit = GUICtrlCreateLabel('(m/s)', 218, 581, 100, 17)
@@ -200,12 +201,12 @@ $label_pch_note = GUICtrlCreateLabel('Popis:', 70, 602, 30, 17)
 $input_pch_note = GUICtrlCreateInput('', 106, 603, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; perikard
-$group_perikard = GUICtrlCreateGroup("Perikard", 8, 634, 610, 40)
+$group_perikard = GUICtrlCreateGroup('Perikard', 8, 634, 610, 40)
 $label_perikard_note = GUICtrlCreateLabel('Popis:', 70, 650, 30, 17)
 $input_perikard_note = GUICtrlCreateInput('', 106, 647, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; jine
-$group_other = GUICtrlCreateGroup("Jiné", 8, 677, 610, 40)
+$group_other = GUICtrlCreateGroup('Jiné', 8, 677, 610, 40)
 $label_other_note = GUICtrlCreateLabel('Popis:', 70, 693, 30, 17)
 $input_other_note = GUICtrlCreateInput('', 106, 690, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
@@ -367,15 +368,15 @@ func dekurz()
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
 	logger('Zapisuji XLS data. ' & @MIN & ':' & @SEC)
 	; styling
-	$book.Activesheet.Range('A1').ColumnWidth = 20
-	$book.Activesheet.Range('B1').ColumnWidth = 11
-	$book.Activesheet.Range('C1').ColumnWidth = 3.5
-	$book.Activesheet.Range('D1').ColumnWidth = 9
-	$book.Activesheet.Range('E1').ColumnWidth = 3.5
-	$book.Activesheet.Range('F1').ColumnWidth = 9
-	$book.Activesheet.Range('G1').ColumnWidth = 3.5
-	$book.Activesheet.Range('H1').ColumnWidth = 3.5
-	$book.Activesheet.Range('A1:A20').RowHeight = 13
+	$book.Activesheet.Range('A').ColumnWidth = 20
+	$book.Activesheet.Range('B').ColumnWidth = 11
+	$book.Activesheet.Range('C').ColumnWidth = 3.5
+	$book.Activesheet.Range('D').ColumnWidth = 9
+	$book.Activesheet.Range('E').ColumnWidth = 3.5
+	$book.Activesheet.Range('F').ColumnWidth = 9
+	$book.Activesheet.Range('G').ColumnWidth = 3.5
+	$book.Activesheet.Range('H').ColumnWidth = 3.5
+	$book.Activesheet.Range('1:20').RowHeight = 13
 	; aorta
 	_Excel_RangeWrite($book, $book.Activesheet, 'Aorta', 'A1')
 	$book.Activesheet.Range('A1').Font.Bold = True
