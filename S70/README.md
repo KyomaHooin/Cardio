@@ -12,7 +12,6 @@ MEDICUS SETUP
 FILE
 <pre>
 S70.au3 - Main CLI source code.
-
 S70.png - Setup GUI screen.
 S70.ico - Program icon.
 </pre>
