@@ -51,9 +51,16 @@ global $varlist[] = [ _
 'E/Em', 'MR Vmax', 'MR Vmean', 'MR maxPG', 'MR meanPG', 'MR VTI', 'AV Vmax', 'AV Vmean', 'AV Env\.Ti', 'AV VTI', _
 'MR Vmax', 'MR VTI', 'MR ERO', 'MR RV' _
 ]
+
 global $buffer = ObjCreate('Scripting.Dictionary')
 $buffer.CompareMode = 0
 $buffer.RemoveAll
+
+global $note_list[] = [AONOTE, LKNOTE, LSNOTE, PKNOTE, PSNOTE, AOCHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
+global $note_buffer = ObjCreate('Scripting.Dictionary')
+$note_buffer.CompareMode = 0
+$note_buffer.RemoveAll
+
 global $excel, $book
 global $dekurz = @ScriptDir & '\' & 'rc.txt'
 
