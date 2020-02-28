@@ -36,8 +36,7 @@
 $version = '1.4'
 $logfile = @ScriptDir & '\' & 'S70.log'
 $archive_path = @ScriptDir & '\' & 'archive'
-$export_path = @ScriptDir & '\' & 'export'
-;$export_path = 'c:\ECHOREPORTY'
+$export_path = 'c:\ECHOREPORTY'
 $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN : @SEC
 
 global $varlist[] = [ _
@@ -57,6 +56,7 @@ $buffer.CompareMode = 0
 $buffer.RemoveAll
 
 global $note_list[] = [AONOTE, LKNOTE, LSNOTE, PKNOTE, PSNOTE, AOCHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
+
 global $note_buffer = ObjCreate('Scripting.Dictionary')
 $note_buffer.CompareMode = 0
 $note_buffer.RemoveAll
@@ -237,18 +237,14 @@ GUICtrlSetBkColor($input_rc, 0xC0DCC0)
 GUICtrlSetBkColor($input_poj, 0xC0DCC0)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
 GUICtrlSetData($label_datetime, $current_date)
+GUICtrlSetData($input_pacient, $cmdline[3] & ' ' & $cmdline[2])
+GUICtrlSetData($input_rc, StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'))
+GUICtrlSetData($input_poj, $cmdline[4])
 
 ; MAIN
 
 ; logging
 logger('Begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
-
-; cmdline
-if UBound($cmdline) == 5 then
-	GUICtrlSetData($input_pacient, $cmdline[3] & ' ' & $cmdline[2])
-	GUICtrlSetData($input_rc, StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'))
-	GUICtrlSetData($input_poj, $cmdline[4])
-endif
 
 ; export / history
 $export_file = file_from_export($export_path, $cmdline[1])
@@ -265,7 +261,7 @@ elseif FileExists($archive_path & '\' & $cmdline[1] & '.dat') then
 	endif
 	if _DateDiff('h', $ftime, $current_date) < 24 then
 		if msgbox(4, 'S70 Echo ' & $version & ' - Historie', 'Načíst poslední záznam?') = 6 then
-			$raw = StringSplit(FileRead($archive_path & '\' & $cmdline[1] & '.dat'), '|', 2)
+			$raw = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
 			if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 			$list_to_dict = list_to_dict($raw, $buffer)
 		endif
