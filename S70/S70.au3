@@ -29,6 +29,7 @@
 #include <Excel.au3>
 #include <ExcelConstants.au3>
 #include <File.au3>
+;#include <Date.au3>
 
 ; VAR
 
@@ -36,7 +37,8 @@ $version = '1.4'
 $logfile = @ScriptDir & '\' & 'S70.log'
 $archive_path = @ScriptDir & '\' & 'archive'
 $export_path = @ScriptDir & '\' & 'export'
-$current_date = @MDAY & '.' & @MON & '.' & @YEAR & ' ' & @HOUR & ':' & @MIN
+;$export_path = 'c:\ECHOREPORTY'
+$current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN : @SEC
 
 global $varlist[] = [ _
 'RV Major', 'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'LA Diam', 'Ao Diam SVals', 'RVIDd', 'RA Minor', 'RA Major', _
@@ -53,7 +55,7 @@ global $buffer = ObjCreate('Scripting.Dictionary')
 $buffer.CompareMode = 0
 $buffer.RemoveAll
 global $excel, $book
-global $dekurz = @ScriptDir & '\' & 'dekurz.txt'
+global $dekurz = @ScriptDir & '\' & 'rc.txt'
 
 ; CONTROL
 
@@ -245,13 +247,21 @@ endif
 $export_file = file_from_export($export_path, $cmdline[1])
 if $export_file then
 	$exp = export_parse($export_path & '\' & $export_file, $buffer)
-	if @error then logger($export_file & ': ' & $exp)
+	if @error then logger($exp & ': ' & export_file)
 	;FileDelete($export_path & '\' & $export_file)
-elseif FileExists($archive_path & '\' & $cmdline[1] & '.dat') Then
-	if msgbox(4, 'S70 Echo ' & $version & ' - Historie', 'Načíst poslední záznam?') = 6 then
-		$raw = StringSplit(FileRead($archive_path & '\' & $cmdline[1] & '.dat'), '|', 2)
-		if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
-		$list_to_dict = list_to_dict($raw, $buffer)
+elseif FileExists($archive_path & '\' & $cmdline[1] & '.dat') then
+	$ctime = FileGetTime($archive_path & '\' & $cmdline[1] & '.dat')
+	if @error then
+		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
+	else
+		$ftime = $ctime[0] & '/' & $ctime[1] & '/' & $ctime[2] & ' ' & $ctime[3] & ':' & $ctime[4] & ':' & $ctime[5]
+	endif
+	if _DateDiff('h', $ftime, $current_date) < 24 then
+		if msgbox(4, 'S70 Echo ' & $version & ' - Historie', 'Načíst poslední záznam?') = 6 then
+			$raw = StringSplit(FileRead($archive_path & '\' & $cmdline[1] & '.dat'), '|', 2)
+			if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
+			$list_to_dict = list_to_dict($raw, $buffer)
+		endif
 	endif
 endif
 
@@ -361,22 +371,21 @@ func dekurz()
 	_ClipBoard_Close()
 	logger('Clipboard smazán. ' & @MIN & ':' & @SEC)
 	; excel
-	$excel = _Excel_Open(False, Default, False)
-	;$excel = _Excel_Open()
+	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
 	logger('Zapisuji XLS data. ' & @MIN & ':' & @SEC)
 	; styling
-	$book.Activesheet.Range('A').ColumnWidth = 20
-	$book.Activesheet.Range('B').ColumnWidth = 11
-	$book.Activesheet.Range('C').ColumnWidth = 3.5
-	$book.Activesheet.Range('D').ColumnWidth = 9
-	$book.Activesheet.Range('E').ColumnWidth = 3.5
-	$book.Activesheet.Range('F').ColumnWidth = 9
-	$book.Activesheet.Range('G').ColumnWidth = 3.5
-	$book.Activesheet.Range('H').ColumnWidth = 3.5
-	$book.Activesheet.Range('1:20').RowHeight = 13
+	$book.Activesheet.Range('A1').ColumnWidth = 20
+	$book.Activesheet.Range('B1').ColumnWidth = 11
+	$book.Activesheet.Range('C1').ColumnWidth = 3.5
+	$book.Activesheet.Range('D1').ColumnWidth = 9
+	$book.Activesheet.Range('E1').ColumnWidth = 3.5
+	$book.Activesheet.Range('F1').ColumnWidth = 9
+	$book.Activesheet.Range('G1').ColumnWidth = 3.5
+	$book.Activesheet.Range('H1').ColumnWidth = 3.5
+	$book.Activesheet.Range('A1:A21').RowHeight = 13
 	; aorta
 	_Excel_RangeWrite($book, $book.Activesheet, 'Aorta', 'A1')
 	$book.Activesheet.Range('A1').Font.Bold = True
@@ -566,17 +575,17 @@ func dekurz()
 		.Weight = 2
 	EndWith
 	; zaver
-	;_Excel_RangeWrite($book, $book.Activesheet, 'Závěr', 'A21')
-	;$book.Activesheet.Range('A21').Font.Bold = True
-	;$book.Activesheet.Range('B21:H21').MergeCells = True
-	;_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'B21')
-	;With $book.Activesheet.Range('A21:H21').Borders(9)
-	;	.LineStyle = 1
-	;	.Weight = 2
-	;EndWith
+	_Excel_RangeWrite($book, $book.Activesheet, 'Závěr', 'A21')
+	$book.Activesheet.Range('A21').Font.Bold = True
+	$book.Activesheet.Range('B21:H21').MergeCells = True
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'B21')
+	With $book.Activesheet.Range('A21:H21').Borders(9)
+		.LineStyle = 1
+		.Weight = 2
+	EndWith
 	logger('Zápis XLS dat dokončen. ' & @MIN & ':' & @SEC)
 	; clip
-	$range = $book.ActiveSheet.Range('A1:H20')
+	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 	logger('Clipboard dokončen. ' & @MIN & ':' & @SEC)
@@ -588,48 +597,45 @@ EndFunc
 func dekurz_print($rc, $name, $date)
 	$f = FileOpen($dekurz, 256 + 2); UTF no BOM overwrite
 	if @error then return SetError(1, 0, 'Nemuzu otevrit dekurz.txt.')
-	FileWriteLine($f, '                                                Kardiologie - Na Poříčí 23 Praha 4')
+	FileWriteLine($f, '                                             Kardiologie - Na Poříčí 23 Praha 4')
 	FileWriteLine($f, 'Echokardiografické vyšetření')
-	FileWriteLine($f, '----------------------------')
+	FileWriteLine($f, '____________________________')
 	FileWriteLine($f, '')
 	FileWriteLine($f, '      Jméno: ' & $name)
 	FileWriteLine($f, 'Rodné číslo: ' & StringRegExpReplace($rc, '(^\d{6})(.*)', '$1\/$2'))
 	FileWriteLine($f, '')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Aorta                Koren Auroty: ' & GUICtrlRead($input_ao_root) & ' mm            Index: ' & GUICtrlRead($input_ao_index) & ' mm/m2')
 	FileWriteLine($f, '')
 	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_ao_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Levá komora                 LVEDD: ' & GUICtrlRead($input_lk_lvedd) & ' mm           LVEDDi: ' & GUICtrlRead($input_lk_lveddi) & ' mm/m2')
 	FileWriteLine($f, '                            LVESD: ' & GUICtrlRead($input_lk_lvesd) & ' mm              IVS: ' & GUICtrlRead($input_lk_ivs) & ' mm')
 	FileWriteLine($f, '                             LVEF: ' & GUICtrlRead($input_lk_lvef) & ', odhadem  Inferolat: ' & GUICtrlRead($input_lk_inferolat))
 	FileWriteLine($f, '')
 	FileWriteLine($f, '                            Popis:  '& GUICtrlRead($input_lk_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Levá síň                  LA-PLAX: ' & GUICtrlRead($input_ls_laplax) & ' mm      LAV: ' & GUICtrlRead($input_ls_lav) & ' ml       LAV-i: ' & GUICtrlRead($input_ls_lavi) & ' ml/m2')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
 	FileWriteLine($f, 'Pravá komora           RVEDD-PLAX: ' & GUICtrlRead($input_pk_rveddplax) & ' mm    TAPSE: ' & GUICtrlRead($input_pk_tapse) & ' mm        RVD1: ' & GUICtrlRead($input_pk_rvd1) & ' mm')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
 	FileWriteLine($f, 'Pravá síň                  RA-A4C: ' & GUICtrlRead($input_ps_raa4c) & ' mm')
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
 	FileWriteLine($f, 'Aortální chlopeň            Popis: ' & GUICtrlRead($input_ach_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, "Mitrálni chlopeň               E': " & GUICtrlRead($input_mch_es) & " cm/s             DT: " & GUICtrlRead($input_mch_dt) & " ms")
 	FileWriteLine($f, "                             E/E': " & GUICtrlRead($input_mch_ee) & "                   A: " & GUICtrlRead($input_mch_a) & " m/s")
 	FileWriteLine($f, '                                E: ' & GUICtrlRead($input_mch_e) & ' m/s             E/A: ' & GUICtrlRead($input_mch_ea))
 	FileWriteLine($f, '')
 	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_mch_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Trikuspidální chlopeň   PGmax-reg: ' & GUICtrlRead($input_tch_pg) & ' mmHg           DDŽ: ' & GUICtrlRead($input_tch_ddz) & ' mm')
 	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_tch_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Pulmonární chlopeň          V max: ' & GUICtrlRead($input_pch_vmax) & ' m/s')
 	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_pch_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Perikard                    Popis: ' & GUICtrlRead($input_perikard_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Jiné                        Popis: ' & GUICtrlRead($input_other_note))
-	FileWriteLine($f, '----------------------------------------------------------------------------------')
+	FileWriteLine($f, '_______________________________________________________________________________')
 	FileWriteLine($f, 'Závěr:')
 	FileWriteLine($f, '               ' & GUICtrlRead($edit_dekurz))
 	FileWriteLine($f, '')
