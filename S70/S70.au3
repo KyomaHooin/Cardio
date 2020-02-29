@@ -306,9 +306,15 @@ GUISetState(@SW_SHOW)
 While 1
 	$msg = GUIGetMsg()
 	if $msg = $button_dekurz then
+		GUICtrlSetState($button_dekurz, $GUI_DISABLE)
+		GUICtrlSetState($button_tisk, $GUI_DISABLE)
+		GUICtrlSetState($button_konec, $GUI_DISABLE)
 		$dek = dekurz()
 		if @error then logger($dek)
-	EndIf
+		GUICtrlSetState($button_dekurz, $GUI_ENABLE)
+		GUICtrlSetState($button_tisk, $GUI_ENABLE)
+		GUICtrlSetState($button_konec, $GUI_ENABLE)
+	endif
 	if $msg = $button_tisk Then
 		$prn = dekurz_print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
 		if @error then logger($prn)
@@ -399,9 +405,6 @@ func export_parse($file, $buffer)
 endfunc
 
 func dekurz()
-	GUICtrlSetState($button_dekurz, $GUI_DISABLE)
-	GUICtrlSetState($button_tisk, $GUI_DISABLE)
-	GUICtrlSetState($button_konec, $GUI_DISABLE)
 	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
@@ -412,7 +415,6 @@ func dekurz()
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
-	logger('Zapisuji XLS data: ' & @MIN & ':' & @SEC)
 	; styling
 	$book.Activesheet.Range('A1').ColumnWidth = 20
 	$book.Activesheet.Range('B1').ColumnWidth = 11
@@ -620,15 +622,11 @@ func dekurz()
 		.LineStyle = 1
 		.Weight = 2
 	EndWith
-	logger('Zápis XLS dat dokončen: ' & @MIN & ':' & @SEC)
 	; clip
 	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-	logger('Clipboard dokončen: ' & @MIN & ':' & @SEC)
-	GUICtrlSetState($button_dekurz, $GUI_ENABLE)
-	GUICtrlSetState($button_tisk, $GUI_ENABLE)
-	GUICtrlSetState($button_konec, $GUI_ENABLE)
+	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
 func dekurz_print($rc, $name, $date)
