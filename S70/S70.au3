@@ -29,7 +29,7 @@
 #include <Excel.au3>
 #include <ExcelConstants.au3>
 #include <File.au3>
-;#include <Date.au3>
+#include <Date.au3>
 
 ; VAR
 
@@ -298,7 +298,6 @@ if $buffer_note.Exists('TCHNOTE') then GUICtrlSetData($input_tch_note, $buffer_n
 if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_note.Item('PCHNOTE'))
 if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
 if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
-
 
 ; display GUI
 
