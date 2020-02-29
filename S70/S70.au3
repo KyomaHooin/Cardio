@@ -271,12 +271,15 @@ elseif FileExists($archive_file) then
 		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
 	else
 		$file_time = $ctime[0] & '/' & $ctime[1] & '/' & $ctime[2] & ' ' & $ctime[3] & ':' & $ctime[4] & ':' & $ctime[5]
-	endif
-	if _DateDiff('h', $file_time, $current_date) < $HISTORY then
-		if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední záznam?') = 6 then
-			$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-			if @error then logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
-			list_to_dict($raw_data, $buffer)
+		if _DateDiff('h', $file_time, $current_date) < $HISTORY then
+			if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
+				$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
+				if @error then
+					logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
+				else
+					list_to_dict($raw_data, $buffer)
+				endif
+			endif
 		endif
 	endif
 endif
@@ -316,25 +319,16 @@ While 1
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
 		; update data
-		if $buffer.Exists('IVSd') then $buffer.Remove('IVSd')
-		$buffer.Add('IVSd', GUICtrlRead($input_lk_ivs))
+		$buffer.Item('IVSd') = GUICtrlRead($input_lk_ivs)
 		; update note
-		if $buffer_note.Exists('AONOTE') then $buffer_note.Remove('AONOTE')
-		$buffer_note.Add('AONOTE', StringReplace(GUICtrlRead($input_ao_note), '|', ''))
-		if $buffer_note.Exists('LKNOTE') then $buffer_note.Remove('LKNOTE')
-		$buffer_note.Add('LKNOTE', StringReplace(GUICtrlRead($input_lk_note), '|', ''))
-		if $buffer_note.Exists('ACHNOTE') then $buffer_note.Remove('ACHNOTE')
-		$buffer_note.Add('ACHNOTE', StringReplace(GUICtrlRead($input_ach_note), '|', ''))
-		if $buffer_note.Exists('MCHNOTE') then $buffer_note.Remove('MCHNOTE')
-		$buffer_note.Add('MCHNOTE', StringReplace(GUICtrlRead($input_mch_note), '|', ''))
-		if $buffer_note.Exists('TCHNOTE') then $buffer_note.Remove('TCHNOTE')
-		$buffer_note.Add('TCHNOTE', StringReplace(GUICtrlRead($input_tch_note), '|', ''))
-		if $buffer_note.Exists('PCHNOTE') then $buffer_note.Remove('PCHNOTE')
-		$buffer_note.Add('PCHNOTE', StringReplace(GUICtrlRead($input_pch_note), '|', ''))
-		if $buffer_note.Exists('PNOTE') then $buffer_note.Remove('PNOTE')
-		$buffer_note.Add('PNOTE', StringReplace(GUICtrlRead($input_perikard_note), '|', ''))
-		if $buffer_note.Exists('ONOTE') then $buffer_note.Remove('ONOTE')
-		$buffer_note.Add('ONOTE', StringReplace(GUICtrlRead($input_other_note), '|', ''))
+		$buffer_note.Item('AONOTE') = StringReplace(GUICtrlRead($input_ao_note), '|', '')
+		$buffer_note.Item('LKNOTE') = StringReplace(GUICtrlRead($input_lk_note), '|', '')
+		$buffer_note.Item('ACHNOTE') = StringReplace(GUICtrlRead($input_ach_note), '|', '')
+		$buffer_note.Item('MCHNOTE') = StringReplace(GUICtrlRead($input_mch_note), '|', '')
+		$buffer_note.Item('TCHNOTE') = StringReplace(GUICtrlRead($input_tch_note), '|', '')
+		$buffer_note.Item('PCHNOTE') = StringReplace(GUICtrlRead($input_pch_note), '|', '')
+		$buffer_note.Item('PNOTE') = StringReplace(GUICtrlRead($input_perikard_note), '|', '')
+		$buffer_note.Item('ONOTE') = StringReplace(GUICtrlRead($input_other_note), '|', '')
 		; update archive
 		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2 + 256); UTF8 / BOM
 		$write_data = dict_to_file($f, $buffer)
