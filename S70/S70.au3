@@ -33,13 +33,17 @@
 
 ; VAR
 
-$version = '1.4'
+$VERSION = '1.4'
+$HISTORY = 24
+
+$export_path = 'c:\ECHOREPORTY'
 $logfile = @ScriptDir & '\' & 'S70.log'
 $archive_path = @ScriptDir & '\' & 'archive'
-$export_path = 'c:\ECHOREPORTY'
+$dekurz = @ScriptDir & '\' & 'dekurz.txt'
 $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN : @SEC
 
-global $varlist[] = [ _
+$note_list[] = [AONOTE, LKNOTE, ACHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
+$varlist[] = [ _
 'RV Major', 'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'LA Diam', 'Ao Diam SVals', 'RVIDd', 'RA Minor', 'RA Major', _
 'LA Minor', 'LA Major', 'LAAd A4C', 'LALd A4C', 'LAEDV A-L A4C', 'LAEDV MOD A4C', 'MR Rad' , 'MR Als.Vel', _
 'MR Flow', _
@@ -51,18 +55,15 @@ global $varlist[] = [ _
 'MR Vmax', 'MR VTI', 'MR ERO', 'MR RV' _
 ]
 
-global $buffer = ObjCreate('Scripting.Dictionary')
+global $excel, $book
+
+$buffer = ObjCreate('Scripting.Dictionary')
 $buffer.CompareMode = 0
 $buffer.RemoveAll
 
-global $note_list[] = [AONOTE, LKNOTE, LSNOTE, PKNOTE, PSNOTE, AOCHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
-
-global $note_buffer = ObjCreate('Scripting.Dictionary')
-$note_buffer.CompareMode = 0
-$note_buffer.RemoveAll
-
-global $excel, $book
-global $dekurz = @ScriptDir & '\' & 'rc.txt'
+$buffer_note = ObjCreate('Scripting.Dictionary')
+$buffer_note.CompareMode = 0
+$buffer_note.RemoveAll
 
 ; CONTROL
 
@@ -71,24 +72,24 @@ DirCreate($archive_path)
 DirCreate($export_path)
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'S70 Echo v' & $version, 'Program byl již spuštěn.')
+	MsgBox(48, 'S70 Echo v' & $VERSION, 'Program byl již spuštěn.')
 	exit
 endif
 ; logging
 $log = FileOpen($logfile, 1)
 if @error then
-	MsgBox(48, 'S70 Echo v' & $version, 'System je připojen pouze pro čtení.')
+	MsgBox(48, 'S70 Echo v' & $VERSION, 'System je připojen pouze pro čtení.')
 	exit
 endif
 ; cmdline
 if UBound($cmdline) <> 5 then
-	MsgBox(48, 'S70 Echo v' & $version, 'Načtení kompletních dat Medicus selhalo.')
+	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení kompletních dat Medicus selhalo.')
 	exit
 endif
 
 ; GUI
 
-$gui = GUICreate("S70 Echo " & $version, 626, 880, 900, 11)
+$gui = GUICreate("S70 Echo " & $VERSION, 626, 880, 900, 11)
 ; header
 $label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
 $input_pacient = GUICtrlCreateInput('', 106, 6, 121, 21, 1)
@@ -246,32 +247,55 @@ GUICtrlSetData($input_poj, $cmdline[4])
 ; logging
 logger('Begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
-; export / history
+; history / export
+
+$archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
 $export_file = file_from_export($export_path, $cmdline[1])
+
+if FileExists($archive_file) then
+	$raw_note = StringSplit(FileReadLine($archive_file, 2), '|', 2)
+	if @error then
+		logger('Nepodařilo se načíst historii popisu: ' & $cmdline[1] & '.dat')
+	else
+		list_to_dict($raw_note, $buffer_note)
+	endif
+endif
+
 if $export_file then
-	$exp = export_parse($export_path & '\' & $export_file, $buffer)
-	if @error then logger($exp & ': ' & export_file)
+	$export = export_parse($export_path & '\' & $export_file, $buffer)
+	if @error then logger($export & ': ' & export_file)
 	;FileDelete($export_path & '\' & $export_file)
-elseif FileExists($archive_path & '\' & $cmdline[1] & '.dat') then
-	$ctime = FileGetTime($archive_path & '\' & $cmdline[1] & '.dat')
+elseif FileExists($archive_file) then
+	$archive_time = FileGetTime($archive_file)
 	if @error then
 		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
 	else
-		$ftime = $ctime[0] & '/' & $ctime[1] & '/' & $ctime[2] & ' ' & $ctime[3] & ':' & $ctime[4] & ':' & $ctime[5]
+		$file_time = $ctime[0] & '/' & $ctime[1] & '/' & $ctime[2] & ' ' & $ctime[3] & ':' & $ctime[4] & ':' & $ctime[5]
 	endif
-	if _DateDiff('h', $ftime, $current_date) < 24 then
-		if msgbox(4, 'S70 Echo ' & $version & ' - Historie', 'Načíst poslední záznam?') = 6 then
-			$raw = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-			if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
-			$list_to_dict = list_to_dict($raw, $buffer)
+	if _DateDiff('h', $file_time, $current_date) < $HISTORY then
+		if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední záznam?') = 6 then
+			$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
+			if @error then logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
+			list_to_dict($raw_data, $buffer)
 		endif
 	endif
 endif
 
-; Fill GUI & Default
+; Fill GUI & default
 
 if $buffer.Exists('IVSd') then GUICtrlSetData($input_lk_ivs, $buffer.Item('IVSd'))
-GUICtrlSetData($edit_dekurz, 'Levá komora nedilatovaná, není hypertrofická, s normální celkovou systolickou funkcí (EFLK odhad >65%), bez  hrubší regionální poruchy kinetiky, diastolická funkce v normě,levá síň nedilatovaná, mitrální chlopeň jemná, stopová  mitrální regurgitace, aortální chlopeň trojcípá, jemná, bez vady, norm. vel. ascend. aorty, pravá komora nedilatovaná, s normální systolickou funkcí, pravá síň nedilatovaná, stopová pulmonální  a  trikuspidální regurgitace, odhadovaný systolický tlak v plicnici nezvýšen, VCI nedilatovaná, kolabuje nad 50% s respirací, perikard bez patologické separace.'& @CRLF & @CRLF & 'Závěr:  Dobrá syst. i diast. fce obou nedil. komor, ost. srd. oddíly nedilat, chlopenní aparát bez významnější valvulopatie, tenze v plicnici nezvýšena.')
+
+;if $buffer.Exists('EXTRA') then $buffer_note.Item('AONOTE') = $buffer_note.Item('AONOTE') & '## Extra: ' & $buffer.Item('EXTRA') & ' mm ##'
+
+if $buffer_note.Exists('AONOTE') then GUICtrlSetData($input_ao_note, $buffer_note.Item('AONOTE'))
+if $buffer_note.Exists('LKNOTE') then GUICtrlSetData($input_lk_note, $buffer_note.Item('LKNOTE'))
+if $buffer_note.Exists('ACHNOTE') then GUICtrlSetData($input_ach_note, $buffer_note.Item('ACHNOTE'))
+if $buffer_note.Exists('MCHNOTE') then GUICtrlSetData($input_mch_note, $buffer_note.Item('MCHNOTE'))
+if $buffer_note.Exists('TCHNOTE') then GUICtrlSetData($input_tch_note, $buffer_note.Item('TCHNOTE'))
+if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_note.Item('PCHNOTE'))
+if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
+if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
+
 
 ; display GUI
 
@@ -291,14 +315,32 @@ While 1
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
-		;update data
-		if GUICtrlRead($input_lk_ivs) then
-			if $buffer.Exists('IVSd') then $buffer.Remove('IVSd')
-			$buffer.Add('IVSd', GUICtrlRead($input_lk_ivs))
-		endif
-		;update archive
-		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2)
-		dict_to_file($f, $buffer)
+		; update data
+		if $buffer.Exists('IVSd') then $buffer.Remove('IVSd')
+		$buffer.Add('IVSd', GUICtrlRead($input_lk_ivs))
+		; update note
+		if $buffer_note.Exists('AONOTE') then $buffer_note.Remove('AONOTE')
+		$buffer_note.Add('AONOTE', StringReplace(GUICtrlRead($input_ao_note), '|', ''))
+		if $buffer_note.Exists('LKNOTE') then $buffer_note.Remove('LKNOTE')
+		$buffer_note.Add('LKNOTE', StringReplace(GUICtrlRead($input_lk_note), '|', ''))
+		if $buffer_note.Exists('ACHNOTE') then $buffer_note.Remove('ACHNOTE')
+		$buffer_note.Add('ACHNOTE', StringReplace(GUICtrlRead($input_ach_note), '|', ''))
+		if $buffer_note.Exists('MCHNOTE') then $buffer_note.Remove('MCHNOTE')
+		$buffer_note.Add('MCHNOTE', StringReplace(GUICtrlRead($input_mch_note), '|', ''))
+		if $buffer_note.Exists('TCHNOTE') then $buffer_note.Remove('TCHNOTE')
+		$buffer_note.Add('TCHNOTE', StringReplace(GUICtrlRead($input_tch_note), '|', ''))
+		if $buffer_note.Exists('PCHNOTE') then $buffer_note.Remove('PCHNOTE')
+		$buffer_note.Add('PCHNOTE', StringReplace(GUICtrlRead($input_pch_note), '|', ''))
+		if $buffer_note.Exists('PNOTE') then $buffer_note.Remove('PNOTE')
+		$buffer_note.Add('PNOTE', StringReplace(GUICtrlRead($input_perikard_note), '|', ''))
+		if $buffer_note.Exists('ONOTE') then $buffer_note.Remove('ONOTE')
+		$buffer_note.Add('ONOTE', StringReplace(GUICtrlRead($input_other_note), '|', ''))
+		; update archive
+		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2 + 256); UTF8 / BOM
+		$write_data = dict_to_file($f, $buffer)
+		if @error then logger($write_data & ': ' & $cmdline[1] & '.dat')
+		$write_note = dict_to_file($f, $buffer_note)
+		if @error then logger($write_note & ': ' & $cmdline[1] & '.dat')
 		FileClose($f)
 		exitloop
 	endif
@@ -319,7 +361,7 @@ endfunc
 
 func file_from_export($path, $id)
 	local $list = _FileListToArray($path, '*.txt')
-	if not @error then; _ArraySearch()
+	if not @error then; _ArraySearch()?
 		for $i = 1 to ubound($list) - 1
 			if StringRegExp($list[$i], '^' & $id & '_.*') then return $list[$i]
 		next
@@ -367,18 +409,17 @@ func dekurz()
 	GUICtrlSetState($button_dekurz, $GUI_DISABLE)
 	GUICtrlSetState($button_tisk, $GUI_DISABLE)
 	GUICtrlSetState($button_konec, $GUI_DISABLE)
-	logger('Dekurz. ' & @MIN & ':' & @SEC)
+	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
-	logger('Clipboard smazán. ' & @MIN & ':' & @SEC)
 	; excel
 	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
-	logger('Zapisuji XLS data. ' & @MIN & ':' & @SEC)
+	logger('Zapisuji XLS data: ' & @MIN & ':' & @SEC)
 	; styling
 	$book.Activesheet.Range('A1').ColumnWidth = 20
 	$book.Activesheet.Range('B1').ColumnWidth = 11
@@ -586,12 +627,12 @@ func dekurz()
 		.LineStyle = 1
 		.Weight = 2
 	EndWith
-	logger('Zápis XLS dat dokončen. ' & @MIN & ':' & @SEC)
+	logger('Zápis XLS dat dokončen: ' & @MIN & ':' & @SEC)
 	; clip
 	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-	logger('Clipboard dokončen. ' & @MIN & ':' & @SEC)
+	logger('Clipboard dokončen: ' & @MIN & ':' & @SEC)
 	GUICtrlSetState($button_dekurz, $GUI_ENABLE)
 	GUICtrlSetState($button_tisk, $GUI_ENABLE)
 	GUICtrlSetState($button_konec, $GUI_ENABLE)
