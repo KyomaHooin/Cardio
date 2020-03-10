@@ -1,0 +1,160 @@
+﻿
+
+Echokardiografie transthorakální   Kardiologie Praha 17-Repy s.r.o.
+
+GE Vivid S70, Matrix probe M5Sc
+
+----------
+
+Name testtest, 
+Patient Id testtest
+BSA 2.10 m²
+Height 180.0 cm
+Weight 90.0 kg
+Date 08/03/2020
+
+Obr. TTE
+
+Obr. TTE
+
+2-D parametry 
+
+
+
+RV Major	16	mm....PKplax..mm..pravá komora..1s1
+IVSd	9	mm............IVS.....mm..levá komora..3s1
+LVIDd	47	mm............LKd.....mm..levá komora..1s1
+                      výpočet LKd index..mm/m² =LKd/BSA..levá komora..1s2..(M do 30, Ž do 31)
+LVPWd	8	mm............ZS......mm..levá komora..4s1
+LVIDs	24	mm............LKs.....mm..levá komora..2s1
+LVOT Diam	23	mm....LVOT....mm..aortální chlopeň..x
+                    výpočet LKs index..mm/m² =LKs/BSA...levá komora..2s2
+                    výpočet EFLK % Teich. =(7/(2,4+LKd/10)*(LKd/10)^3-7/(2,4+LKs/10)*(LKs/10)^3)/(7/(2,4+LKd/10)*(LKd/10)^3)*100...levá komora..3s2 
+                    výpočet EFLK % odhad  (manuální vložení odhad. hodnoty)..levá komora..5s1
+                    výpočet hmotnost..g  =1,04*((LKd/10+IVS/10+ZS/10)^3-(LKd/10)^3)-13,6...g..levá komora..1s3
+                    výpočet index hmotnosti =hmotnost/(výška/100)^2,7...g/m2,7..levá komora..2s3..(M do 49, Ž do 47)                    
+                    výpočet index hmotnosti =hmotnost/BSA..g/m2..levá komora..3s3..(M do 125, Ž do 111g/m2)
+		    výpočet RWT= (2*ZS)/LKd..levá komora..7s2..levá komora..4s2..(norma do 0,42)
+                    výpočet FS..%..(LKd-LKs)/LKd*100..levá komora 4s3 (norma 28-44)
+EF Biplane..67%.....EFLK biplane...%....levá komora...ř1,
+SV MOD A4C...15ml  ...ne jen do výpočtu
+SV MOD A2C...20ml...ne jen do výpočtu 
+     výpočet SV biplane = (SV MOD A4C+SV MOD A2C)/2...ml...levá komora...ř2,
+LVEDV MOD BP   24.05ml...EDV...ml...levá komora...ř3....EDVi=EDV/BSA..ml/m2...ř4, 
+LVESV MOD BP   16.00ml...ESV...ml...levá komora...ř5....ESVi=EDV/BSA...ř6
+
+LA Diam	 34	mm............LAplax..mm..levá síň..1s1
+Ao Diam SVals	22	mm....AoBulb..mm..aorta..1s1
+Ao Diam         mm............AoAsc...mm..aorta..1s2
+LAAd A4C	11.8	cm²..ne
+LALd A4C	43	mm...ne
+LAEDV A-L A4C	27	ml(A)...výpočet "LAV-A4C" = (A+B)/2...ml..levá síň..2s1
+LAEDV MOD A4C	26	ml(B)...viz A
+LALd A2C	54	mm...ne
+LAAd A2C	17	cm²..ne
+LAEDV A-L A2C	45	ml(C)...výpočet = (("LAV-A4C")+(C+D)/2)/2=.."LAV-2D"..ml..levá síň..3s1
+LAEDV MOD A2C	42	ml(D)...viz C
+                                výpočet = "LAV-2D"/BSA..LAVi-2D..ml/m2..levá síň..3s2
+LA Minor        40      mm...LA šířka..mm..levá síň..1s2
+LA Major        55      mm...LA délka..mm..levá síň..1s3
+RA Minor        39      mm...RA šířka..mm..pravá síň..1s1
+RA Major        50      mm...RA délka..mm..pravá síň..1s2
+RAV.............60....ml....RAV...ml..pravá síň..2s1......................................(nutno dodělat definici v mašině)
+MR Rad	0.46	cm..*100=...PISA MR radius...mm..mitrální chlopeň..ř1
+MR Als.Vel	0.59	m/s...ne
+MR Flow	77.53	ml/s..ne
+AR Rad	0.47	cm..*100...PISA AR radius..mm..aortální chlopeň..ř1
+AR Als.Vel	0.59	m/s..ne
+AR Flow	81.70	ml/s..ne
+RVIDd  30.........RVD1..mm..pravá komora..1s2
+------------------------------------doplnit S-RV..cm/s...pravá komora 2s1
+------------------------------------doplnit EDA, ESA, FAC%....pravá komora ř1,2,3
+
+2-D kalkulace 
+
+LVIDd Index	2.26	cm/m²..ne
+EDV(Teich)	104	ml..ne
+EDV(Cube)	106	ml..ne
+LVd Mass	151	g..ne
+LVd Mass Index	72	g/m²..ne
+LVd Mass (ASE)	133	g..ne
+LVd Mass Ind (ASE)	63	g/m²..ne
+LVIDs Index	1.1	cm/m²..ne
+ESV(Teich)	19	ml..ne
+EF(Teich)	81	%..ne
+ESV(Cube)	13.2	ml..ne
+EF(Cube)	87.6	%..ne
+%FS	50	%..ne
+SV(Teich)	85	ml..ne
+SI(Teich)	40	ml/m²..ne
+SV(Cube)	93.3	ml..ne
+SI(Cube)	44.4	ml/m²..ne
+LAVi	12.9	ml/m².............LAVi...ml/m²...levá síň...2s2
+RAVi    15.6    ml/m².............RAVi...ml/m²...pravá síň...2s2.............(nutno dodělat definici v mašině) 
+
+-------------------------------------------------------------------------------------------------------
+
+Doppler+Mmode 
+
+IVC Diam Exp....mm...DDŽexp...ostatní 1s1
+IVC diam Ins....mm...DDŽinsp...ostatní 1s2
+PV Vmax.....Vmax-pulm. cm/s...pulmonální chlopeň...1s1
+PVAcc T......ACT...ms...pulmonální chlopeň...2s1
+PV maxPG.....Pulm-PGmax/mean...torr...pulmonální chlopeň..3s1
+PV meanPG......pro dvojhodnotu
+PRend PG.......PGenddiast-reg....torr...pulmonální chlopeň..ř1
+PR maxPG.....Pulm-PGregMax/mean...torr...pulmonální chlopeň..ř2/3
+PR meanPG 
+Ao Diam	24	mm....AOascMM...mm..aorta..1s3
+TAPSE	18	mm....TAPSE...mm..pravá komora..1s3 
+MV E Vel	42	cm/s...E...cm/s..mitrální chlopeň..1s1
+MV A Vel	55	cm/s...A...cm/s...mitrální chlopeň..1s2
+MV E/A Ratio	0.8     .......E/A...mitrální chlopeň..2s1
+MV DecT	249	ms.............DecT..ms..mitrální chlopeň 1s3
+MV1 PHT	72.1	ms.............MV-PHT..ms..mitrální chlopeň 3s2
+MV maxPG	23.10	mmHg...MV maxPG...torr...mitrální chlopeň..4s1, 
+MV meanPG	14.61	mmHg...MV meanPG...torr...mitrální chlopeň..4s2,
+              pokud existuje MV meanPG pak výpočet..."MV-PHT"=220/"MV-PHT"..cm2...mitrální chlopeň..4s3,
+
+EmSept	5	cm/s...........EmSept...mitrální chlopeň...2s2
+EmLat	5	cm/s...........EmLat...mitrální chlopeň...2s3
+EmAver	4.9	cm/s..ne
+E/Em z mašiny ne......pokud existuje Em pak výpočet E/Em =(2*E/(EmLat+EmSept)...mitrální chlopeň...3s1 
+
+PV Vmax	1.40	m/s     Ao Vmax...m/s...aortální chlopeň..1s1
+AAo Vmax	1.5	m/s..ne
+AAo maxPG	9	mmHg....ne
+AV Vmax	2.40	m/s     Ao Vmax...m/s...aortální chlopeň..1s1
+AV Vmean	1.82	m/s...ne
+AV maxPG	23.10	mmHg...Ao-PGmax...torr...aortální chlopeň...1s2
+AV meanPG	14.61	mmHg...Ao-PGmean...torr...aortální chlopeň...1s3
+AV Env.Ti	345.39	ms
+AV VTI	62.84	cm............Ao-VTI...torr...aortální chlopeň..2s1
+LVOT Vmax	0.37	m/s...ne
+LVOT Vmean	0.27	m/s...ne
+LVOT maxPG	0.56	mmHg...ne
+LVOT meanPG	0.33	mmHg...ne
+LVOT Env.Ti	205.52	ms
+LVOT VTI	5.63	cm....LVOT-VTI...torr...aortální chlopeň...2s2
+                 výpočet SV= "LVOT-VTI"*LVOT^2*3,14159/4/100...zapsat jako dvojhodnotu SV ml/SVi ml/m2...aortální chlopeň 2s3 (pozn SVi je SV/BSA)
+                 výpočet AVA= "LVOT-VTI"*LVOT^2*3,14159/4/G14/100...cm2...aortální chlopeň...3s1
+                 výpočet AVAi= AVA/BSA...cm2/m2...aortální chlopeň...3s2
+                 výpočet VTI LVOT/Ao= "VTI-LVOT"/"Ao-VTI"...aortální chlopeň...3s3
+HR	296.06	BPM...ne
+LVSV Dopp	24.18	ml...ne
+LVSI Dopp	11.51	ml/m²...ne
+LVCO Dopp	7.16	l/min....ne
+LVCI Dopp	3.41	l/minm²...ne
+AVA Vmax	0.67	cm²....ne
+AVA (VTI)	0.38	cm²....ne
+AVAI (VTI)	0.183	cm²/m²...ne
+AVAI Vmax	0.319	cm²/m²...ne
+MR Vmax	3.06	m/s...ne
+MR VTI	64.52	cm....MR-VTI..cm..mitrální chlopeň..ř2
+MR ERO	0.25	cm²...MR-ERO..cm2..mitrální chlopeň..ř3
+MR RV	16.34	ml....MR-RV...ml..mitrální chlopeň..ř4
+AR Vmax	2.77	m/s...ne
+AR VTI	71.95	cm....AR-VTI..cm..aortální chlopeň..ř2
+AR ERO	0.29	cm²...AR-ERO..cm2..aortální chlopeň..ř3
+AR RV	21.21	ml....AR-RV...ml..aortální chlopeň..ř4
+
