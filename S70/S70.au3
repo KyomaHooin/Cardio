@@ -44,15 +44,15 @@ $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN : @S
 
 $note_list[] = [AONOTE, LKNOTE, ACHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
 $varlist[] = [ _
-'RV Major', 'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'LA Diam', 'Ao Diam SVals', 'RVIDd', 'RA Minor', 'RA Major', _
-'LA Minor', 'LA Major', 'LAAd A4C', 'LALd A4C', 'LAEDV A-L A4C', 'LAEDV MOD A4C', 'MR Rad' , 'MR Als.Vel', _
-'MR Flow', _
-'LVIDd Index', 'EDV\(Teich\)', 'EDV\(Cube\)', 'LVd Mass', 'LVd Mass Index', 'LVd Mass \(ASE\)', 'LVd Mass Ind \(ASE\)', _
-'LVIDs Index', 'ESV\(Teich\)', 'EF\(Teich\)', 'ESV\(Cube\)', 'EF\(Cube\)', '%FS', 'SV\(Teich\)', 'SI\(Teich\)', 'SV\(Cube\)', _
-'SI\(Cube\)', 'LAVi', _
-'Ao Diam', 'TV maxPG', 'MV E Vel', 'MV A Vel', 'MV E/A Ratio', 'MV DecT', 'MV PHT', 'EmSept', 'EmLat', 'EmAver', _
-'E/Em', 'MR Vmax', 'MR Vmean', 'MR maxPG', 'MR meanPG', 'MR VTI', 'AV Vmax', 'AV Vmean', 'AV Env\.Ti', 'AV VTI', _
-'MR Vmax', 'MR VTI', 'MR ERO', 'MR RV' _
+'RV Major', 'RVIDd', 'S-RV', 'EDA', 'ESA', 'FAC%', 'TAPSE', _; pk
+'RA Minor', 'RA Major', 'RAV', 'RAVi', _; ps
+'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'EF Biplane', 'SV MOD A4C', 'SV MOD A2C', 'LVEDV MOD BP', 'LVESV MOD BP', _; lk
+'LA Diam', 'LAEDV A-L A4C', 'LAEDV MOD A4C', 'LAEDV A-L A2C', 'LAEDV MOD A2C', 'LA Minor', 'LA Major', 'LAVi', _; ls
+'Ao Diam SVals', 'Ao Diam', _; ao
+'LVOT Diam', 'AR Rad', 'PV Vmax', 'AV Vmax', 'AV maxPG', 'AV meanPG', 'AV VTI', 'LVOT VTI', 'AR VTI', 'AR ERO', 'AR RV', _; aoch
+'MR Rad', 'MV E Vel', 'MV A Vel', 'MV E/A Ratio', 'MV DecT','MV1 PHT', 'MV maxPG', 'MV meanPG', 'EmSept', 'EmLat', 'MR VTI', 'MR ERO', 'MR RV', _; mitch
+'PV Vmax', 'PVAcc T', 'PV maxPG', 'PV meanPG', 'PRend PG', 'PR maxPG', 'PR meanPG', _; pulmch
+'IVC Diam Exp', 'IVC diam Ins' _; other
 ]
 
 global $excel, $book
