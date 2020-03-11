@@ -1,0 +1,16 @@
+
+LVOT Diam -- aoch [x]?
+EFLK % Teich. jednotky?
+-----------------------------
+
+#PK
+PKplax(mm) ..  ..
+.. ..
+.. ..
+#LK
+LKd(mm) .. LKd index(mm/m2) .. IVS(mm)
+LKs(mm) .. LKs index(mm/m2) .. EFLK % Teich.(?)
+.. index hmotnosti(g/m2) .. hmotnost(g)
+ZS(mm) .. ..
+EFLK % odhad .. ..
+
