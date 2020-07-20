@@ -30,6 +30,7 @@
 #include <ExcelConstants.au3>
 #include <File.au3>
 #include <Date.au3>
+#include <print.au3>
 
 ; VAR
 
@@ -40,10 +41,10 @@ $export_path = 'c:\ECHOREPORTY'
 $logfile = @ScriptDir & '\' & 'S70.log'
 $archive_path = @ScriptDir & '\' & 'archive'
 $dekurz = @ScriptDir & '\' & 'dekurz.txt'
-$current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN : @SEC
+$current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
-$note_list[] = [AONOTE, LKNOTE, ACHNOTE, MCHNOTE, TCHNOTE, PCHNOTE PNOTE, ONOTE]
-$varlist[] = [ _
+global $note_list[8] = ['AONOTE', 'LKNOTE', 'ACHNOTE', 'MCHNOTE', 'TCHNOTE', 'PCHNOTE', 'PNOTE', 'ONOTE']
+global $varlist[100]=[ _
 'RV Major', 'RVIDd', 'S-RV', 'EDA', 'ESA', 'FAC%', 'TAPSE', _; pk
 'RA Minor', 'RA Major', 'RAV', 'RAVi', _; ps
 'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'EF Biplane', 'SV MOD A4C', 'SV MOD A2C', 'LVEDV MOD BP', 'LVESV MOD BP', _; lk
@@ -263,10 +264,10 @@ endif
 
 if $export_file then
 	$export = export_parse($export_path & '\' & $export_file, $buffer)
-	if @error then logger($export & ': ' & export_file)
+	if @error then logger($export & ': ' & $export_file)
 	;FileDelete($export_path & '\' & $export_file)
 elseif FileExists($archive_file) then
-	$archive_time = FileGetTime($archive_file)
+	$ctime = FileGetTime($archive_file)
 	if @error then
 		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
 	else
@@ -316,7 +317,7 @@ While 1
 		GUICtrlSetState($button_konec, $GUI_ENABLE)
 	endif
 	if $msg = $button_tisk Then
-		$prn = dekurz_print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
+		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
 		if @error then logger($prn)
 	endif
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
@@ -629,59 +630,43 @@ func dekurz()
 	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
-func dekurz_print($rc, $name, $date)
-	$f = FileOpen($dekurz, 256 + 2); UTF no BOM overwrite
-	if @error then return SetError(1, 0, 'Nemuzu otevrit dekurz.txt.')
-	FileWriteLine($f, '                                             Kardiologie - Na Poříčí 23 Praha 4')
-	FileWriteLine($f, 'Echokardiografické vyšetření')
-	FileWriteLine($f, '____________________________')
-	FileWriteLine($f, '')
-	FileWriteLine($f, '      Jméno: ' & $name)
-	FileWriteLine($f, 'Rodné číslo: ' & StringRegExpReplace($rc, '(^\d{6})(.*)', '$1\/$2'))
-	FileWriteLine($f, '')
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Aorta                Koren Auroty: ' & GUICtrlRead($input_ao_root) & ' mm            Index: ' & GUICtrlRead($input_ao_index) & ' mm/m2')
-	FileWriteLine($f, '')
-	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_ao_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Levá komora                 LVEDD: ' & GUICtrlRead($input_lk_lvedd) & ' mm           LVEDDi: ' & GUICtrlRead($input_lk_lveddi) & ' mm/m2')
-	FileWriteLine($f, '                            LVESD: ' & GUICtrlRead($input_lk_lvesd) & ' mm              IVS: ' & GUICtrlRead($input_lk_ivs) & ' mm')
-	FileWriteLine($f, '                             LVEF: ' & GUICtrlRead($input_lk_lvef) & ', odhadem  Inferolat: ' & GUICtrlRead($input_lk_inferolat))
-	FileWriteLine($f, '')
-	FileWriteLine($f, '                            Popis:  '& GUICtrlRead($input_lk_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Levá síň                  LA-PLAX: ' & GUICtrlRead($input_ls_laplax) & ' mm      LAV: ' & GUICtrlRead($input_ls_lav) & ' ml       LAV-i: ' & GUICtrlRead($input_ls_lavi) & ' ml/m2')
-	FileWriteLine($f, 'Pravá komora           RVEDD-PLAX: ' & GUICtrlRead($input_pk_rveddplax) & ' mm    TAPSE: ' & GUICtrlRead($input_pk_tapse) & ' mm        RVD1: ' & GUICtrlRead($input_pk_rvd1) & ' mm')
-	FileWriteLine($f, 'Pravá síň                  RA-A4C: ' & GUICtrlRead($input_ps_raa4c) & ' mm')
-	FileWriteLine($f, 'Aortální chlopeň            Popis: ' & GUICtrlRead($input_ach_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, "Mitrálni chlopeň               E': " & GUICtrlRead($input_mch_es) & " cm/s             DT: " & GUICtrlRead($input_mch_dt) & " ms")
-	FileWriteLine($f, "                             E/E': " & GUICtrlRead($input_mch_ee) & "                   A: " & GUICtrlRead($input_mch_a) & " m/s")
-	FileWriteLine($f, '                                E: ' & GUICtrlRead($input_mch_e) & ' m/s             E/A: ' & GUICtrlRead($input_mch_ea))
-	FileWriteLine($f, '')
-	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_mch_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Trikuspidální chlopeň   PGmax-reg: ' & GUICtrlRead($input_tch_pg) & ' mmHg           DDŽ: ' & GUICtrlRead($input_tch_ddz) & ' mm')
-	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_tch_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Pulmonární chlopeň          V max: ' & GUICtrlRead($input_pch_vmax) & ' m/s')
-	FileWriteLine($f, '                            Popis: ' & GUICtrlRead($input_pch_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Perikard                    Popis: ' & GUICtrlRead($input_perikard_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Jiné                        Popis: ' & GUICtrlRead($input_other_note))
-	FileWriteLine($f, '_______________________________________________________________________________')
-	FileWriteLine($f, 'Závěr:')
-	FileWriteLine($f, '               ' & GUICtrlRead($edit_dekurz))
-	FileWriteLine($f, '')
-	FileWriteLine($f, 'Datum:' & $date & '                                   Podpis:')
-	FileWriteLine($f, '')
-	FileWriteLine($f, '')
-	FileWriteLine($f, '')
-	FileWriteLine($f, '')
-	FileClose($f)
-	_FilePrint($dekurz)
-	if @error then return SetError(1, 0 , 'Tisk se nezdařil.')
-	;FileDelete($dekurz)
-EndFunc
+func print($id,$name,$date)
+	local $printer,$printer_error,$marginx,$marginy
+	;priner init
+	$printer = _PrintDllStart($printer_error)
+	if $printer = 0 then
+		logger('Priner error: ' & $printer_error & @CRLF)
+	endif
+	;_PrintPageOrientation($printer,0);landscape
 
+	_PrintSetDocTitle($printer,"S70 Dekurz - Patient ID: 123456")
+
+; printer write data
+	_PrintStartPrint($printer)
+
+	;_PrintGetpageheight($printer) - _PrintGetYOffset($printer)
+	;_PrintGetpageWidth($printer) - _PrintGetXOffset($printer)
+	;_PrintSetFont($printer,'Arial',18,0,'bold,underline')
+	;_PrintGetTextWidth($printer,$Title)
+	;_PrintGetTextHeight($printer,$title)
+	;_PrintSetLineWid($printer,2)
+	;_PrintSetLineCol($printer,0)
+	;_printsetfont($printer,'Times New Roman',12,0,'')
+	;_PrintGetTextHeight($printer,"Jan")
+	;_PrintText($printer,$n,$basex - _PrintGetTextWidth($printer,$n) - 20,$pght-$basey-$n*$ydiv-Int(_printGetTextHeight($printer,'10')/2))
+	;_PrintLIne($printer,$basex - 5,$pght - $basey - $n*$ydiv,$basex + 5,$pght - $basey - $n*$ydiv)
+	;_PrintSetLineCol($printer,0x0000ff)
+	;_PrintSetBrushCol($printer,0x55FF55)
+	;_PrintSetLineCol($printer,0)
+	;_PrintLine($printer,Int($pgwd/2),2*$th + 125,$Basex + 8*$xdiv ,$pght - $basey - Int($sales[8]*$ydiv/10))
+	;_Printsetlinecol($printer,0x0000ff)
+	;_PrintSetLineWid($printer,10)
+	;_PrintSetBrushCol($printer,0xbbccee)
+	;_PrintEllipse($printer,Int($pgwd/2) - 200,2*$th,Int($pgwd/2) + 200,2*$th + 250)
+	;_PrintImage($printer,"screenshot004.bmp",Int($pgwd/2) - 150,2*$th+260,300,350)
+
+	; print end data
+	_PrintEndPrint($printer)
+	_PrintNewPage($printer)
+	_printDllClose($printer)
+EndFunc

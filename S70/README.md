@@ -8,6 +8,11 @@ GE Vivid S70 Medicus 3 integration.
 MEDICUS SETUP
 
 ![Medicus](https://github.com/KyomaHooin/Cardio/raw/master/S70/Medicus.png "screenshot")
+<pre>
+Configuration > External PRogram > [+] > Command line:
+
+S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
+</pre>
 
 FILE
 <pre>
