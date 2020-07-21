@@ -9,16 +9,22 @@ MEDICUS SETUP
 
 ![Medicus](https://github.com/KyomaHooin/Cardio/raw/master/S70/Medicus.png "screenshot")
 <pre>
-Configuration > External PRogram > [+] > Command line:
+Configuration > External Program > [+] > Command line:
 
-S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
+../S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
 </pre>
 
 FILE
 <pre>
-S70.au3 - Main CLI source code.
-S70.png - Setup GUI screen.
-S70.ico - Program icon.
+    S70.au3 - Main GUI source code.
+    S70.ini - Program ini file.
+  print.au3 - Printing library by "martin".
+  print.dll - Printing DLL.
+    LICENSE - License & disclaimer.
+
+Medicus.png - Medicus 3 external app configuration screen.
+    S70.pnp - Program GUI screen.
+    S70.ico - Program icon.
 </pre>
 SOURCE
 
