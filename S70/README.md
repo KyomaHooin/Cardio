@@ -17,7 +17,7 @@ Configuration > External Program > [+] > Command line:
 FILE
 <pre>
     S70.au3 - Main GUI source code.
-    S70.ini - Program ini file.
+    S70.ini - Program configuration file.
   print.au3 - Printing library by "martin".
   print.dll - Printing DLL.
     LICENSE - License & disclaimer.

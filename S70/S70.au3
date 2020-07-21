@@ -42,12 +42,13 @@ $VERSION = '1.4'
 $HISTORY = 24; stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
+global $config_file = @ScriptDir & '\' & 'S70.ini'
 global $result_file = @ScriptDir & '\' & 'result.txt'; default result text
+global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
+;default path
 global $export_path = 'c:\ECHOREPORTY'
 global $archive_path = @ScriptDir & '\' & 'archive'
-
-global $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
 ;
 ; DATA
@@ -82,10 +83,6 @@ $buffer_note.RemoveAll
 ; INIT
 ;
 
-; create archive / export dir
-DirCreate($archive_path)
-DirCreate($export_path)
-
 ; check one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
 	MsgBox(48, 'S70 Echo v' & $VERSION, 'Program byl již spuštěn.')
@@ -109,11 +106,21 @@ endif
 ; MAIN
 ;
 
+global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+global $export_file = get_export_file($export_path, $cmdline[1])
+
 ; logging
 logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
-global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
-global $export_file = get_export_file($export_path, $cmdline[1])
+; update paths from conifguration
+if FileExists($config_file) then
+	read_config_file($config_file)
+	if @error then logger('Načtení konfiguračního souboru selhalo.')
+endif
+
+; create dirs
+DirCreate($archive_path)
+DirCreate($export_path)
 
 ; read note buffer from history
 if FileExists($archive_file) then
@@ -147,7 +154,7 @@ elseif FileExists($archive_file) then
 		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
 	else
 		$file_time = $c_time[0] & '/' & $c_time[1] & '/' & $c_time[2] & ' ' & $c_time[3] & ':' & $c_time[4] & ':' & $c_time[5]
-		if _DateDiff('h', $file_time, $current_date) < $HISTORY then
+		if _DateDiff('h', $file_time, $runtime) < $HISTORY then
 			if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
 				$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
 				if @error then
@@ -312,7 +319,7 @@ $label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
 $edit_dekurz = GUICtrlCreateEdit($result_text, 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 ; date
 $label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
-$label_datetime = GUICtrlCreateLabel($current_date, 51, 853, 100, 17)
+$label_datetime = GUICtrlCreateLabel($runtime, 51, 853, 100, 17)
 ; button
 $button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
 $button_dekurz = GUICtrlCreateButton('Dekurz', 463, 846, 75, 25)
@@ -342,7 +349,7 @@ While 1
 	endif
 	; print data
 	if $msg = $button_tisk Then
-		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
+		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $runtime)
 		if @error then logger($prn)
 	endif
 	; write & exit
@@ -437,6 +444,17 @@ func export_parse($file, $buffer)
 				$buffer.Add($varlist[$i], StringRegExpReplace($raw[$j], '.*\t(.*)\t.*', '$1'))
 			EndIf
 		next
+	next
+endfunc
+
+; read configuration file 
+func read_config_file($file)
+	local $cfg
+	_FileReadToArray($file, $cfg, 0, '='); no count; split by '='
+	if @error then return SetError(1)
+	for $i = 0 to UBound($cfg) - 1
+		if $cfg[$i][0] == 'export' then $export_path = $cfg[$i][1]
+		if $cfg[$i][0] == 'archiv' then $archive_path = $cfg[$i][1]
 	next
 endfunc
 
