@@ -1,7 +1,7 @@
 ; GE Vivid S70 - Medicus 3 integration
 ; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
 ;
-; Copyright (c) 2020  Kyoma Hooin
+; Copyright (c) 2020 Kyoma Hooin
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 ;#AutoIt3Wrapper_UseX64=y
 #NoTrayIcon
 
+;
 ; INCLUDE
+;
 
 #include <GUIConstantsEx.au3>
 #include <Clipboard.au3>
@@ -32,16 +34,21 @@
 #include <Date.au3>
 #include <print.au3>
 
+;
 ; VAR
+;
 
 $VERSION = '1.4'
 $HISTORY = 24
 
-$export_path = 'c:\ECHOREPORTY'
-$logfile = @ScriptDir & '\' & 'S70.log'
-$archive_path = @ScriptDir & '\' & 'archive'
-$dekurz = @ScriptDir & '\' & 'dekurz.txt'
-$current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
+global $export_path = 'c:\ECHOREPORTY'
+global $logfile = @ScriptDir & '\' & 'S70.log'
+global $archive_path = @ScriptDir & '\' & 'archive'
+global $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
+
+;
+; DATA
+;
 
 global $note_list[8] = ['AONOTE', 'LKNOTE', 'ACHNOTE', 'MCHNOTE', 'TCHNOTE', 'PCHNOTE', 'PNOTE', 'ONOTE']
 global $varlist[100]=[ _
@@ -66,29 +73,36 @@ $buffer_note = ObjCreate('Scripting.Dictionary')
 $buffer_note.CompareMode = 0
 $buffer_note.RemoveAll
 
+;
 ; CONTROL
+;
 
-; create archive
+; create archive / export dir
 DirCreate($archive_path)
 DirCreate($export_path)
-; one instance
+
+; check one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
 	MsgBox(48, 'S70 Echo v' & $VERSION, 'Program byl již spuštěn.')
 	exit
 endif
+
 ; logging
 $log = FileOpen($logfile, 1)
 if @error then
 	MsgBox(48, 'S70 Echo v' & $VERSION, 'System je připojen pouze pro čtení.')
 	exit
 endif
+
 ; cmdline
 if UBound($cmdline) <> 5 then
-	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení kompletních dat Medicus selhalo.')
+	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
 	exit
 endif
 
+;
 ; GUI
+;
 
 $gui = GUICreate("S70 Echo " & $VERSION, 626, 880, 900, 11)
 ; header
@@ -243,10 +257,12 @@ GUICtrlSetData($input_pacient, $cmdline[3] & ' ' & $cmdline[2])
 GUICtrlSetData($input_rc, StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'))
 GUICtrlSetData($input_poj, $cmdline[4])
 
+;
 ; MAIN
+;
 
 ; logging
-logger('Begin: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
 ; history / export
 
@@ -300,12 +316,13 @@ if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_n
 if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
 if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
 
-; display GUI
 
+; display gui
 GUISetState(@SW_SHOW)
 
 While 1
 	$msg = GUIGetMsg()
+	; generate dekurz clipboard
 	if $msg = $button_dekurz then
 		GUICtrlSetState($button_dekurz, $GUI_DISABLE)
 		GUICtrlSetState($button_tisk, $GUI_DISABLE)
@@ -316,16 +333,21 @@ While 1
 		GUICtrlSetState($button_tisk, $GUI_ENABLE)
 		GUICtrlSetState($button_konec, $GUI_ENABLE)
 	endif
+	; print data
 	if $msg = $button_tisk Then
 		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $current_date)
 		if @error then logger($prn)
 	endif
+	; write & exit
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
+
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
+
 		; update data
 		$buffer.Item('IVSd') = GUICtrlRead($input_lk_ivs)
+
 		; update note
 		$buffer_note.Item('AONOTE') = StringReplace(GUICtrlRead($input_ao_note), '|', '')
 		$buffer_note.Item('LKNOTE') = StringReplace(GUICtrlRead($input_lk_note), '|', '')
@@ -335,6 +357,7 @@ While 1
 		$buffer_note.Item('PCHNOTE') = StringReplace(GUICtrlRead($input_pch_note), '|', '')
 		$buffer_note.Item('PNOTE') = StringReplace(GUICtrlRead($input_perikard_note), '|', '')
 		$buffer_note.Item('ONOTE') = StringReplace(GUICtrlRead($input_other_note), '|', '')
+	
 		; update archive
 		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2 + 256); UTF8 / BOM
 		$write_data = dict_to_file($f, $buffer)
@@ -347,13 +370,15 @@ While 1
 wend
 
 ;exit
-logger('Exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('Program exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 logger('----')
 FileClose($log)
 
 exit
 
-; FUNC
+;
+; FUNCTION
+;
 
 func logger($text)
 	FileWriteLine($logfile, $text)
