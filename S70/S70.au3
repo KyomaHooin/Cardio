@@ -39,19 +39,22 @@
 ;
 
 $VERSION = '1.4'
-$HISTORY = 24
+$HISTORY = 24; stored data age in hours
+
+global $log_file = @ScriptDir & '\' & 'S70.log'
+global $result_file = @ScriptDir & '\' & 'result.txt'; default result text
 
 global $export_path = 'c:\ECHOREPORTY'
-global $logfile = @ScriptDir & '\' & 'S70.log'
 global $archive_path = @ScriptDir & '\' & 'archive'
+
 global $current_date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
 ;
 ; DATA
 ;
 
-global $note_list[8] = ['AONOTE', 'LKNOTE', 'ACHNOTE', 'MCHNOTE', 'TCHNOTE', 'PCHNOTE', 'PNOTE', 'ONOTE']
-global $varlist[100]=[ _
+global $note_list[] = ['AONOTE','LKNOTE','ACHNOTE','MCHNOTE','TCHNOTE','PCHNOTE','PNOTE','ONOTE']
+global $varlist[]=[ _
 'RV Major', 'RVIDd', 'S-RV', 'EDA', 'ESA', 'FAC%', 'TAPSE', _; pk
 'RA Minor', 'RA Major', 'RAV', 'RAVi', _; ps
 'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'EF Biplane', 'SV MOD A4C', 'SV MOD A2C', 'LVEDV MOD BP', 'LVESV MOD BP', _; lk
@@ -65,16 +68,18 @@ global $varlist[100]=[ _
 
 global $excel, $book
 
+; data dictionary buffer
 $buffer = ObjCreate('Scripting.Dictionary')
 $buffer.CompareMode = 0
 $buffer.RemoveAll
 
+; note dictionary buffer
 $buffer_note = ObjCreate('Scripting.Dictionary')
 $buffer_note.CompareMode = 0
 $buffer_note.RemoveAll
 
 ;
-; CONTROL
+; INIT
 ;
 
 ; create archive / export dir
@@ -88,7 +93,7 @@ if UBound(ProcessList(@ScriptName)) > 2 then
 endif
 
 ; logging
-$log = FileOpen($logfile, 1)
+$log = FileOpen($log_file, 1)
 if @error then
 	MsgBox(48, 'S70 Echo v' & $VERSION, 'System je připojen pouze pro čtení.')
 	exit
@@ -101,17 +106,84 @@ if UBound($cmdline) <> 5 then
 endif
 
 ;
+; MAIN
+;
+
+; logging
+logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+
+global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+global $export_file = get_export_file($export_path, $cmdline[1])
+
+; read note buffer from history
+if FileExists($archive_file) then
+	$raw_note = StringSplit(FileReadLine($archive_file, 2), '|', 2)
+	if @error then
+		logger('Nepodařilo se načíst historii popisů: ' & $cmdline[1] & '.dat')
+	else
+		list_to_dict($raw_note, $buffer_note)
+	endif
+endif
+
+; read default result
+if FileExists($result_file) then
+	$result_text = StringSplit(FileRead($dekurz_file)
+	if @error then
+		$result_text = ''
+		logger('Nepodařilo se načíst výchozí závěr: ' & $result_file)
+	endif
+endif
+
+; write export to buffer
+if $export_file then
+	$export = export_parse($export_path & '\' & $export_file, $buffer)
+	if @error then logger($export & ': ' & $export_file)
+	;FileDelete($export_path & '\' & $export_file)
+
+; update buffer from history
+elseif FileExists($archive_file) then
+	$c_time = FileGetTime($archive_file)
+	if @error then
+		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
+	else
+		$file_time = $c_time[0] & '/' & $c_time[1] & '/' & $c_time[2] & ' ' & $c_time[3] & ':' & $c_time[4] & ':' & $c_time[5]
+		if _DateDiff('h', $file_time, $current_date) < $HISTORY then
+			if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
+				$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
+				if @error then
+					logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
+				else
+					list_to_dict($raw_data, $buffer)
+				endif
+			endif
+		endif
+	endif
+endif
+
+; Fill GUI & default
+;if $buffer.Exists('IVSd') then GUICtrlSetData($input_lk_ivs, $buffer.Item('IVSd'))
+;if $buffer.Exists('EXTRA') then $buffer_note.Item('AONOTE') = $buffer_note.Item('AONOTE') & '## Extra: ' & $buffer.Item('EXTRA') & ' mm ##'
+;if $buffer_note.Exists('AONOTE') then GUICtrlSetData($input_ao_note, $buffer_note.Item('AONOTE'))
+;if $buffer_note.Exists('LKNOTE') then GUICtrlSetData($input_lk_note, $buffer_note.Item('LKNOTE'))
+;if $buffer_note.Exists('ACHNOTE') then GUICtrlSetData($input_ach_note, $buffer_note.Item('ACHNOTE'))
+;if $buffer_note.Exists('MCHNOTE') then GUICtrlSetData($input_mch_note, $buffer_note.Item('MCHNOTE'))
+;if $buffer_note.Exists('TCHNOTE') then GUICtrlSetData($input_tch_note, $buffer_note.Item('TCHNOTE'))
+;if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_note.Item('PCHNOTE'))
+;if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
+;if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
+
+;
 ; GUI
 ;
 
 $gui = GUICreate("S70 Echo " & $VERSION, 626, 880, 900, 11)
 ; header
 $label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
-$input_pacient = GUICtrlCreateInput('', 106, 6, 121, 21, 1)
+$input_pacient = GUICtrlCreateInput($cmdline[3] & ' ' & $cmdline[2], 106, 6, 121, 21, 1)
 $label_rc = GUICtrlCreateLabel('r.č.', 268, 9, 19, 17)
-$input_rc = GUICtrlCreateInput('', 290, 6, 105, 21, 1)
+$input_rc = GUICtrlCreateInput(StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'), 290, 6, 105, 21, 1)
 $label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
-$input_poj = GUICtrlCreateInput('', 476, 6, 41, 21, 1)
+$input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1)
 ; aorta
 $group_aorta = GUICtrlCreateGroup('Aorta', 8, 32, 610, 65)
 $label_ao_root = GUICtrlCreateLabel('Kořen aorty:', 108, 46, 65, 17)
@@ -121,7 +193,7 @@ $label_ao_index = GUICtrlCreateLabel('Index:', 358, 46, 30, 17)
 $input_ao_index = GUICtrlCreateInput('', 392, 44, 41, 21, 1)
 $label_ao_index_unit = GUICtrlCreateLabel('(19+-1 mm/m2)', 440, 46, 80, 17)
 $label_ao_note = GUICtrlCreateLabel('Popis:', 70, 74, 30, 17)
-$input_ao_note = GUICtrlCreateInput('', 106, 70, 506, 21)
+$input_ao_note = GUICtrlCreateInput($buffer_note.Item('AONOTE'), 106, 70, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; leva komora
 $group_lk = GUICtrlCreateGroup('Levá komora', 8, 100, 610, 113)
@@ -146,7 +218,7 @@ $input_lk_inferolat = GUICtrlCreateInput('', 392, 158, 41, 21, 1)
 $label_lk_inferolat_unit = GUICtrlCreateLabel('(6-11)', 440, 162, 100, 17)
 ;--------
 $label_lk_note = GUICtrlCreateLabel('Popis:', 70, 190, 30, 17)
-$input_lk_note = GUICtrlCreateInput('', 106, 185, 506, 21)
+$input_lk_note = GUICtrlCreateInput($buffer_note.Item('LKNOTE'), 106, 185, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; leva sin
 $group_ls = GUICtrlCreateGroup('Levá síň', 8, 216, 610, 38)
@@ -181,7 +253,7 @@ GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; aortalni chlopen
 $group_ach = GUICtrlCreateGroup('Aortální chlopeň', 8, 339, 610, 40)
 $label_ach_note = GUICtrlCreateLabel('Popis:', 70, 355, 30, 17)
-$input_ach_note = GUICtrlCreateInput('', 106, 352, 506, 21)
+$input_ach_note = GUICtrlCreateInput($buffer_note.Item('ACHNOTE'), 106, 352, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; mitralni chlopen
 $group_mch = GUICtrlCreateGroup('Mitrální chlopeň', 8, 382, 610, 113)
@@ -204,7 +276,7 @@ $label_mch_ea = GUICtrlCreateLabel('E/A:', 362, 443, 30, 17)
 $input_mch_ea = GUICtrlCreateInput('', 392, 440, 41, 21, 1)
 ;--------
 $label_mch_note = GUICtrlCreateLabel('Popis:', 70, 468, 30, 17)
-$input_mch_note = GUICtrlCreateInput('', 106, 467, 506, 21)
+$input_mch_note = GUICtrlCreateInput($buffer_note.Item('MCHNOTE'), 106, 467, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; trikuspidalni chlopen
 $group_trikuspidal = GUICtrlCreateGroup('Trikuspidální chlopeň', 8, 498, 610, 65)
@@ -215,7 +287,7 @@ $label_tch_ddz = GUICtrlCreateLabel('DDŽ:', 358, 512, 30, 17)
 $input_tch_ddz = GUICtrlCreateInput('', 392, 509, 41, 21, 1)
 $label_tch_ddz_unit = GUICtrlCreateLabel('(mm)', 440, 512, 80, 17)
 $label_tch_note = GUICtrlCreateLabel('Popis:', 70, 538, 30, 17)
-$input_tch_note = GUICtrlCreateInput('', 106, 535, 506, 21)
+$input_tch_note = GUICtrlCreateInput($buffer_note.Item('TCHNOTE'), 106, 535, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; pulmonalni chlopen
 $group_pulmonal = GUICtrlCreateGroup('Pulmonární chlopeň', 8, 566, 610, 65)
@@ -223,101 +295,36 @@ $label_pch_vmax = GUICtrlCreateLabel('V max:', 134, 581, 40, 17)
 $input_pch_vmax = GUICtrlCreateInput('', 172, 577, 41, 21, 1)
 $label_pch_vmax_unit = GUICtrlCreateLabel('(m/s)', 218, 581, 100, 17)
 $label_pch_note = GUICtrlCreateLabel('Popis:', 70, 602, 30, 17)
-$input_pch_note = GUICtrlCreateInput('', 106, 603, 506, 21)
+$input_pch_note = GUICtrlCreateInput($buffer_note.Item('PCHNOTE'), 106, 603, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; perikard
 $group_perikard = GUICtrlCreateGroup('Perikard', 8, 634, 610, 40)
 $label_perikard_note = GUICtrlCreateLabel('Popis:', 70, 650, 30, 17)
-$input_perikard_note = GUICtrlCreateInput('', 106, 647, 506, 21)
+$input_perikard_note = GUICtrlCreateInput($buffer_note.Item('PNOTE'), 106, 647, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; jine
 $group_other = GUICtrlCreateGroup('Jiné', 8, 677, 610, 40)
 $label_other_note = GUICtrlCreateLabel('Popis:', 70, 693, 30, 17)
-$input_other_note = GUICtrlCreateInput('', 106, 690, 506, 21)
+$input_other_note = GUICtrlCreateInput($buffer_note.Item('ONOTE'), 106, 690, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
-$edit_dekurz = GUICtrlCreateEdit('', 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$edit_dekurz = GUICtrlCreateEdit($result_text, 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 ; date
 $label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
-$label_datetime = GUICtrlCreateLabel('', 51, 853, 100, 17)
+$label_datetime = GUICtrlCreateLabel($current_date, 51, 853, 100, 17)
 ; button
 $button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
 $button_dekurz = GUICtrlCreateButton('Dekurz', 463, 846, 75, 25)
 $button_konec = GUICtrlCreateButton('Konec', 542, 846, 75, 25)
 
 ; GUI tune
-
 GUICtrlSetBkColor($input_pacient, 0xC0DCC0)
 GUICtrlSetBkColor($input_rc, 0xC0DCC0)
 GUICtrlSetBkColor($input_poj, 0xC0DCC0)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
-GUICtrlSetData($label_datetime, $current_date)
-GUICtrlSetData($input_pacient, $cmdline[3] & ' ' & $cmdline[2])
-GUICtrlSetData($input_rc, StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'))
-GUICtrlSetData($input_poj, $cmdline[4])
 
-;
-; MAIN
-;
-
-; logging
-logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
-
-; history / export
-
-$archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
-$export_file = file_from_export($export_path, $cmdline[1])
-
-if FileExists($archive_file) then
-	$raw_note = StringSplit(FileReadLine($archive_file, 2), '|', 2)
-	if @error then
-		logger('Nepodařilo se načíst historii popisu: ' & $cmdline[1] & '.dat')
-	else
-		list_to_dict($raw_note, $buffer_note)
-	endif
-endif
-
-if $export_file then
-	$export = export_parse($export_path & '\' & $export_file, $buffer)
-	if @error then logger($export & ': ' & $export_file)
-	;FileDelete($export_path & '\' & $export_file)
-elseif FileExists($archive_file) then
-	$ctime = FileGetTime($archive_file)
-	if @error then
-		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
-	else
-		$file_time = $ctime[0] & '/' & $ctime[1] & '/' & $ctime[2] & ' ' & $ctime[3] & ':' & $ctime[4] & ':' & $ctime[5]
-		if _DateDiff('h', $file_time, $current_date) < $HISTORY then
-			if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
-				$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-				if @error then
-					logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
-				else
-					list_to_dict($raw_data, $buffer)
-				endif
-			endif
-		endif
-	endif
-endif
-
-; Fill GUI & default
-
-if $buffer.Exists('IVSd') then GUICtrlSetData($input_lk_ivs, $buffer.Item('IVSd'))
-
-;if $buffer.Exists('EXTRA') then $buffer_note.Item('AONOTE') = $buffer_note.Item('AONOTE') & '## Extra: ' & $buffer.Item('EXTRA') & ' mm ##'
-
-if $buffer_note.Exists('AONOTE') then GUICtrlSetData($input_ao_note, $buffer_note.Item('AONOTE'))
-if $buffer_note.Exists('LKNOTE') then GUICtrlSetData($input_lk_note, $buffer_note.Item('LKNOTE'))
-if $buffer_note.Exists('ACHNOTE') then GUICtrlSetData($input_ach_note, $buffer_note.Item('ACHNOTE'))
-if $buffer_note.Exists('MCHNOTE') then GUICtrlSetData($input_mch_note, $buffer_note.Item('MCHNOTE'))
-if $buffer_note.Exists('TCHNOTE') then GUICtrlSetData($input_tch_note, $buffer_note.Item('TCHNOTE'))
-if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_note.Item('PCHNOTE'))
-if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
-if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
-
-
-; display gui
+; GUI display
 GUISetState(@SW_SHOW)
 
 While 1
@@ -381,14 +388,14 @@ exit
 ;
 
 func logger($text)
-	FileWriteLine($logfile, $text)
+	FileWriteLine($log_file, $text)
 endfunc
 
-func file_from_export($path, $id)
-	local $list = _FileListToArray($path, '*.txt')
+func get_export_file($export_path, $rc)
+	local $list = _FileListToArray($export_path, '*.txt')
 	if not @error then; _ArraySearch()?
 		for $i = 1 to ubound($list) - 1
-			if StringRegExp($list[$i], '^' & $id & '_.*') then return $list[$i]
+			if StringRegExp($list[$i], '^' & $rc & '_.*') then return $list[$i]
 		next
 	endif
 endfunc
@@ -401,12 +408,14 @@ endfunc
 ;	endif
 ;endfunc
 
+;read list to dict
 func list_to_dict($list, $buffer)
 	for $i = 0 to UBound($list) / 2 - 1
 		$buffer.Add(String($list[2 * $i]), $list[2 * $i + 1])
 	next
 endfunc
 
+;write dict to file
 func dict_to_file($file, $buffer)
 	local $str, $keys = $buffer.keys
 	for $i = 0 to UBound($keys) - 1
@@ -416,6 +425,7 @@ func dict_to_file($file, $buffer)
 	if @error then Return SetError(1, 0, 'Zápis selhal.')
 endfunc
 
+; parse S70 txt file 
 func export_parse($file, $buffer)
 	local $raw
 	_FileReadToArray($file, $raw, 0); no count
@@ -430,6 +440,7 @@ func export_parse($file, $buffer)
 	next
 endfunc
 
+; write data to XLS clipboard
 func dekurz()
 	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
