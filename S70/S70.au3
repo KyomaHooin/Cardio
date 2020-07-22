@@ -51,22 +51,99 @@ global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & 
 global $export_path = 'c:\ECHOREPORTY'
 global $archive_path = @ScriptDir & '\' & 'archive'
 
-;
-; DATA
-;
-
-global $note_list[] = ['AONOTE','LKNOTE','ACHNOTE','MCHNOTE','TCHNOTE','PCHNOTE','PNOTE','ONOTE']
-global $varlist[]=[ _
-'RV Major', 'RVIDd', 'S-RV', 'EDA', 'ESA', 'FAC%', 'TAPSE', _; pk
-'RA Minor', 'RA Major', 'RAV', 'RAVi', _; ps
-'IVSd', 'LVIDd', 'LVPWd', 'LVIDs', 'EF Biplane', 'SV MOD A4C', 'SV MOD A2C', 'LVEDV MOD BP', 'LVESV MOD BP', _; lk
-'LA Diam', 'LAEDV A-L A4C', 'LAEDV MOD A4C', 'LAEDV A-L A2C', 'LAEDV MOD A2C', 'LA Minor', 'LA Major', 'LAVi', _; ls
-'Ao Diam SVals', 'Ao Diam', _; ao
-'LVOT Diam', 'AR Rad', 'PV Vmax', 'AV Vmax', 'AV maxPG', 'AV meanPG', 'AV VTI', 'LVOT VTI', 'AR VTI', 'AR ERO', 'AR RV', _; aoch
-'MR Rad', 'MV E Vel', 'MV A Vel', 'MV E/A Ratio', 'MV DecT','MV1 PHT', 'MV maxPG', 'MV meanPG', 'EmSept', 'EmLat', 'MR VTI', 'MR ERO', 'MR RV', _; mitch
-'PV Vmax', 'PVAcc T', 'PV maxPG', 'PV meanPG', 'PRend PG', 'PR maxPG', 'PR meanPG', _; pulmch
-'IVC Diam Exp', 'IVC diam Ins' _; other
-]
+global $json_template = '{
+	"patient":"",
+	"name":"",
+	"poj":"",
+	"note":{
+		"ao_note":"",
+		"lk_note":"",
+		"ach_note":"",
+		"mch_note":"",
+		"tch_note":"",
+		"pch_note":"",
+		"p_note":"",
+		"o_note":""
+	},
+	"pk":{
+		"RV Major":"",
+		"RVIDd":"",
+		"S-RV":"",
+		"EDA":"",
+		"ESA":"",
+		"FAC%":"",
+		"TAPSE":""
+	},
+	"ps":{
+		"RA Minor":"",
+		"RA Major":"",
+		"RAV":"",
+		"RAVi":""
+	},
+	"lk":{
+		"IVSd":"",
+		"LVIDd":"",
+		"LVPWd":"",
+		"LVIDs":"",
+		"EF Biplane":"",
+		"SV MOD A4C":"",
+		"SV MOD A2C":"",
+		"LVEDV MOD BP":"",
+		"LVESV MOD BP":""
+	},
+	"ls":{
+		"LA Diam":"",
+		"LAEDV A-L A4C":"",
+		"LAEDV MOD A4C":"",
+		"LAEDV A-L A2C":"",
+		"LAEDV MOD A2C":"",
+		"LA Minor":"",
+		"LA Major":"",
+		"LAVi":""
+	},
+	"ao":{
+		"Ao Diam SVals":"",
+		"Ao Diam":""
+	},
+	"aoch":{
+		"LVOT Diam":"",
+		"AR Rad":"",
+		"PV Vmax":"",
+		"AV Vmax":"",
+		"AV maxPG":"",
+		"AV meanPG":"",
+		"AV VTI":"",
+		"LVOT VTI":"",
+		"AR VTI":"",
+		"AR ERO":"",
+		"AR RV":""
+		
+	"mitch":{
+		"MR Rad":"",
+		"MV E Vel":"",
+		"MV A Vel":"",
+		"MV E/A Ratio":"",
+		"MV DecT','MV1 PHT":"",
+		"MV maxPG":"",
+		"MV meanPG":"",
+		"EmSept":"",
+		"EmLat":"",
+		"MR VTI":"",
+		"MR ERO":"",
+		"MR RV":""
+	"pulmch":{
+		"PV Vmax":"",
+		"PVAcc T":"",
+		"PV maxPG":"",
+		"PV meanPG":"",
+		"PRend PG":"",
+		"PR maxPG":"",
+		"PR meanPG":""
+	"other":{
+		"IVC Diam Exp":"",
+		"IVC diam Ins":""
+	}
+}'
 
 global $excel, $book
 
