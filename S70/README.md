@@ -17,9 +17,12 @@ Configuration > External Program > [+] > Command line:
 FILE
 <pre>
     S70.au3 - Main GUI source code.
-    S70.ini - Program configuration file.
-  print.au3 - Printing library by "martin".
+  Print.au3 - Printing library by "martin".
+   Json.au3 - JSON library by "Ward".
+ 
   print.dll - Printing DLL.
+    S70.ini - Program configuration file.
+    
     LICENSE - License & disclaimer.
 
 Medicus.png - Medicus 3 external app configuration screen.

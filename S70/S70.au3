@@ -32,7 +32,8 @@
 #include <ExcelConstants.au3>
 #include <File.au3>
 #include <Date.au3>
-#include <print.au3>
+#include <Print.au3>
+#include <Json.au3>
 
 ;
 ; VAR
