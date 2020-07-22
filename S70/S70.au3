@@ -51,11 +51,13 @@ global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & 
 global $export_path = 'c:\ECHOREPORTY'
 global $archive_path = @ScriptDir & '\' & 'archive'
 
+;data template
 global $json_template = '{
 	"patient":"",
 	"name":"",
 	"poj":"",
 	"date","",
+	"result":"",
 	"note":{
 		"ao_note":"",
 		"lk_note":"",
@@ -67,96 +69,90 @@ global $json_template = '{
 		"o_note":""
 	},
 	"pk":{
-		"RV Major":"",
-		"RVIDd":"",
-		"S-RV":"",
-		"EDA":"",
-		"ESA":"",
-		"FAC%":"",
-		"TAPSE":""
+		"RV Major":0,
+		"RVIDd":0,
+		"S-RV":0,
+		"EDA":0,
+		"ESA":0,
+		"FAC%":0,
+		"TAPSE":0
 	},
 	"ps":{
-		"RA Minor":"",
-		"RA Major":"",
-		"RAV":"",
-		"RAVi":""
+		"RA Minor":0,
+		"RA Major":0,
+		"RAV":0,
+		"RAVi":0
 	},
 	"lk":{
-		"IVSd":"",
-		"LVIDd":"",
-		"LVPWd":"",
-		"LVIDs":"",
-		"EF Biplane":"",
-		"SV MOD A4C":"",
-		"SV MOD A2C":"",
-		"LVEDV MOD BP":"",
-		"LVESV MOD BP":""
+		"IVSd":0,
+		"LVIDd":0,
+		"LVPWd":0,
+		"LVIDs":0,
+		"EF Biplane":0,
+		"SV MOD A4C":0,
+		"SV MOD A2C":0,
+		"LVEDV MOD BP":0,
+		"LVESV MOD BP":0
 	},
 	"ls":{
-		"LA Diam":"",
-		"LAEDV A-L A4C":"",
-		"LAEDV MOD A4C":"",
-		"LAEDV A-L A2C":"",
-		"LAEDV MOD A2C":"",
-		"LA Minor":"",
-		"LA Major":"",
-		"LAVi":""
+		"LA Diam":0,
+		"LAEDV A-L A4C":0,
+		"LAEDV MOD A4C":0,
+		"LAEDV A-L A2C":0,
+		"LAEDV MOD A2C":0,
+		"LA Minor":0,
+		"LA Major":0,
+		"LAVi":0
 	},
 	"ao":{
-		"Ao Diam SVals":"",
-		"Ao Diam":""
+		"Ao Diam SVals":0,
+		"Ao Diam":0
 	},
 	"aoch":{
-		"LVOT Diam":"",
-		"AR Rad":"",
-		"PV Vmax":"",
-		"AV Vmax":"",
-		"AV maxPG":"",
-		"AV meanPG":"",
-		"AV VTI":"",
-		"LVOT VTI":"",
-		"AR VTI":"",
-		"AR ERO":"",
-		"AR RV":""
+		"LVOT Diam":0,
+		"AR Rad":0,
+		"PV Vmax":0,
+		"AV Vmax":0,
+		"AV maxPG":0,
+		"AV meanPG":0,
+		"AV VTI":0,
+		"LVOT VTI":0,
+		"AR VTI":0,
+		"AR ERO":0,
+		"AR RV":0
 		
 	"mitch":{
-		"MR Rad":"",
-		"MV E Vel":"",
-		"MV A Vel":"",
-		"MV E/A Ratio":"",
-		"MV DecT','MV1 PHT":"",
-		"MV maxPG":"",
-		"MV meanPG":"",
-		"EmSept":"",
-		"EmLat":"",
-		"MR VTI":"",
-		"MR ERO":"",
-		"MR RV":""
+		"MR Rad":0,
+		"MV E Vel":0,
+		"MV A Vel":0,
+		"MV E/A Ratio":0,
+		"MV DecT":0,
+		"MV1 PHT":0,
+		"MV maxPG":0,
+		"MV meanPG":0,
+		"EmSept":0,
+		"EmLat":0,
+		"MR VTI":0,
+		"MR ERO":0,
+		"MR RV":0
 	"pulmch":{
-		"PV Vmax":"",
-		"PVAcc T":"",
-		"PV maxPG":"",
-		"PV meanPG":"",
-		"PRend PG":"",
-		"PR maxPG":"",
-		"PR meanPG":""
+		"PV Vmax":0,
+		"PVAcc T":0,
+		"PV maxPG":0,
+		"PV meanPG":0,
+		"PRend PG":0,
+		"PR maxPG":0,
+		"PR meanPG":0
 	"other":{
-		"IVC Diam Exp":"",
-		"IVC diam Ins":""
+		"IVC Diam Exp":0,
+		"IVC diam Ins":0
 	}
 }'
 
+;data
+global $buffer = Json_StringDecode($json_template)
+;XLS variable
 global $excel, $book
-
-; data dictionary buffer
-$buffer = ObjCreate('Scripting.Dictionary')
-$buffer.CompareMode = 0
-$buffer.RemoveAll
-
-; note dictionary buffer
-$buffer_note = ObjCreate('Scripting.Dictionary')
-$buffer_note.CompareMode = 0
-$buffer_note.RemoveAll
 
 ;
 ; INIT
@@ -185,7 +181,9 @@ endif
 ; MAIN
 ;
 
+; archive filename
 global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+; export filename
 global $export_file = get_export_file($export_path, $cmdline[1])
 
 ; logging
@@ -201,13 +199,15 @@ endif
 DirCreate($archive_path)
 DirCreate($export_path)
 
-; read note buffer from history
+; update note from history
 if FileExists($archive_file) then
-	$raw_note = StringSplit(FileReadLine($archive_file, 2), '|', 2)
+	$history = Json_Decode(FileRead($archive_file))
 	if @error then
-		logger('Nepodařilo se načíst historii popisů: ' & $cmdline[1] & '.dat')
+		logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 	else
-		list_to_dict($raw_note, $buffer_note)
+		for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
+			Json_Put($buffer, ['note'][$n], Json_Get($history['note'][$n]), True)
+		next
 	endif
 endif
 
@@ -215,8 +215,9 @@ endif
 if FileExists($result_file) then
 	$result_text = StringSplit(FileRead($dekurz_file)
 	if @error then
-		$result_text = ''
 		logger('Nepodařilo se načíst výchozí závěr: ' & $result_file)
+	else
+		Json_Put($buffer, 'result', $result_text, True)
 	endif
 endif
 
@@ -476,31 +477,6 @@ func get_export_file($export_path, $rc)
 			if StringRegExp($list[$i], '^' & $rc & '_.*') then return $list[$i]
 		next
 	endif
-endfunc
-
-;func space_align($str, $cnt, $right = True)
-;	if $right then
-;		return $str & _StringRepeat(' ', $cnt)
-;	else
-;		return _StringRepeat(' ', $cnt) & $str
-;	endif
-;endfunc
-
-;read list to dict
-func list_to_dict($list, $buffer)
-	for $i = 0 to UBound($list) / 2 - 1
-		$buffer.Add(String($list[2 * $i]), $list[2 * $i + 1])
-	next
-endfunc
-
-;write dict to file
-func dict_to_file($file, $buffer)
-	local $str, $keys = $buffer.keys
-	for $i = 0 to UBound($keys) - 1
-		$str &= '|' & $keys[$i] & '|' & $buffer($keys[$i])
-	next
-	FileWrite($file, StringTrimLeft($str, 1)); update
-	if @error then Return SetError(1, 0, 'Zápis selhal.')
 endfunc
 
 ; parse S70 txt file 
