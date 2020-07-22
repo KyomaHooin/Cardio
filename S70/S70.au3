@@ -150,7 +150,8 @@ global $json_template = '{
 }'
 
 ;data
-global $buffer = Json_StringDecode($json_template)
+global $archive, $buffer = Json_StringDecode($json_template)
+
 ;XLS variable
 global $excel, $book
 
@@ -181,11 +182,6 @@ endif
 ; MAIN
 ;
 
-; archive filename
-global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
-; export filename
-global $export_file = get_export_file($export_path, $cmdline[1])
-
 ; logging
 logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 
@@ -195,53 +191,53 @@ if FileExists($config_file) then
 	if @error then logger('Načtení konfiguračního souboru selhalo.')
 endif
 
+; archive filename
+global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+; export filename
+global $export_file = get_export_file($export_path, $cmdline[1])
+
 ; create dirs
 DirCreate($archive_path)
 DirCreate($export_path)
 
-; update note from history
+; read archive
 if FileExists($archive_file) then
-	$history = Json_Decode(FileRead($archive_file))
-	if @error then
-		logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
-	else
-		for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
-			Json_Put($buffer, ['note'][$n], Json_Get($history['note'][$n]), True)
-		next
-	endif
+	$archive = Json_Decode(FileRead($archive_file))
+	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-; read default result
+; update note
+if $archive then
+	for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
+		Json_Put($buffer, ['note'][$n], Json_Get($archive['note'][$n]), True)
+	next
+endif
+
+; update result
 if FileExists($result_file) then
-	$result_text = StringSplit(FileRead($dekurz_file)
+	$result_text = FileRead($dekurz_file)
 	if @error then
-		logger('Nepodařilo se načíst výchozí závěr: ' & $result_file)
+		logger('Nepodařilo se načíst výchozí závěr: ' & $result_text)
 	else
 		Json_Put($buffer, 'result', $result_text, True)
 	endif
 endif
 
-; write export to buffer
-if $export_file then
+; parse export
+if FileExists($export_file) then
 	$export = export_parse($export_path & '\' & $export_file, $buffer)
 	if @error then logger($export & ': ' & $export_file)
 	;FileDelete($export_path & '\' & $export_file)
 
 ; update buffer from history
 elseif FileExists($archive_file) then
-	$c_time = FileGetTime($archive_file)
-	if @error then
-		logger('Nepodařilo se získat časové razítko souboru: ' & $cmdline[1] & '.dat')
-	else
-		$file_time = $c_time[0] & '/' & $c_time[1] & '/' & $c_time[2] & ' ' & $c_time[3] & ':' & $c_time[4] & ':' & $c_time[5]
-		if _DateDiff('h', $file_time, $runtime) < $HISTORY then
-			if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
-				$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-				if @error then
-					logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
-				else
-					list_to_dict($raw_data, $buffer)
-				endif
+	if _DateDiff('h', $file_time, Json_Get($archive,'date') < $HISTORY then
+		if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední hodnoty?') = 6 then
+			$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
+			if @error then
+				logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
+			else
+				;$archive -> $buffer
 			endif
 		endif
 	endif
@@ -500,8 +496,8 @@ func read_config_file($file)
 	_FileReadToArray($file, $cfg, 0, '='); no count; split by '='
 	if @error then return SetError(1)
 	for $i = 0 to UBound($cfg) - 1
-		if $cfg[$i][0] == 'export' then $export_path = $cfg[$i][1]
-		if $cfg[$i][0] == 'archiv' then $archive_path = $cfg[$i][1]
+		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1],'(.*)[\\]$','$1')
+		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1],'(.*)[\\]$','$1')
 	next
 endfunc
 
