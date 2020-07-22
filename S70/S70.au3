@@ -55,6 +55,7 @@ global $json_template = '{
 	"patient":"",
 	"name":"",
 	"poj":"",
+	"date","",
 	"note":{
 		"ao_note":"",
 		"lk_note":"",
