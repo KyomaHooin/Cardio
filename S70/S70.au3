@@ -167,18 +167,6 @@ elseif FileExists($archive_file) then
 	endif
 endif
 
-; Fill GUI & default
-;if $buffer.Exists('IVSd') then GUICtrlSetData($input_lk_ivs, $buffer.Item('IVSd'))
-;if $buffer.Exists('EXTRA') then $buffer_note.Item('AONOTE') = $buffer_note.Item('AONOTE') & '## Extra: ' & $buffer.Item('EXTRA') & ' mm ##'
-;if $buffer_note.Exists('AONOTE') then GUICtrlSetData($input_ao_note, $buffer_note.Item('AONOTE'))
-;if $buffer_note.Exists('LKNOTE') then GUICtrlSetData($input_lk_note, $buffer_note.Item('LKNOTE'))
-;if $buffer_note.Exists('ACHNOTE') then GUICtrlSetData($input_ach_note, $buffer_note.Item('ACHNOTE'))
-;if $buffer_note.Exists('MCHNOTE') then GUICtrlSetData($input_mch_note, $buffer_note.Item('MCHNOTE'))
-;if $buffer_note.Exists('TCHNOTE') then GUICtrlSetData($input_tch_note, $buffer_note.Item('TCHNOTE'))
-;if $buffer_note.Exists('PCHNOTE') then GUICtrlSetData($input_pch_note, $buffer_note.Item('PCHNOTE'))
-;if $buffer_note.Exists('PNOTE') then GUICtrlSetData($input_perikard_note, $buffer_note.Item('PNOTE'))
-;if $buffer_note.Exists('ONOTE') then GUICtrlSetData($input_other_note, $buffer_note.Item('ONOTE'))
-
 ;
 ; GUI
 ;
@@ -334,23 +322,27 @@ GUICtrlSetState($button_konec, $GUI_FOCUS)
 ; GUI display
 GUISetState(@SW_SHOW)
 
+; dekurz initialize
+$dekurz_init = dekurz_init()
+if @error then logger($dekurz_init)
+
 While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
 	if $msg = $button_dekurz then
-		GUICtrlSetState($button_dekurz, $GUI_DISABLE)
-		GUICtrlSetState($button_tisk, $GUI_DISABLE)
-		GUICtrlSetState($button_konec, $GUI_DISABLE)
-		$dek = dekurz()
-		if @error then logger($dek)
-		GUICtrlSetState($button_dekurz, $GUI_ENABLE)
-		GUICtrlSetState($button_tisk, $GUI_ENABLE)
-		GUICtrlSetState($button_konec, $GUI_ENABLE)
+		$dekurz = dekurz()
+		if @error then
+			logger($dekurz)
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
+		endif
 	endif
 	; print data
 	if $msg = $button_tisk Then
 		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $runtime)
-		if @error then logger($prn)
+		if @error then
+			logger($prn)
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
+		endif
 	endif
 	; write & exit
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
@@ -358,28 +350,28 @@ While 1
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
-
 		; update data
 		$buffer.Item('IVSd') = GUICtrlRead($input_lk_ivs)
-
+		;....
+		;....
+		;
 		; update note
-		$buffer_note.Item('AONOTE') = StringReplace(GUICtrlRead($input_ao_note), '|', '')
-		$buffer_note.Item('LKNOTE') = StringReplace(GUICtrlRead($input_lk_note), '|', '')
-		$buffer_note.Item('ACHNOTE') = StringReplace(GUICtrlRead($input_ach_note), '|', '')
-		$buffer_note.Item('MCHNOTE') = StringReplace(GUICtrlRead($input_mch_note), '|', '')
-		$buffer_note.Item('TCHNOTE') = StringReplace(GUICtrlRead($input_tch_note), '|', '')
-		$buffer_note.Item('PCHNOTE') = StringReplace(GUICtrlRead($input_pch_note), '|', '')
-		$buffer_note.Item('PNOTE') = StringReplace(GUICtrlRead($input_perikard_note), '|', '')
-		$buffer_note.Item('ONOTE') = StringReplace(GUICtrlRead($input_other_note), '|', '')
+		$buffer_note.Item('AONOTE') = GUICtrlRead($input_ao_note)
+		$buffer_note.Item('LKNOTE') = GUICtrlRead($input_lk_note)
+		$buffer_note.Item('ACHNOTE') = GUICtrlRead($input_ach_note)
+		$buffer_note.Item('MCHNOTE') = GUICtrlRead($input_mch_note)
+		$buffer_note.Item('TCHNOTE') = GUICtrlRead($input_tch_note)
+		$buffer_note.Item('PCHNOTE') = GUICtrlRead($input_pch_note)
+		$buffer_note.Item('PNOTE') = GUICtrlRead($input_perikard_note)
+		$buffer_note.Item('ONOTE') = GUICtrlRead($input_other_note)
 	
-		; update archive
+		; write archive
 		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2 + 256); UTF8 / BOM
 		$write_data = dict_to_file($f, $buffer)
 		if @error then logger($write_data & ': ' & $cmdline[1] & '.dat')
 		$write_note = dict_to_file($f, $buffer_note)
 		if @error then logger($write_note & ': ' & $cmdline[1] & '.dat')
 		FileClose($f)
-		exitloop
 	endif
 wend
 
@@ -458,13 +450,8 @@ func read_config_file($file)
 	next
 endfunc
 
-; write data to XLS clipboard
-func dekurz()
-	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
-	;clear the clip
-	_ClipBoard_Open(0)
-	_ClipBoard_Empty()
-	_ClipBoard_Close()
+; initialize XLS template
+func dekurz_init()
 	; excel
 	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
@@ -485,14 +472,11 @@ func dekurz()
 	$book.Activesheet.Range('A1').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'Kořen aorty:', 'B1')
 	$book.Activesheet.Range('B1').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_root), 'C1')
 	$book.Activesheet.Range('C1').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'Index:', 'D1')
 	$book.Activesheet.Range('D1').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_index), 'E1')
 	$book.Activesheet.Range('E1').HorizontalAlignment = $xlCenter;
 	$book.Activesheet.Range('B2:H2').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B2')
 	With $book.Activesheet.Range('A2:H2').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -502,30 +486,23 @@ func dekurz()
 	$book.Activesheet.Range('A3').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'LVEDD:', 'B3')
 	$book.Activesheet.Range('B3').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvedd), 'C3')
 	$book.Activesheet.Range('C3').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'LVEDDi:', 'D3')
 	$book.Activesheet.Range('D3').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lveddi), 'E3')
 	$book.Activesheet.Range('E3').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'LVESD:', 'B4')
 	$book.Activesheet.Range('B4').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvesd), 'C4')
 	$book.Activesheet.Range('C4').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'IVS:', 'D4')
 	$book.Activesheet.Range('D4').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_ivs), 'E4')
 	$book.Activesheet.Range('E4').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'LVEF:', 'B5')
 	$book.Activesheet.Range('B5').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvef), 'C5')
 	$book.Activesheet.Range('C5').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'Inferolat:', 'D5')
 	$book.Activesheet.Range('D5').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_inferolat), 'E5')
 	$book.Activesheet.Range('E5').HorizontalAlignment = $xlCenter;
 	$book.Activesheet.Range('B6:H6').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_note), 'B6')
 	With $book.Activesheet.Range('A6:H6').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -535,15 +512,12 @@ func dekurz()
 	$book.Activesheet.Range('A7').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'LA-PLAX:', 'B7')
 	$book.Activesheet.Range('B7').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_laplax), 'C7')
 	$book.Activesheet.Range('C7').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'LAV:', 'D7')
 	$book.Activesheet.Range('D7').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lav), 'E7')
 	$book.Activesheet.Range('E7').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'LAV-i:', 'F7')
 	$book.Activesheet.Range('F7').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lavi), 'G7')
 	$book.Activesheet.Range('G7').HorizontalAlignment = $xlCenter;
 	With $book.Activesheet.Range('A7:H7').Borders(9)
 		.LineStyle = 1
@@ -554,15 +528,12 @@ func dekurz()
 	$book.Activesheet.Range('A8').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'REDD-PLAX:', 'B8')
 	$book.Activesheet.Range('B8').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rveddplax), 'C8')
 	$book.Activesheet.Range('C8').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'TAPSE:', 'D7')
 	$book.Activesheet.Range('D8').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_tapse), 'E8')
 	$book.Activesheet.Range('E8').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'RVD1:', 'F7')
 	$book.Activesheet.Range('F8').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rvd1), 'G8')
 	$book.Activesheet.Range('G8').HorizontalAlignment = $xlCenter;
 	With $book.Activesheet.Range('A8:H8').Borders(9)
 		.LineStyle = 1
@@ -573,7 +544,6 @@ func dekurz()
 	$book.Activesheet.Range('A9').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'RA-A4C:', 'B9')
 	$book.Activesheet.Range('B9').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ps_raa4c), 'C9')
 	With $book.Activesheet.Range('A9:H9').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -582,7 +552,6 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, 'Aortální chlopeň', 'A10')
 	$book.Activesheet.Range('A10').Font.Bold = True
 	$book.Activesheet.Range('B10:H10').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B10')
 	With $book.Activesheet.Range('A10:H10').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -592,30 +561,23 @@ func dekurz()
 	$book.Activesheet.Range('A11').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, "E':", 'B11')
 	$book.Activesheet.Range('B11').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_es), 'C11')
 	$book.Activesheet.Range('C11').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'DT:', 'D11')
 	$book.Activesheet.Range('D11').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_dt), 'E11')
 	$book.Activesheet.Range('E11').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, "E/E':", 'B12')
 	$book.Activesheet.Range('B12').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ee), 'C12')
 	$book.Activesheet.Range('C12').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'A:', 'D12')
 	$book.Activesheet.Range('D12').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_a), 'E12')
 	$book.Activesheet.Range('E12').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'E:', 'B13')
 	$book.Activesheet.Range('B13').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_e), 'C13')
 	$book.Activesheet.Range('C13').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'E/A:', 'D13')
 	$book.Activesheet.Range('D13').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ea), 'E13')
 	$book.Activesheet.Range('E13').HorizontalAlignment = $xlCenter;
 	$book.Activesheet.Range('B14:H14').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_note), 'B14')
 	With $book.Activesheet.Range('A14:H14').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -625,14 +587,11 @@ func dekurz()
 	$book.Activesheet.Range('A15').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'PGmax-reg:', 'B15')
 	$book.Activesheet.Range('B15').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_pg), 'C15')
 	$book.Activesheet.Range('C15').HorizontalAlignment = $xlCenter;
 	_Excel_RangeWrite($book, $book.Activesheet, 'DDŽ:', 'D15')
 	$book.Activesheet.Range('D15').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_ddz), 'E15')
 	$book.Activesheet.Range('E15').HorizontalAlignment = $xlCenter;
 	$book.Activesheet.Range('B16:H16').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_note), 'B16')
 	With $book.Activesheet.Range('A16:H16').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -642,10 +601,8 @@ func dekurz()
 	$book.Activesheet.Range('A17').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'Vmax:', 'B17')
 	$book.Activesheet.Range('B17').HorizontalAlignment = $xlRight;
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_vmax), 'C17')
 	$book.Activesheet.Range('C17').HorizontalAlignment = $xlCenter;
 	$book.Activesheet.Range('B18:H18').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_note), 'B18')
 	With $book.Activesheet.Range('A18:H18').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -654,7 +611,6 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, 'Perikard', 'A19')
 	$book.Activesheet.Range('A19').Font.Bold = True
 	$book.Activesheet.Range('B19:H19').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_perikard_note), 'B19')
 	With $book.Activesheet.Range('A19:H19').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -663,7 +619,6 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, 'Jiné', 'A20')
 	$book.Activesheet.Range('A20').Font.Bold = True
 	$book.Activesheet.Range('B20:H20').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_other_note), 'B20')
 	With $book.Activesheet.Range('A20:H20').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
@@ -672,11 +627,61 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, 'Závěr', 'A21')
 	$book.Activesheet.Range('A21').Font.Bold = True
 	$book.Activesheet.Range('B21:H21').MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'B21')
 	With $book.Activesheet.Range('A21:H21').Borders(9)
 		.LineStyle = 1
 		.Weight = 2
-	EndWith
+
+; update XLS data & write clipboard
+func dekurz()
+	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
+	;clear the clip
+	_ClipBoard_Open(0)
+	_ClipBoard_Empty()
+	_ClipBoard_Close()
+	; aorta
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_root), 'C1')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_index), 'E1')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B2')
+	; leva komora
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvedd), 'C3')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lveddi), 'E3')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvesd), 'C4')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_ivs), 'E4')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvef), 'C5')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_inferolat), 'E5')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_note), 'B6')
+	; leva sin
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_laplax), 'C7')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lav), 'E7')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lavi), 'G7')
+	; prava komora
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rveddplax), 'C8')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_tapse), 'E8')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rvd1), 'G8')
+	; prava sin
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ps_raa4c), 'C9')
+	; aortalni chlopen
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B10')
+	; mitralni chlopen
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_es), 'C11')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_dt), 'E11')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ee), 'C12')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_a), 'E12')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_e), 'C13')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ea), 'E13')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_note), 'B14')
+	; trikuspidalni chlopen
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_pg), 'C15')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_ddz), 'E15')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_note), 'B16')
+	; pulmonarni chlopen
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_vmax), 'C17')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_note), 'B18')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_perikard_note), 'B19')
+	; jine
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_other_note), 'B20')
+	; zaver
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'B21')
 	; clip
 	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
@@ -695,7 +700,7 @@ func print($id,$name,$date)
 
 	_PrintSetDocTitle($printer,"S70 Dekurz - Patient ID: 123456")
 
-; printer write data
+	; printer write data
 	_PrintStartPrint($printer)
 
 	;_PrintGetpageheight($printer) - _PrintGetYOffset($printer)
