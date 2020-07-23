@@ -39,25 +39,25 @@
 ; VAR
 ;
 
-$VERSION = '1.4'
+$VERSION = '1.5'
 $HISTORY = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
-global $result_file = @ScriptDir & '\' & 'result.txt'; default result text
-global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
+global $result_file = @ScriptDir & '\' & 'zaver.txt'
 
-;default path
 global $export_path = 'c:\ECHOREPORTY'
 global $archive_path = @ScriptDir & '\' & 'archive'
 
+global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
+
 ;data template
 global $json_template = '{
-	"patient":"",
-	"name":"",
-	"poj":"",
-	"date","",
-	"result":"",
+	"patient":null,
+	"name":null,
+	"poj":null,
+	"date",null,
+	"result":null,
 	"note":{
 		"ao_note":null,
 		"lk_note":null,
@@ -150,7 +150,7 @@ global $json_template = '{
 }'
 
 ;data
-global $archive, $buffer = Json_StringDecode($json_template)
+global $history, $buffer = Json_StringDecode($json_template)
 
 ;XLS variable
 global $excel, $book
@@ -198,49 +198,44 @@ global $export_file = get_export_file($export_path, $cmdline[1])
 
 ; create dirs
 DirCreate($archive_path)
-DirCreate($export_path)
 
 ; read history
 if FileExists($archive_file) then
-	$archive = Json_Decode(FileRead($archive_file))
+	$history = Json_Decode(FileRead($archive_file))
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
-endif
-
-; update note
-if $archive then
-	for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
-		Json_Put($buffer, ['note'][$n], Json_Get($archive['note'][$n]), True)
-	next
-endif
-
-; update result
-if FileExists($result_file) then
-	$result_text = FileRead($dekurz_file)
-	if @error then
-		logger('Nepodařilo se načíst výchozí závěr: ' & $result_text)
-	else
-		Json_Put($buffer, 'result', $result_text, True)
-	endif
 endif
 
 ; parse export
 if FileExists($export_file) then
-	$export = export_parse($export_path & '\' & $export_file, $buffer)
-	if @error then logger($export & ': ' & $export_file)
-	;FileDelete($export_path & '\' & $export_file)
-
-; update buffer from history
-elseif FileExists($archive_file) then
-	if _DateDiff('h', $file_time, Json_Get($archive,'date') < $HISTORY then
-		if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
-			$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-			if @error then
-				logger('Nepodařilo se načíst historii dat: ' & $cmdline[1] & '.dat')
-			else
-				;$archive -> $buffer
-			endif
-		endif
+	$parse = export_parse($export_path & '\' & $export_file, $buffer)
+	if @error then
+		; error
+		FileMove($export_path & '\' & $export_file, $export_path & '\' & $export_file & '.err', 1); overwrite
+		logger($parse & ': ' & $export_file)
+	else
+		; archive
+		FileMove($export_path & '\' & $export_file, $export_path & '\' & $export_file & '.old', 1); overwrite
 	endif
+endif
+
+; update export note from history
+if $history then
+	for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
+		Json_Put($buffer, ['note'][$n], Json_Get($archive['note'][$n]), True)
+	next
+else
+	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
+endif
+
+; default result template
+if not Json_Get($export, 'result') then
+	if  FileExists($result_file) then
+		$result_text = FileRead($dekurz_file)
+		if @error then
+			logger('Načtení výchozího závěru selhalo: ' & $result_text)
+		else
+			Json_Put($buffer, 'result', $result_text)
+		endif
 endif
 
 ;
@@ -366,17 +361,17 @@ $label_pch_vmax = GUICtrlCreateLabel('V max:', 134, 581, 40, 17)
 $input_pch_vmax = GUICtrlCreateInput('', 172, 577, 41, 21, 1)
 $label_pch_vmax_unit = GUICtrlCreateLabel('(m/s)', 218, 581, 100, 17)
 $label_pch_note = GUICtrlCreateLabel('Popis:', 70, 602, 30, 17)
-$input_pch_note = GUICtrlCreateInput($buffer_note.Item('PCHNOTE'), 106, 603, 506, 21)
+$input_pch_note = GUICtrlCreateInput($buffer.note['PCHNOTE'], 106, 603, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; perikard
 $group_perikard = GUICtrlCreateGroup('Perikard', 8, 634, 610, 40)
 $label_perikard_note = GUICtrlCreateLabel('Popis:', 70, 650, 30, 17)
-$input_perikard_note = GUICtrlCreateInput($buffer_note.Item('PNOTE'), 106, 647, 506, 21)
+$input_perikard_note = GUICtrlCreateInput($buffer.note['PNOTE'], 106, 647, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; jine
 $group_other = GUICtrlCreateGroup('Jiné', 8, 677, 610, 40)
 $label_other_note = GUICtrlCreateLabel('Popis:', 70, 693, 30, 17)
-$input_other_note = GUICtrlCreateInput($buffer_note.Item('ONOTE'), 106, 690, 506, 21)
+$input_other_note = GUICtrlCreateInput($buffer.note['ONOTE'], 106, 690, 506, 21)
 GUICtrlCreateGroup('', -99, -99, 1, 1)
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
@@ -403,6 +398,7 @@ GUISetState(@SW_SHOW)
 $dekurz_init = dekurz_init()
 if @error then logger($dekurz_init)
 
+; main loop
 While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
@@ -415,18 +411,32 @@ While 1
 	endif
 	; print data
 	if $msg = $button_tisk Then
-		$prn = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $runtime)
+		$print = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $runtime)
 		if @error then
-			logger($prn)
+			logger($print)
 			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
 		endif
 	endif
-	; load data from history
+	; load history
 	if $msg = $button_history Then
-		;$history buffer -> GUICtrlSet()
-		; ....
-		; ....
-		; ....
+		if FileExists($archive_file) then
+			if _DateDiff('h', $runtime, Json_Get($archive,'date') < $HISTORY then
+				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' _
+					& @CRLF & '(Popisy se načítají vždy.)') = 6 then
+					$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
+					if @error then
+						logger('Nepodařilo se načíst data z archivu: ' & $cmdline[1] & '.dat')
+					else
+					; update buffer (?)
+					; $history -> $buffer
+					; update GUI
+					; GUICtrlSet(...)
+					; ....
+				endif
+			else
+				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načíst, příliš stará data.')
+			endif	
+		endif
 	endif
 	; write & exit
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
@@ -752,13 +762,12 @@ func dekurz()
 	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
-func print($id,$name,$date)
+func print()
 	local $printer,$printer_error,$marginx,$marginy
 	;priner init
 	$printer = _PrintDllStart($printer_error)
-	if $printer = 0 then
-		logger('Priner error: ' & $printer_error & @CRLF)
-	endif
+	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
+
 	;_PrintPageOrientation($printer,0);landscape
 
 	_PrintSetDocTitle($printer,"S70 Dekurz - Patient ID: 123456")
@@ -792,3 +801,4 @@ func print($id,$name,$date)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
 EndFunc
+
