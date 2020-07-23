@@ -498,7 +498,7 @@ func export_parse($file, $buffer)
 	local $raw
 	_FileReadToArray($file, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst soubor exportu.')
-	for $i = 0 to UBound($varlist) - 1
+	for $key in Json_ObjKeys($buffer['data'])
 		for $j = 0 to UBound($raw) - 1
 			if StringRegExp($raw[$j], '^' & $varlist[$i] & '\t.*') then
 				if $buffer.Exists($varlist[$i]) then $buffer.Remove($varlist[$i])
