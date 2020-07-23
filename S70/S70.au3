@@ -47,7 +47,7 @@ global $config_file = @ScriptDir & '\' & 'S70.ini'
 global $result_file = @ScriptDir & '\' & 'zaver.txt'
 
 global $export_path = 'c:\ECHOREPORTY'
-global $archive_path = @ScriptDir & '\' & 'archive'
+global $archive_path = @ScriptDir & '\' & 'archiv'
 
 global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
@@ -68,84 +68,88 @@ global $json_template = '{
 		"p_note":null,
 		"o_note":null
 	},
-	"pk":{
-		"RV Major":null,
-		"RVIDd":null,
-		"S-RV":null,
-		"EDA":null,
-		"ESA":null,
-		"FAC%":null,
-		"TAPSE":null
-	},
-	"ps":{
-		"RA Minor":null,
-		"RA Major":null,
-		"RAV":null,
-		"RAVi":null
-	},
-	"lk":{
-		"IVSd":null,
-		"LVIDd":null,
-		"LVPWd":null,
-		"LVIDs":null,
-		"EF Biplane":null,
-		"SV MOD A4C":null,
-		"SV MOD A2C":null,
-		"LVEDV MOD BP":null,
-		"LVESV MOD BP":null
-	},
-	"ls":{
-		"LA Diam":null,
-		"LAEDV A-L A4C":null,
-		"LAEDV MOD A4C":null,
-		"LAEDV A-L A2C":null,
-		"LAEDV MOD A2C":null,
-		"LA Minor":null,
-		"LA Major":null,
-		"LAVi":null
-	},
-	"ao":{
-		"Ao Diam SVals":null,
-		"Ao Diam":null
-	},
-	"aoch":{
-		"LVOT Diam":null,
-		"AR Rad":null,
-		"PV Vmax":null,
-		"AV Vmax":null,
-		"AV maxPG":null,
-		"AV meanPG":null,
-		"AV VTI":null,
-		"LVOT VTI":null,
-		"AR VTI":null,
-		"AR ERO":null,
-		"AR RV":null
-		
-	"mitch":{
-		"MR Rad":null,
-		"MV E Vel":null,
-		"MV A Vel":null,
-		"MV E/A Ratio":null,
-		"MV DecT":null,
-		"MV1 PHT":null,
-		"MV maxPG":null,
-		"MV meanPG":null,
-		"EmSept":null,
-		"EmLat":null,
-		"MR VTI":null,
-		"MR ERO":null,
-		"MR RV":null
-	"pulmch":{
-		"PV Vmax":null,
-		"PVAcc T":null,
-		"PV maxPG":null,
-		"PV meanPG":null,
-		"PRend PG":null,
-		"PR maxPG":null,
-		"PR meanPG":null
-	"other":{
+	"data":{
+		"pk":{
+			"RV Major":null,
+			"RVIDd":null,
+			"S-RV":null,
+			"EDA":null,
+			"ESA":null,
+			"FAC%":null,
+			"TAPSE":null
+		},
+		"ps":{
+			"RA Minor":null,
+			"RA Major":null,
+			"RAV":null,
+			"RAVi":null
+		},
+		"lk":{
+			"IVSd":null,
+			"LVIDd":null,
+			"LVPWd":null,
+			"LVIDs":null,
+			"EF Biplane":null,
+			"SV MOD A4C":null,
+			"SV MOD A2C":null,
+			"LVEDV MOD BP":null,
+			"LVESV MOD BP":null
+		},
+		"ls":{
+			"LA Diam":null,
+			"LAEDV A-L A4C":null,
+			"LAEDV MOD A4C":null,
+			"LAEDV A-L A2C":null,
+			"LAEDV MOD A2C":null,
+			"LA Minor":null,
+			"LA Major":null,
+			"LAVi":null
+		},
+		"ao":{
+			"Ao Diam SVals":null,
+			"Ao Diam":null
+		},
+		"aoch":{
+			"LVOT Diam":null,
+			"AR Rad":null,
+			"PV Vmax":null,
+			"AV Vmax":null,
+			"AV maxPG":null,
+			"AV meanPG":null,
+			"AV VTI":null,
+			"LVOT VTI":null,
+			"AR VTI":null,
+			"AR ERO":null,
+			"AR RV":null
+		},	
+		"mitch":{
+			"MR Rad":null,
+			"MV E Vel":null,
+			"MV A Vel":null,
+			"MV E/A Ratio":null,
+			"MV DecT":null,
+			"MV1 PHT":null,
+			"MV maxPG":null,
+			"MV meanPG":null,
+			"EmSept":null,
+			"EmLat":null,
+			"MR VTI":null,
+			"MR ERO":null,
+			"MR RV":null
+		},
+		"pulmch":{
+			"PV Vmax":null,
+			"PVAcc T":null,
+			"PV maxPG":null,
+			"PV meanPG":null,
+			"PRend PG":null,
+			"PR maxPG":null,
+			"PR meanPG":null
+		},
+		"other":{
 		"IVC Diam Exp":null,
 		"IVC diam Ins":null
+		}
 	}
 }'
 
@@ -191,30 +195,30 @@ if FileExists($config_file) then
 	if @error then logger('Načtení konfiguračního souboru selhalo.')
 endif
 
-; update archive filename
-global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
-; export filename
-global $export_file = get_export_file($export_path, $cmdline[1])
-
-; create dirs
+; create archive directory
 DirCreate($archive_path)
 
-; read history
+; archive file full path
+global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+; export  file full path
+global $export_file = $export_path & '\' & get_export_file($export_path, $cmdline[1])
+
+; update history buffer
 if FileExists($archive_file) then
-	$history = Json_Decode(FileRead($archive_file))
+	$history = Json_Decode(FileRead($archive_file)
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-; parse export
+; update export buffer
 if FileExists($export_file) then
-	$parse = export_parse($export_path & '\' & $export_file, $buffer)
+	$parse = export_parse($export_file, $buffer)
 	if @error then
 		; error
-		FileMove($export_path & '\' & $export_file, $export_path & '\' & $export_file & '.err', 1); overwrite
-		logger($parse & ': ' & $export_file)
+		FileMove($export_file, $export_file & '.err', 1); overwrite
+		if @error then logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
 	else
 		; archive
-		FileMove($export_path & '\' & $export_file, $export_path & '\' & $export_file & '.old', 1); overwrite
+		FileMove($export_file, $export_file & '.old', 1); overwrite
 	endif
 endif
 
@@ -480,43 +484,49 @@ exit
 ; FUNCTION
 ;
 
+; logging
 func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
 
+; find export file
 func get_export_file($export_path, $rc)
-	local $list = _FileListToArray($export_path, '*.txt')
-	if not @error then; _ArraySearch()?
+	local $list = _FileListToArray($export_path, '*.txt', 1); files only
+	if not @error then
 		for $i = 1 to ubound($list) - 1
 			if StringRegExp($list[$i], '^' & $rc & '_.*') then return $list[$i]
 		next
 	endif
 endfunc
 
-; parse S70 txt file 
-func export_parse($file, $buffer)
-	local $raw
-	_FileReadToArray($file, $raw, 0); no count
-	if @error then return SetError(1, 0, 'Nelze načíst soubor exportu.')
-	for $key in Json_ObjKeys($buffer['data'])
-		for $j = 0 to UBound($raw) - 1
-			if StringRegExp($raw[$j], '^' & $varlist[$i] & '\t.*') then
-				if $buffer.Exists($varlist[$i]) then $buffer.Remove($varlist[$i])
-				$buffer.Add($varlist[$i], StringRegExpReplace($raw[$j], '.*\t(.*)\t.*', '$1'))
-			EndIf
-		next
-	next
-endfunc
-
 ; read configuration file 
 func read_config_file($file)
 	local $cfg
-	_FileReadToArray($file, $cfg, 0, '='); no count; split by '='
+	_FileReadToArray($file, $cfg, 0, '='); no count, split by '='
 	if @error then return SetError(1)
 	for $i = 0 to UBound($cfg) - 1
-		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1],'(.*)[\\]$','$1')
-		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1],'(.*)[\\]$','$1')
-		if $cfg[$i][0] == 'history' then $HISTORY = StringRegExpReplace($cfg[$i][1],'(.*)[\\]$','$1')
+		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
+		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
+		if $cfg[$i][0] == 'history' then $HISTORY = $cfg[$i][1]
+	next
+endfunc
+
+; parse S70 export file 
+func export_parse($file, $buffer)
+	local $raw
+	_FileReadToArray($file, $raw, 0); no count
+	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
+	for $group in Json_ObjGetKeys($buffer, '["data"]')
+		for $member in Json_ObjGetKeys($buffer, '["data"][' & $group & ']')
+			for $i = 0 to UBound($raw) - 1
+				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
+					Json_Put($buffer, _
+						'[data][' & $group & '][' & $member & ']' , _
+						 StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')
+					)
+				endif
+			next
+		next
 	next
 endfunc
 
