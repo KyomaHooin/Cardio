@@ -7,7 +7,7 @@ GE Vivid S70 Medicus 3 integration.
 
 TODO
 <pre>
--parsing
+-GUI
 -dynamic print
 -dynamic XLS
 </pre>
