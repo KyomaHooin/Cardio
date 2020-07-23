@@ -5,6 +5,13 @@ DESCRIPTION
 
 GE Vivid S70 Medicus 3 integration.
 
+TODO
+<pre>
+-parsing
+-dynamic print
+-dynamic XLS
+</pre>
+
 MEDICUS SETUP
 
 ![Medicus](https://github.com/KyomaHooin/Cardio/raw/master/S70/Medicus.png "screenshot")
