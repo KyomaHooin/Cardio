@@ -75,24 +75,25 @@ global $json_template = '{
 		"lk":{
 			"IVSd":null,;IVS
 			"LVIDd":null,;LVd
-			"LVd index":null,
+			"LVd index":null,;.................. LVd/bsa
 			"LVPWd":null,;ZS
 			"LVIDs":null,;LVs
-			"LVs index":null,
-			"LVEF % Teich.":null,
+			"LVs index":null,;................. LVs/bsa
+			"LVEF % Teich.":null,;......... 7/(2,4+LVd/10)*(LVd/10)^3-7/(2,4+LVs/10)*(LVs/10)^3)/(7/(2,4+LVd/10)*(LVd/10)^3)*100
 			"LVEF % odhad":null,
-			"LVmass":null,
-			"LVmass-i^2.7":null,
-			"LVmass-BSA":null,
-			"RTW":null,
-			"FS":null,
+			"LVmass":null,;................ 1,04*((LVd/10+IVS/10+ZS/10)^3-(LVd/10)^3)-13,6
+			"LVmass-i^2.7":null,;.......... LVmass/(výška/100)^2,7
+			"LVmass-BSA":null,;............ LVmass/BSA
+			"RTW":null,;................... (2*ZS)/LVd
+			"FS":null,;.................... (LVd-LVs)/LVd*100
 			"EF Biplane":null,;LVEF biplane
-			"SV MOD A4C":null,
-			"SV MOD A2C":null,
+			"SV MOD A4C":null,;.................. calculation
+			"SV MOD A2C":null,;.................. calculation
+			"SV-biplane":null,;.................. (SV MOD A4C+SV MOD A2C)/2
 			"LVEDV MOD BP":null,;EDV
 			"LVESV MOD BP":null,;ESV
-			"EDVi":null,
-			"ESVi":null
+			"EDVi":null,;........................ EDV/BSA
+			"ESVi":null;......................... ESV/BSA
 				
 		},
 		"ls":{
@@ -100,10 +101,10 @@ global $json_template = '{
 			"LAV-A4C":null,
 			"LAV-2D":null,
 			"LAVi-2D":null,
-			"LAEDV A-L A4C":null,
-			"LAEDV MOD A4C":null,
-			"LAEDV A-L A2C":null,
-			"LAEDV MOD A2C":null,
+			"LAEDV A-L A4C":null,;............... calculation
+			"LAEDV MOD A4C":null,;............... calculation
+			"LAEDV A-L A2C":null,;............... calculation
+			"LAEDV MOD A2C":null,;............... calculation
 			"LA Minor":null,; LA sirka
 			"LA Major":null,; LA delka
 			"LAVi":null;LAVi
@@ -131,8 +132,8 @@ global $json_template = '{
 			"LVOT Diam":null,;LVOT
 			"AR Rad":null,;PISA AR radius
 			"AV Vmax":null,;Vmax
-			"AV maxPG":null,
-			"AV meanPG":null,
+			"AV maxPG":null,;.................. calculation
+			"AV meanPG":null,;................. calculation
 			"AV max/meanPG":null,
 			"AV VTI":null,;Ao-VTI
 			"LVOT VTI":null,;LVOT-VTI
@@ -151,8 +152,8 @@ global $json_template = '{
 			"MV E/A Ratio":null,;E/A
 			"MV DecT":null,;DecT
 			"MV1 PHT":null,;MV-PHT
-			"MV maxPG":null,
-			"MV meanPG":null,
+			"MV maxPG":null,;.................. calculation
+			"MV meanPG":null,;................. calculation
 			"MV max/meanPG":null,
 			"MVA-PHT":null,
 			"MVAi-PHT":null,
@@ -166,19 +167,19 @@ global $json_template = '{
 		"pch":{
 			"PV Vmax":null,;Vmax
 			"PVAcc T":null,;ACT
-			"PV maxPG":null,
-			"PV meanPG":null,
+			"PV maxPG":null,;.................. calculation
+			"PV meanPG":null,;................. calculation
 			"PV max/meanPG":null,
 			"PRend PG":null,;PGed-reg
-			"PR maxPG":null,
-			"PR meanPG":null,
+			"PR maxPG":null,;.................. calculation
+			"PR meanPG":null,;................. calculation
 			"PR max/meanPG",null
 		},
 		"tch":{
 			"TR maxPG":null,;PGmax-reg
 			"TR meanPG":null,;PGmean-reg
-			"TV maxPG":null,
-			"TV meanPG":null,
+			"TV maxPG":null,;.................. calculation
+			"TV meanPG":null,;................. calculation
 			"TV max/meanPG":null
 		},
 		"other":{
