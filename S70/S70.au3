@@ -56,6 +56,9 @@ global $json_template = '{
 	"patient":null,
 	"name":null,
 	"poj":null,
+	"bsa":null,
+	"weight":null,
+	"height":null,
 	"date",null,
 	"result":null,
 	"note":{
@@ -69,86 +72,118 @@ global $json_template = '{
 		"o_note":null
 	},
 	"data":{
-		"pk":{
-			"RV Major":null,
-			"RVIDd":null,
-			"S-RV":null,
-			"EDA":null,
-			"ESA":null,
-			"FAC%":null,
-			"TAPSE":null
-		},
-		"ps":{
-			"RA Minor":null,
-			"RA Major":null,
-			"RAV":null,
-			"RAVi":null
-		},
 		"lk":{
-			"IVSd":null,
-			"LVIDd":null,
-			"LVPWd":null,
-			"LVIDs":null,
-			"EF Biplane":null,
+			"IVSd":null,;IVS
+			"LVIDd":null,;LVd
+			"LVd index":null,
+			"LVPWd":null,;ZS
+			"LVIDs":null,;LVs
+			"LVs index":null,
+			"LVEF % Teich.":null,
+			"LVEF % odhad":null,
+			"LVmass":null,
+			"LVmass-i^2.7":null,
+			"LVmass-BSA":null,
+			"RTW":null,
+			"FS":null,
+			"EF Biplane":null,;LVEF biplane
 			"SV MOD A4C":null,
 			"SV MOD A2C":null,
-			"LVEDV MOD BP":null,
-			"LVESV MOD BP":null
+			"LVEDV MOD BP":null,;EDV
+			"LVESV MOD BP":null,;ESV
+			"EDVi":null,
+			"ESVi":null
+				
 		},
 		"ls":{
-			"LA Diam":null,
+			"LA Diam":null,;Plax
+			"LAV-A4C":null,
+			"LAV-2D":null,
+			"LAVi-2D":null,
 			"LAEDV A-L A4C":null,
 			"LAEDV MOD A4C":null,
 			"LAEDV A-L A2C":null,
 			"LAEDV MOD A2C":null,
-			"LA Minor":null,
-			"LA Major":null,
-			"LAVi":null
+			"LA Minor":null,; LA sirka
+			"LA Major":null,; LA delka
+			"LAVi":null;LAVi
+		},
+		"pk":{
+			"RV Major":null,;RVplax
+			"RVIDd":null,;RVD1
+			"S-RV":null,
+			"EDA":null,
+			"ESA":null,
+			"FAC%":null,
+			"TAPSE":null;TAPSE
+		},
+		"ps":{
+			"RA Minor":null,;RA sirka
+			"RA Major":null,;RA delka
+			"RAV":null,;RAV
+			"RAVi":null;RAVi
 		},
 		"ao":{
-			"Ao Diam SVals":null,
-			"Ao Diam":null
+			"Ao Diam SVals":null,;Bulbus
+			"Ao Diam":null;Asc-Ao
 		},
-		"aoch":{
-			"LVOT Diam":null,
-			"AR Rad":null,
-			"PV Vmax":null,
-			"AV Vmax":null,
+		"ach":{
+			"LVOT Diam":null,;LVOT
+			"AR Rad":null,;PISA AR radius
+			"AV Vmax":null,;Vmax
 			"AV maxPG":null,
 			"AV meanPG":null,
-			"AV VTI":null,
-			"LVOT VTI":null,
-			"AR VTI":null,
-			"AR ERO":null,
-			"AR RV":null
+			"AV max/meanPG":null,
+			"AV VTI":null,;Ao-VTI
+			"LVOT VTI":null,;LVOT-VTI
+			"SV/SVi":null,
+			"AVA":null,
+			"AVAi":null,
+			"VTI LVOT/Ao":null,
+			"AR VTI":null,;AR-VTI
+			"AR ERO":null,;AR-ERO
+			"AR RV":null;AR-RV
 		},	
-		"mitch":{
-			"MR Rad":null,
-			"MV E Vel":null,
-			"MV A Vel":null,
-			"MV E/A Ratio":null,
-			"MV DecT":null,
-			"MV1 PHT":null,
+		"mch":{
+			"MR Rad":null,;PISA MR radius
+			"MV E Vel":null,;E
+			"MV A Vel":null,;A
+			"MV E/A Ratio":null,;E/A
+			"MV DecT":null,;DecT
+			"MV1 PHT":null,;MV-PHT
 			"MV maxPG":null,
 			"MV meanPG":null,
-			"EmSept":null,
-			"EmLat":null,
-			"MR VTI":null,
-			"MR ERO":null,
-			"MR RV":null
+			"MV max/meanPG":null,
+			"MVA-PHT":null,
+			"MVAi-PHT":null,
+			"EmSept":null,;EmSept
+			"EmLat":null,;EmLat
+			"E/Em":null,
+			"MR VTI":null,;MR-VTI
+			"MR ERO":null,;MR-ERO
+			"MR RV":null;MR-RV
 		},
-		"pulmch":{
-			"PV Vmax":null,
-			"PVAcc T":null,
+		"pch":{
+			"PV Vmax":null,;Vmax
+			"PVAcc T":null,;ACT
 			"PV maxPG":null,
 			"PV meanPG":null,
-			"PRend PG":null,
+			"PV max/meanPG":null,
+			"PRend PG":null,;PGed-reg
 			"PR maxPG":null,
-			"PR meanPG":null
+			"PR meanPG":null,
+			"PR max/meanPG",null
+		},
+		"tch":{
+			"TR maxPG":null,;PGmax-reg
+			"TR meanPG":null,;PGmean-reg
+			"TV maxPG":null,
+			"TV meanPG":null,
+			"TV max/meanPG":null
 		},
 		"other":{
-		"IVC Diam Exp":null,
-		"IVC diam Ins":null
+			"IVC Diam Exp":null,;DDŽexp
+			"IVC diam Ins":null;DDŽinsp
 		}
 	}
 }'
