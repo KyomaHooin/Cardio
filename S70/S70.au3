@@ -572,11 +572,38 @@ endfunc
 ; calculate aditional variables
 calculate()
 	if $buffer then
-		if Json_Get($buffer, 'data.ls.LVIDd') and  Json_Get($buffer, 'data.ls.LVIDs') then
-			Json_Put($buffer, "data.ls.'LVEF % Teich'", 7/(2.4 _
-				 + Json_Get($buffer, 'data.ls.LVIDd')/10) * (Json_Get($buffer, 'data.ls.LVIDd')/10)^3 _
-				 - 7/(2.4 + Json_Get($buffer,'data.ls.LVIDs')/10) * (Json_Get($buffer, 'data.ls.LVIDs')/10)^3)/(7/(2,4 _
-				 + Json_Get($buffer, 'data.ls.LVIDd')/10)*(Json_Get($buffer, 'data.ls.LVIDd')/10)^3)*100
+		; LVEF % Teich.
+		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVIDs') then
+			Json_Put($buffer, 'data.lk.LVEF % Teich', 7/(2.4 + Json_Get($buffer, 'data.lk.LVIDd')/10)*(Json_Get($buffer, 'data.lk.LVIDd')/10)^3 - 7/(2.4 + Json_Get($buffer, 'data.lk.LVIDs')/10)*(Json_Get($buffer, 'data.lk.LVIDs')/10)^3)/(7/(2.4 + Json_Get($buffer, 'data.lk.LVIDd')/10)*(Json_Get($buffer, 'data.lk.LVIDd')/10)^3)*100
+		endif
+		; LVmass
+		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.IVSd') and Json_Get($buffer, 'data.lk.LVPWd') then
+			Json_Put($buffer, 'data.lk.LVmass', 1.04*((Json_get($buffer, 'data.lk.LVIDd')/10 + Json_Get($buffer, 'data.lk.IVSd')/10 + Json_Get($buffer, 'data.lk.LVPWd')/10)^3 - (Json_Get($buffer, 'data.lk.LVIDd')/10)^3) - 13.6
+		endif
+		; LVmass-i^2,7
+		if Json_Get($buffer, 'height') and Json_Get($buffer, 'data.lk.LVmass') then
+			Json_Put($buffer, 'data.lk.LVmass-i^2.7', Json_Get($buffer, 'data.lk.LVmass')/(Json_Get($buffer, 'height')/100)^2.7
+		endif
+		; LVmass-BSA
+		if Json_Get($buffer, 'bsa') and Json_Get($buffer, 'data.lk.LVmass') then
+			Json_Put($buffer,'data.lk.LVmass-BSA', Json_Get($buffer, 'data.lk.LVmass')/Json_Get($buffer, 'bsa')
+		endif
+		; RTW
+		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVPWd') then
+			Json_Put($buffer, 'data.lk.RTW', (2*Json_Get($buffer, 'data.lk.LVPWd'))/Json_Get($buffer, 'data.lk.LVIDd'))
+		endif
+		; FS
+		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVIDs') then
+			Json_Put($buffer, 'data.lk.FS', (Json_Get($buffer, 'data.lk.LVIDd')-Json_Get($buffer, 'data.lk.LVIDs'))/Json_Get($buffer, 'data.lk.LVIDd')*100)
+		endif
+		; SV-biplane
+		if Json_Get($buffer, 'data.lk.SV MOD A2C') and Json_Get($buffer, 'data.lk.SV MOD A4C') then
+			Json_Put($buffer,'data.lk.SV-biplane', (Json_Get($buffer, 'data.lk.SV MOD A4C') + Json_Get($buffer, 'data.lk.SV MOD A2C'))/2)
+		endif
+		; LAV-A4C
+		if Json_Get($buffer, 'data.ls.LAEDV A-L A4C') and Json_Get($buffer, 'data.ls.LAEDV MOD A4C') then
+			Json_Put($buffer,'data.ls.LAV-A4C', (Json_Get($buffer, 'data.ls.LAEDV A-L A4C') + Json_Get($buffer, 'data.ls.LAEDV MOD A4C'))/2)
+		endif
 	endif
 
 ; initialize XLS template
