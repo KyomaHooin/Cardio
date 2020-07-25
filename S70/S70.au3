@@ -62,14 +62,17 @@ global $json_template = '{
 	"date",null,
 	"result":null,
 	"note":{
-		"ao_note":null,
 		"lk_note":null,
+		"ls_note":null,
+		"pk_note":null,
+		"ps_note":null,
+		"ao_note":null,
 		"ach_note":null,
 		"mch_note":null,
-		"tch_note":null,
 		"pch_note":null,
+		"tch_note":null,
 		"p_note":null,
-		"o_note":null
+		"other_note":null
 	},
 	"data":{
 		"lk":{
@@ -608,6 +611,11 @@ func dekurz_init()
 	$book.Activesheet.Range('F1').ColumnWidth = 9
 	$book.Activesheet.Range('G1').ColumnWidth = 3.5
 	$book.Activesheet.Range('H1').ColumnWidth = 3.5
+
+	;loop over group
+	; ... line
+	; ... borders
+
 	; aorta
 	_Excel_RangeWrite($book, $book.Activesheet, 'Aorta', 'A1')
 	$book.Activesheet.Range('A1').Font.Bold = True
@@ -779,11 +787,7 @@ func dekurz()
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
-	; aorta
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_root), 'C1')
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_index), 'E1')
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B2')
-	; leva komora
+	; lk
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvedd), 'C3')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lveddi), 'E3')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvesd), 'C4')
@@ -791,19 +795,23 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvef), 'C5')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_inferolat), 'E5')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_note), 'B6')
-	; leva sin
+	; ls
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_laplax), 'C7')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lav), 'E7')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ls_lavi), 'G7')
-	; prava komora
+	; pk
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rveddplax), 'C8')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_tapse), 'E8')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pk_rvd1), 'G8')
-	; prava sin
+	; ps
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ps_raa4c), 'C9')
-	; aortalni chlopen
+	; aorta
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_root), 'C1')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_index), 'E1')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B2')
+	; ach
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_ao_note), 'B10')
-	; mitralni chlopen
+	; mch
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_es), 'C11')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_dt), 'E11')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ee), 'C12')
@@ -811,18 +819,20 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_e), 'C13')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_ea), 'E13')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_mch_note), 'B14')
-	; trikuspidalni chlopen
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_pg), 'C15')
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_ddz), 'E15')
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_note), 'B16')
-	; pulmonarni chlopen
+	; pch
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_vmax), 'C17')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_pch_note), 'B18')
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_perikard_note), 'B19')
-	; jine
+	; tch
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_pg), 'C15')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_ddz), 'E15')
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_tch_note), 'B16')
+	; p
+	; other
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_other_note), 'B20')
-	; zaver
+	; result
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'B21')
+
 	; clip
 	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
@@ -836,33 +846,36 @@ func print()
 	$printer = _PrintDllStart($printer_error)
 	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
 
-	;_PrintPageOrientation($printer,0);landscape
+	; page title
+	_PrintSetDocTitle($printer,"S70 Dekurz - Pacient: " & $cmdline[1])
 
-	_PrintSetDocTitle($printer,"S70 Dekurz - Patient ID: 123456")
-
-	; printer write data
+	; printer create page
 	_PrintStartPrint($printer)
 
-	;_PrintGetpageheight($printer) - _PrintGetYOffset($printer)
-	;_PrintGetpageWidth($printer) - _PrintGetXOffset($printer)
+	; header
+	; ... logo
+	; ... address / contact
+	; ... patient
+	; ... general data
+	; ... separator
+	; data
+	; ... group
+	; ... separator
+	; ...
+
 	;_PrintSetFont($printer,'Arial',18,0,'bold,underline')
-	;_PrintGetTextWidth($printer,$Title)
-	;_PrintGetTextHeight($printer,$title)
-	;_PrintSetLineWid($printer,2)
-	;_PrintSetLineCol($printer,0)
-	;_printsetfont($printer,'Times New Roman',12,0,'')
-	;_PrintGetTextHeight($printer,"Jan")
-	;_PrintText($printer,$n,$basex - _PrintGetTextWidth($printer,$n) - 20,$pght-$basey-$n*$ydiv-Int(_printGetTextHeight($printer,'10')/2))
-	;_PrintLIne($printer,$basex - 5,$pght - $basey - $n*$ydiv,$basex + 5,$pght - $basey - $n*$ydiv)
-	;_PrintSetLineCol($printer,0x0000ff)
-	;_PrintSetBrushCol($printer,0x55FF55)
-	;_PrintSetLineCol($printer,0)
-	;_PrintLine($printer,Int($pgwd/2),2*$th + 125,$Basex + 8*$xdiv ,$pght - $basey - Int($sales[8]*$ydiv/10))
-	;_Printsetlinecol($printer,0x0000ff)
-	;_PrintSetLineWid($printer,10)
-	;_PrintSetBrushCol($printer,0xbbccee)
-	;_PrintEllipse($printer,Int($pgwd/2) - 200,2*$th,Int($pgwd/2) + 200,2*$th + 250)
-	;_PrintImage($printer,"screenshot004.bmp",Int($pgwd/2) - 150,2*$th+260,300,350)
+	;_PrintSetFont($printer,'Times New Roman',12,0,'')
+
+	; bmp, jpg, ico 
+	;_PrintImage($printer,"logo.bmp",x, y,300,350)
+
+	;_PrintSetLineWid($printer, 2)
+	;_PrintLine($printer, x, y x, y)
+
+	;_PrintText($printer, text, x, y)
+
+	;_PrintGetPageHeight($printer)
+	;_PrintGetPageWidth($printer)
 
 	; print end data
 	_PrintEndPrint($printer)
