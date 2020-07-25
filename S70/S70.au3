@@ -267,6 +267,9 @@ else
 	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
 endif
 
+; calculate complex variables
+calculate()
+
 ; default result template
 if not Json_Get($export, 'result') then
 	if  FileExists($result_file) then
@@ -565,6 +568,16 @@ func export_parse($file, $buffer)
 		next
 	next
 endfunc
+
+; calculate aditional variables
+calculate()
+	if $buffer then
+		if Json_Get($buffer, 'data.ls.LVIDd') and  Json_Get($buffer, 'data.ls.LVIDs') then
+			Json_Put($buffer, "data.ls.'LVEF % Teich'", 7/(2.4 _
+				 + Json_Get($buffer, 'data.ls.LVIDd')/10) * (Json_Get($buffer, 'data.ls.LVIDd')/10)^3 _
+				 - 7/(2.4 + Json_Get($buffer,'data.ls.LVIDs')/10) * (Json_Get($buffer, 'data.ls.LVIDs')/10)^3)/(7/(2,4 _
+				 + Json_Get($buffer, 'data.ls.LVIDd')/10)*(Json_Get($buffer, 'data.ls.LVIDd')/10)^3)*100
+	endif
 
 ; initialize XLS template
 func dekurz_init()
