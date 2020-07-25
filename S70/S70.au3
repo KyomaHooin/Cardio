@@ -75,25 +75,25 @@ global $json_template = '{
 		"lk":{
 			"IVSd":null,;IVS
 			"LVIDd":null,;LVd
-			"LVd index":null,;.................. LVd/bsa
+			"LVd index":null,
 			"LVPWd":null,;ZS
 			"LVIDs":null,;LVs
-			"LVs index":null,;................. LVs/bsa
-			"LVEF % Teich.":null,;......... 7/(2,4+LVd/10)*(LVd/10)^3-7/(2,4+LVs/10)*(LVs/10)^3)/(7/(2,4+LVd/10)*(LVd/10)^3)*100
+			"LVs index":null,
+			"LVEF % Teich.":null,
 			"LVEF % odhad":null,
-			"LVmass":null,;................ 1,04*((LVd/10+IVS/10+ZS/10)^3-(LVd/10)^3)-13,6
-			"LVmass-i^2.7":null,;.......... LVmass/(výška/100)^2,7
-			"LVmass-BSA":null,;............ LVmass/BSA
-			"RTW":null,;................... (2*ZS)/LVd
-			"FS":null,;.................... (LVd-LVs)/LVd*100
+			"LVmass":null,
+			"LVmass-i^2.7":null,
+			"LVmass-BSA":null,
+			"RTW":null,
+			"FS":null,
 			"EF Biplane":null,;LVEF biplane
 			"SV MOD A4C":null,;.................. calculation
 			"SV MOD A2C":null,;.................. calculation
-			"SV-biplane":null,;.................. (SV MOD A4C+SV MOD A2C)/2
+			"SV-biplane":null,
 			"LVEDV MOD BP":null,;EDV
 			"LVESV MOD BP":null,;ESV
-			"EDVi":null,;........................ EDV/BSA
-			"ESVi":null;......................... ESV/BSA
+			"EDVi":null,
+			"ESVi":null
 				
 		},
 		"ls":{
@@ -190,7 +190,7 @@ global $json_template = '{
 }'
 
 ;data
-global $history, $buffer = Json_StringDecode($json_template)
+global $history, $buffer = Json_Decode($json_template)
 
 ;XLS variable
 global $excel, $book
@@ -241,7 +241,7 @@ global $export_file = $export_path & '\' & get_export_file($export_path, $cmdlin
 
 ; update history buffer from archive
 if FileExists($archive_file) then
-	$history = Json_Decode(FileRead($archive_file)
+	$history = Json_Decode(FileRead($archive_file))
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
@@ -260,8 +260,8 @@ endif
 
 ; update data buffer note from history
 if $history then
-	for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
-		Json_Put($buffer, ['note'][$n], Json_Get($archive['note'][$n]), True)
+	for $note in Json _ObjGetKeys($history, '.note')
+		Json_Put($buffer, '.note.' & $note, Json_Get($archive, '.note.' & $n))
 	next
 else
 	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
@@ -454,7 +454,7 @@ While 1
 	endif
 	; print data
 	if $msg = $button_tisk Then
-		$print = print($cmdline[1], $cmdline[3] & ' ' & $cmdline[2], $runtime)
+		$print = print()
 		if @error then
 			logger($print)
 			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
@@ -463,51 +463,36 @@ While 1
 	; load history
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
-			if _DateDiff('h', $runtime, Json_Get($archive,'date') < $HISTORY then
-				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' _
-					& @CRLF & '(Popisy se načítají vždy.)') = 6 then
-					$raw_data = StringSplit(FileReadLine($archive_path & '\' & $cmdline[1] & '.dat', 1), '|', 2)
-					if @error then
-						logger('Nepodařilo se načíst data z archivu: ' & $cmdline[1] & '.dat')
-					else
-					; update buffer (?)
-					; $history -> $buffer
-					; update GUI
-					; GUICtrlSet(...)
+			if _DateDiff('h', $runtime, Json_Get($archive,'.date') < $HISTORY then
+				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
+						
+					; update GUI from history
+					GUICtrlSetData($input_lk_note, Json_Get($buffer,'.note.lk'))
+					; ....
 					; ....
 				endif
 			else
-				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načíst, příliš stará data.')
+				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
 			endif	
-		endif
+		else
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
+		endif		
 	endif
 	; write & exit
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
-
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
-		; update data
-		$buffer.Item('IVSd') = GUICtrlRead($input_lk_ivs)
-		;....
-		;....
-		;
-		; update note
-		$buffer_note.Item('AONOTE') = GUICtrlRead($input_ao_note)
-		$buffer_note.Item('LKNOTE') = GUICtrlRead($input_lk_note)
-		$buffer_note.Item('ACHNOTE') = GUICtrlRead($input_ach_note)
-		$buffer_note.Item('MCHNOTE') = GUICtrlRead($input_mch_note)
-		$buffer_note.Item('TCHNOTE') = GUICtrlRead($input_tch_note)
-		$buffer_note.Item('PCHNOTE') = GUICtrlRead($input_pch_note)
-		$buffer_note.Item('PNOTE') = GUICtrlRead($input_perikard_note)
-		$buffer_note.Item('ONOTE') = GUICtrlRead($input_other_note)
+
+		; update data buffer
+		Json_Put($buffer,'.note.lk', GUICtrlRead($input_lk_note))
+		;.....
+		;.....
 	
-		; write archive
-		$f = FileOpen($archive_path & '\' & $cmdline[1] & '.dat', 2 + 256); UTF8 / BOM
-		$write_data = dict_to_file($f, $buffer)
-		if @error then logger($write_data & ': ' & $cmdline[1] & '.dat')
-		$write_note = dict_to_file($f, $buffer_note)
-		if @error then logger($write_note & ': ' & $cmdline[1] & '.dat')
+		; write data buffer to archive
+		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
+		FileWrite($out,write(Json_Encode($buffer))
+		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
 		FileClose($f)
 	endif
 wend
@@ -555,13 +540,11 @@ func export_parse($file, $buffer)
 	local $raw
 	_FileReadToArray($file, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
-	for $group in Json_ObjGetKeys($buffer, '["data"]')
-		for $member in Json_ObjGetKeys($buffer, '["data"][' & $group & ']')
+	for $group in Json_ObjGetKeys($buffer, '.data')
+		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
 			for $i = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-					Json_Put($buffer, _
-						'[data][' & $group & '][' & $member & ']' , _
-						 StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')
+					Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')
 					)
 				endif
 			next
@@ -573,36 +556,36 @@ endfunc
 calculate()
 	if $buffer then
 		; LVEF % Teich.
-		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVIDs') then
-			Json_Put($buffer, 'data.lk.LVEF % Teich', 7/(2.4 + Json_Get($buffer, 'data.lk.LVIDd')/10)*(Json_Get($buffer, 'data.lk.LVIDd')/10)^3 - 7/(2.4 + Json_Get($buffer, 'data.lk.LVIDs')/10)*(Json_Get($buffer, 'data.lk.LVIDs')/10)^3)/(7/(2.4 + Json_Get($buffer, 'data.lk.LVIDd')/10)*(Json_Get($buffer, 'data.lk.LVIDd')/10)^3)*100
+		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.LVIDs') then
+			Json_Put($buffer, '.data.lk.LVEF % Teich', 7/(2.4 + Json_Get($buffer, '.data.lk.LVIDd')/10)*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3 - 7/(2.4 + Json_Get($buffer, '.data.lk.LVIDs')/10)*(Json_Get($buffer, '.data.lk.LVIDs')/10)^3)/(7/(2.4 + Json_Get($buffer, '.data.lk.LVIDd')/10)*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3)*100
 		endif
 		; LVmass
-		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.IVSd') and Json_Get($buffer, 'data.lk.LVPWd') then
-			Json_Put($buffer, 'data.lk.LVmass', 1.04*((Json_get($buffer, 'data.lk.LVIDd')/10 + Json_Get($buffer, 'data.lk.IVSd')/10 + Json_Get($buffer, 'data.lk.LVPWd')/10)^3 - (Json_Get($buffer, 'data.lk.LVIDd')/10)^3) - 13.6
+		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.IVSd') and Json_Get($buffer, '.data.lk.LVPWd') then
+			Json_Put($buffer, '.data.lk.LVmass', 1.04*((Json_get($buffer, '.data.lk.LVIDd')/10 + Json_Get($buffer, '.data.lk.IVSd')/10 + Json_Get($buffer, '.data.lk.LVPWd')/10)^3 - (Json_Get($buffer, '.data.lk.LVIDd')/10)^3) - 13.6
 		endif
 		; LVmass-i^2,7
-		if Json_Get($buffer, 'height') and Json_Get($buffer, 'data.lk.LVmass') then
-			Json_Put($buffer, 'data.lk.LVmass-i^2.7', Json_Get($buffer, 'data.lk.LVmass')/(Json_Get($buffer, 'height')/100)^2.7
+		if Json_Get($buffer, '.height') and Json_Get($buffer, '.data.lk.LVmass') then
+			Json_Put($buffer, 'data.lk.LVmass-i^2.7', Json_Get($buffer, 'data.lk.LVmass')/(Json_Get($buffer, '.height')/100)^2.7
 		endif
 		; LVmass-BSA
-		if Json_Get($buffer, 'bsa') and Json_Get($buffer, 'data.lk.LVmass') then
-			Json_Put($buffer,'data.lk.LVmass-BSA', Json_Get($buffer, 'data.lk.LVmass')/Json_Get($buffer, 'bsa')
+		if Json_Get($buffer, '.bsa') and Json_Get($buffer, '.data.lk.LVmass') then
+			Json_Put($buffer,'.data.lk.LVmass-BSA', Json_Get($buffer, '.data.lk.LVmass')/Json_Get($buffer, '.bsa')
 		endif
 		; RTW
-		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVPWd') then
-			Json_Put($buffer, 'data.lk.RTW', (2*Json_Get($buffer, 'data.lk.LVPWd'))/Json_Get($buffer, 'data.lk.LVIDd'))
+		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.LVPWd') then
+			Json_Put($buffer, '.data.lk.RTW', (2*Json_Get($buffer, '.data.lk.LVPWd'))/Json_Get($buffer, '.data.lk.LVIDd'))
 		endif
 		; FS
-		if Json_Get($buffer, 'data.lk.LVIDd') and Json_Get($buffer, 'data.lk.LVIDs') then
-			Json_Put($buffer, 'data.lk.FS', (Json_Get($buffer, 'data.lk.LVIDd')-Json_Get($buffer, 'data.lk.LVIDs'))/Json_Get($buffer, 'data.lk.LVIDd')*100)
+		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.LVIDs') then
+			Json_Put($buffer, '.data.lk.FS', (Json_Get($buffer, '.data.lk.LVIDd')-Json_Get($buffer, '.data.lk.LVIDs'))/Json_Get($buffer, '.data.lk.LVIDd')*100)
 		endif
 		; SV-biplane
-		if Json_Get($buffer, 'data.lk.SV MOD A2C') and Json_Get($buffer, 'data.lk.SV MOD A4C') then
-			Json_Put($buffer,'data.lk.SV-biplane', (Json_Get($buffer, 'data.lk.SV MOD A4C') + Json_Get($buffer, 'data.lk.SV MOD A2C'))/2)
+		if Json_Get($buffer, '.data.lk.SV MOD A2C') and Json_Get($buffer, '.data.lk.SV MOD A4C') then
+			Json_Put($buffer,'.data.lk.SV-biplane', (Json_Get($buffer, '.data.lk.SV MOD A4C') + Json_Get($buffer, '.data.lk.SV MOD A2C'))/2)
 		endif
 		; LAV-A4C
-		if Json_Get($buffer, 'data.ls.LAEDV A-L A4C') and Json_Get($buffer, 'data.ls.LAEDV MOD A4C') then
-			Json_Put($buffer,'data.ls.LAV-A4C', (Json_Get($buffer, 'data.ls.LAEDV A-L A4C') + Json_Get($buffer, 'data.ls.LAEDV MOD A4C'))/2)
+		if Json_Get($buffer, '.data.ls.LAEDV A-L A4C') and Json_Get($buffer, '.data.ls.LAEDV MOD A4C') then
+			Json_Put($buffer,'.data.ls.LAV-A4C', (Json_Get($buffer, '.data.ls.LAEDV A-L A4C') + Json_Get($buffer, '.data.ls.LAEDV MOD A4C'))/2)
 		endif
 	endif
 
