@@ -239,13 +239,13 @@ global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
 ; export  file full path
 global $export_file = $export_path & '\' & get_export_file($export_path, $cmdline[1])
 
-; update history buffer
+; update history buffer from archive
 if FileExists($archive_file) then
 	$history = Json_Decode(FileRead($archive_file)
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-; update export buffer
+; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file, $buffer)
 	if @error then
@@ -258,7 +258,7 @@ if FileExists($export_file) then
 	endif
 endif
 
-; update export note from history
+; update data buffer note from history
 if $history then
 	for $n in ["ao_note","lk_note","ach_note","mch_note","tch_note","pch_note","p_note","o_note"] do
 		Json_Put($buffer, ['note'][$n], Json_Get($archive['note'][$n]), True)
@@ -271,15 +271,15 @@ endif
 calculate()
 
 ; default result template
-if not Json_Get($export, 'result') then
-	if  FileExists($result_file) then
-		$result_text = FileRead($dekurz_file)
-		if @error then
-			logger('Načtení výchozího závěru selhalo: ' & $result_text)
-		else
-			Json_Put($buffer, 'result', $result_text)
-		endif
-endif
+;if not Json_Get($export, 'result') then
+;	if  FileExists($result_file) then
+;		$result_text = FileRead($dekurz_file)
+;		if @error then
+;			logger('Načtení výchozího závěru selhalo: ' & $result_text)
+;		else
+;			Json_Put($buffer, 'result', $result_text)
+;		endif
+;endif
 
 ;
 ; GUI
