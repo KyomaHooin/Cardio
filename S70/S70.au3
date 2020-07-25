@@ -491,9 +491,9 @@ While 1
 	
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
-		FileWrite($out,write(Json_Encode($buffer))
+		FileWrite($out, Json_Encode($buffer))
 		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
-		FileClose($f)
+		FileClose($out)
 	endif
 wend
 
@@ -544,8 +544,7 @@ func export_parse($file, $buffer)
 		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
 			for $i = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-					Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')
-					)
+					Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1'))
 				endif
 			next
 		next
