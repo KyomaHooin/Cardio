@@ -62,21 +62,25 @@ global $json_template = '{
 	"date",null,
 	"result":null,
 	"note":{
-		"lk_note":null,
-		"ls_note":null,
-		"pk_note":null,
-		"ps_note":null,
-		"ao_note":null,
-		"ach_note":null,
-		"mch_note":null,
-		"pch_note":null,
-		"tch_note":null,
-		"p_note":null,
-		"other_note":null
+		"lk":null,
+		"ls":null,
+		"pk":null,
+		"ps":null,
+		"ao":null,
+		"ach":null,
+		"mch":null,
+		"pch":null,
+		"tch":null,
+		"p":null,
+		"other":null
 	},
 	"data":{
 		"lk":{
-			"IVSd":null,;IVS
+			"IVSd":{
+				"label":"IVS",
+				"unit":"mm",
+				"value":null
+			}
 			"LVIDd":null,;LVd
 			"LVd index":null,
 			"LVPWd":null,;ZS
@@ -184,6 +188,8 @@ global $json_template = '{
 			"TV maxPG":null,;.................. calculation
 			"TV meanPG":null,;................. calculation
 			"TV max/meanPG":null
+		},
+		"p":{
 		},
 		"other":{
 			"IVC Diam Exp":null,;DDŽexp
