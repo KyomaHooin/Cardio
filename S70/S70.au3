@@ -61,25 +61,31 @@ global $json_template = '{
 	"height":null,
 	"date",null,
 	"result":null,
-	"note":{
-		"lk":null,
-		"ls":null,
-		"pk":null,
-		"ps":null,
-		"ao":null,
-		"ach":null,
-		"mch":null,
-		"pch":null,
-		"tch":null,
-		"p":null,
-		"other":null
+	"group":{
+		"lk":{
+			"label":"Levá komora",
+			"note":null,
+			"id":null
+		}
+		"ls":"Levá síň",
+		"pk":"Pravá komora",
+		"ps":"Pravá síň",
+		"ao":"Aorta",
+		"ach":"Aortální chlopeň",
+		"mch":"Mitrální chlopeň",
+		"pch":"Pulmonární chlopeň",
+		"tch":"Trikuspidální chlopeň",
+		"p":"Perikard",
+		"other":"Ostatní"
+
 	},
 	"data":{
 		"lk":{
 			"IVSd":{
 				"label":"IVS",
 				"unit":"mm",
-				"value":null
+				"value":null,
+				"id":null
 			}
 			"LVIDd":null,;LVd
 			"LVd index":null,
@@ -295,142 +301,40 @@ calculate()
 ;
 
 $gui = GUICreate("S70 Echo " & $VERSION, 626, 880, 900, 11)
+
 ; header
 $label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
-$input_pacient = GUICtrlCreateInput($cmdline[3] & ' ' & $cmdline[2], 106, 6, 121, 21, 1)
+$input_pacient = GUICtrlCreateInput($cmdline[3] & ' ' & $cmdline[2], 106, 6, 121, 21, 1); read only
 $label_rc = GUICtrlCreateLabel('r.č.', 268, 9, 19, 17)
-$input_rc = GUICtrlCreateInput(StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'), 290, 6, 105, 21, 1)
+$input_rc = GUICtrlCreateInput(StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'), 290, 6, 105, 21, 1); read only
 $label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
-$input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1)
-; aorta
-$group_aorta = GUICtrlCreateGroup('Aorta', 8, 32, 610, 65)
-$label_ao_root = GUICtrlCreateLabel('Kořen aorty:', 108, 46, 65, 17)
-$input_ao_root = GUICtrlCreateInput('', 172, 44, 41, 21, 1)
-$label_ao_root_unit = GUICtrlCreateLabel('(M<37, Z<33 mm)', 218, 46, 100, 17)
-$label_ao_index = GUICtrlCreateLabel('Index:', 358, 46, 30, 17)
-$input_ao_index = GUICtrlCreateInput('', 392, 44, 41, 21, 1)
-$label_ao_index_unit = GUICtrlCreateLabel('(19+-1 mm/m2)', 440, 46, 80, 17)
-$label_ao_note = GUICtrlCreateLabel('Popis:', 70, 74, 30, 17)
-$input_ao_note = GUICtrlCreateInput($buffer_note.Item('AONOTE'), 106, 70, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; leva komora
-$group_lk = GUICtrlCreateGroup('Levá komora', 8, 100, 610, 113)
-$label_lk_lvedd = GUICtrlCreateLabel('LVEDD:', 128, 116, 45, 17)
-$input_lk_lvedd = GUICtrlCreateInput('', 172, 112, 41, 21, 1)
-$label_lk_lvedd_unit = GUICtrlCreateLabel('(M<58, Z<52 mm)', 218, 116, 100, 17)
-$label_lk_lvesd = GUICtrlCreateLabel('LVESD:', 128, 139, 45, 17)
-$input_lk_lvesd = GUICtrlCreateInput('', 172, 135, 41, 21, 1)
-$label_lk_lvesd_unit = GUICtrlCreateLabel('(M<40, Z<35 mm)', 218, 139, 100, 17)
-$label_lk_lvef = GUICtrlCreateLabel('LVEF:', 135, 162, 30, 17)
-$input_lk_lvef = GUICtrlCreateInput('', 172, 158, 41, 21, 1)
-$label_lk_lvef_unit = GUICtrlCreateLabel('(> 53%), odhadem', 218, 162, 100, 17)
-;--------
-$label_lk_lveddi = GUICtrlCreateLabel('LVEDDi:', 345, 116, 45, 17)
-$input_lk_lveddi = GUICtrlCreateInput('', 392, 112, 41, 21, 1)
-$label_lk_lveddi_unit = GUICtrlCreateLabel('(<31 mm/m2)', 440, 116, 100, 17)
-$label_lk_ivs = GUICtrlCreateLabel('IVS:', 365, 139, 30, 17)
-$input_lk_ivs = GUICtrlCreateInput('', 392, 135, 41, 21, 1)
-$label_lk_ivs_unit = GUICtrlCreateLabel('(6-11 mm)', 440, 139, 100, 17)
-$label_lk_inferolat = GUICtrlCreateLabel('Inferolat:', 345, 162, 50, 17)
-$input_lk_inferolat = GUICtrlCreateInput('', 392, 158, 41, 21, 1)
-$label_lk_inferolat_unit = GUICtrlCreateLabel('(6-11)', 440, 162, 100, 17)
-;--------
-$label_lk_note = GUICtrlCreateLabel('Popis:', 70, 190, 30, 17)
-$input_lk_note = GUICtrlCreateInput($buffer_note.Item('LKNOTE'), 106, 185, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; leva sin
-$group_ls = GUICtrlCreateGroup('Levá síň', 8, 216, 610, 38)
-$label_ls_laplax = GUICtrlCreateLabel('LA-PLAX:', 120, 232, 50, 17)
-$input_ls_laplax = GUICtrlCreateInput('', 172, 228, 41, 21, 1)
-$label_ls_laplax_unit = GUICtrlCreateLabel('(<41 mm)', 218, 232, 100, 17)
-$label_ls_lav = GUICtrlCreateLabel('LAV:', 296, 232, 30, 17)
-$input_ls_lav = GUICtrlCreateInput('', 326, 228, 41, 21, 1)
-$label_ls_lav_unit = GUICtrlCreateLabel('(ml)', 374, 232, 100, 17)
-$label_ls_lavi = GUICtrlCreateLabel('LAV-i:', 440, 232, 35, 17)
-$input_ls_lavi = GUICtrlCreateInput('', 476, 228, 41, 21, 1)
-$label_ls_lavi_unit = GUICtrlCreateLabel('(<34 ml/m2)', 524, 232, 80, 17)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; prava komora
-$group_pk = GUICtrlCreateGroup('Pravá komora', 8, 257, 610, 38)
-$label_pk_rveddplax = GUICtrlCreateLabel('RVEDD-PLAX:', 94, 273, 70, 17)
-$input_pk_rveddplax = GUICtrlCreateInput('', 172, 269, 41, 21, 1)
-$label_pk_rveddplax_unit = GUICtrlCreateLabel('(<31 mm)', 218, 273, 100, 17)
-$label_pk_tapse = GUICtrlCreateLabel('TAPSE:', 280, 273, 40, 17)
-$input_pk_tapse = GUICtrlCreateInput('', 326, 269, 41, 21, 1)
-$label_pk_tapse_unit = GUICtrlCreateLabel('(mm)', 374, 273, 100, 17)
-$label_pk_rvd1 = GUICtrlCreateLabel('RVD1:', 436, 273, 40, 17)
-$input_pk_rvd1 = GUICtrlCreateInput('', 476, 269, 41, 21, 1)
-$label_pk_rvd1_unit = GUICtrlCreateLabel('(mm)', 524, 273, 80, 17)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; prava sin
-$group_ps = GUICtrlCreateGroup('Pravá síň', 8, 298, 610, 38)
-$label_ps_raa4c = GUICtrlCreateLabel('RA-A4C:', 124, 314, 50, 17)
-$input_ps_raa4c = GUICtrlCreateInput('', 172, 310, 41, 21, 1)
-$label_ps_raa4c_unit = GUICtrlCreateLabel('(<50 mm)', 218, 314, 100, 17)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; aortalni chlopen
-$group_ach = GUICtrlCreateGroup('Aortální chlopeň', 8, 339, 610, 40)
-$label_ach_note = GUICtrlCreateLabel('Popis:', 70, 355, 30, 17)
-$input_ach_note = GUICtrlCreateInput($buffer_note.Item('ACHNOTE'), 106, 352, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; mitralni chlopen
-$group_mch = GUICtrlCreateGroup('Mitrální chlopeň', 8, 382, 610, 113)
-$label_mch_es = GUICtrlCreateLabel("E':", 152, 398, 15, 17)
-$input_mch_es = GUICtrlCreateInput('', 172, 394, 41, 21, 1)
-$label_mch_es_unit = GUICtrlCreateLabel('(cm/s)', 218, 398, 30, 17)
-$label_mch_ee = GUICtrlCreateLabel("E/E':", 140, 421, 30, 17)
-$input_mch_ee = GUICtrlCreateInput('', 172, 417, 41, 21, 1)
-$label_mch_e = GUICtrlCreateLabel('E:', 153, 443, 15, 17)
-$input_mch_e = GUICtrlCreateInput('', 172, 440, 41, 21, 1)
-$label_mch_e_unit = GUICtrlCreateLabel('(m/s)', 218, 443, 25, 17)
-;--------
-$label_mch_dt = GUICtrlCreateLabel('DT:', 367, 398, 25, 17)
-$input_mch_dt = GUICtrlCreateInput('', 392, 394, 41, 21, 1)
-$label_mch_dt_unit = GUICtrlCreateLabel('(ms)', 440, 398, 30, 17)
-$label_mch_a = GUICtrlCreateLabel('A:', 373, 421, 15, 17)
-$input_mch_a = GUICtrlCreateInput('', 392, 417, 41, 21, 1)
-$label_mch_a_unit = GUICtrlCreateLabel('(m/s)', 440, 421, 30, 17)
-$label_mch_ea = GUICtrlCreateLabel('E/A:', 362, 443, 30, 17)
-$input_mch_ea = GUICtrlCreateInput('', 392, 440, 41, 21, 1)
-;--------
-$label_mch_note = GUICtrlCreateLabel('Popis:', 70, 468, 30, 17)
-$input_mch_note = GUICtrlCreateInput($buffer_note.Item('MCHNOTE'), 106, 467, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; trikuspidalni chlopen
-$group_trikuspidal = GUICtrlCreateGroup('Trikuspidální chlopeň', 8, 498, 610, 65)
-$label_tch_pg = GUICtrlCreateLabel('PGmax-reg:', 110, 512, 65, 17)
-$input_tch_pg = GUICtrlCreateInput('', 172, 509, 41, 21, 1)
-$label_tch_pg_unit = GUICtrlCreateLabel('(mmHg)', 218, 512, 100, 17)
-$label_tch_ddz = GUICtrlCreateLabel('DDŽ:', 358, 512, 30, 17)
-$input_tch_ddz = GUICtrlCreateInput('', 392, 509, 41, 21, 1)
-$label_tch_ddz_unit = GUICtrlCreateLabel('(mm)', 440, 512, 80, 17)
-$label_tch_note = GUICtrlCreateLabel('Popis:', 70, 538, 30, 17)
-$input_tch_note = GUICtrlCreateInput($buffer_note.Item('TCHNOTE'), 106, 535, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; pulmonalni chlopen
-$group_pulmonal = GUICtrlCreateGroup('Pulmonární chlopeň', 8, 566, 610, 65)
-$label_pch_vmax = GUICtrlCreateLabel('V max:', 134, 581, 40, 17)
-$input_pch_vmax = GUICtrlCreateInput('', 172, 577, 41, 21, 1)
-$label_pch_vmax_unit = GUICtrlCreateLabel('(m/s)', 218, 581, 100, 17)
-$label_pch_note = GUICtrlCreateLabel('Popis:', 70, 602, 30, 17)
-$input_pch_note = GUICtrlCreateInput($buffer.note['PCHNOTE'], 106, 603, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; perikard
-$group_perikard = GUICtrlCreateGroup('Perikard', 8, 634, 610, 40)
-$label_perikard_note = GUICtrlCreateLabel('Popis:', 70, 650, 30, 17)
-$input_perikard_note = GUICtrlCreateInput($buffer.note['PNOTE'], 106, 647, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-; jine
-$group_other = GUICtrlCreateGroup('Jiné', 8, 677, 610, 40)
-$label_other_note = GUICtrlCreateLabel('Popis:', 70, 693, 30, 17)
-$input_other_note = GUICtrlCreateInput($buffer.note['ONOTE'], 106, 690, 506, 21)
-GUICtrlCreateGroup('', -99, -99, 1, 1)
+$input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
+
+; groups
+for $group in Json_ObjGetKeys($buffer, '.group')
+	GUICtrlCreateGroup(Json_Get($buffer,'.group.' & $group), 8, 32, 610, 65)
+	for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+		; data
+		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.label'), 108, 46, 65, 17)
+		Json_Put($buffer, GUICtrlCreateInput(Json_Get($buffer, '.data.' & $member & '.value'), 172, 44, 41, 21, 1)
+		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.unit'), 218, 46, 100, 17)
+		; note
+		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
+		Json_Put($buffer, GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1)
+		; test line break
+		; update offset
+	next
+	GUICtrlCreateGroup('', -99, -99, 1, 1)
+next
+
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
-$edit_dekurz = GUICtrlCreateEdit($result_text, 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+
 ; date
 $label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
 $label_datetime = GUICtrlCreateLabel($runtime, 51, 853, 100, 17)
+
 ; button
 $button_history = GUICtrlCreateButton('Historie', 305, 846, 75, 25)
 $button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
