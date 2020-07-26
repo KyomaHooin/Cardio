@@ -583,32 +583,49 @@ func print()
 	; printer create page
 	_PrintStartPrint($printer)
 
+	$page_hegiht=_PrintGetPageHeight($printer)
+	$page_width=_PrintGetPageWidth($printer)
 	; header
-	; ... logo
-	; ... address / contact
-	; ... patient
-	; ... general data
-	; ... separator
+	_PrintSetFont($printer,'Arial',18,0,'bold,underline')
+	_PrintText($printer, text, x, y)
+	;logo [ bmp | jpg | ico ]
+	_PrintImage($printer,"logo.bmp",x, y,300,350)
+	; company
+	_PrintText($printer, 'Julian Delphiki', x, y)
+	_PrintText($printer, 'Street 23', x, y)
+	_PrintText($printer, 'Rotterdam 31415', x, y)
+	_PrintText($printer, 'Tel: 314-159-265', x, y)
+	; patient
+	_PrintText($printer, Json_Get($buffer,'.name'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.id'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.bsa'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.weight'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.height'), x, y)
+	; separator
+	_PrintSetLineWid($printer, 2)
+	_PrintLine($printer, x, y x, y)
+
 	; data
-	; ... group
-	; ... separator
-	; ...
+	_PrintSetFont($printer,'Times New Roman',12,0,'')
+	for $group in Json_ObjGetKeys($buffer, '.group')
+		; group name
+		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), x, y)
+		; group data		
+		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label'), x, y)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.value'), x, y)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), x, y)
+			; break	
+		next
+		; separator
+		_PrintSetLineWid($printer, 2)
+		_PrintLine($printer, x, y x, y)
+	next
 
-	;_PrintSetFont($printer,'Arial',18,0,'bold,underline')
-	;_PrintSetFont($printer,'Times New Roman',12,0,'')
+	; result
+	_PrintText($printer, Json_Get($buffer,'.result'), x, y)
 
-	; bmp, jpg, ico 
-	;_PrintImage($printer,"logo.bmp",x, y,300,350)
-
-	;_PrintSetLineWid($printer, 2)
-	;_PrintLine($printer, x, y x, y)
-
-	;_PrintText($printer, text, x, y)
-
-	;_PrintGetPageHeight($printer)
-	;_PrintGetPageWidth($printer)
-
-	; print end data
+	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
