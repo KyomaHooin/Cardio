@@ -522,7 +522,7 @@ func dekurz_init()
 	$book.Activesheet.Range('A1:A21').Font.Size = 6
 	; columns height
 	$book.Activesheet.Range('A1:A21').RowHeight = 13
-	; columns width
+	; columns width [ group. label | memeber.label | mameber.value | ... ]
 	$book.Activesheet.Range('A1').ColumnWidth = 20
 	$book.Activesheet.Range('B1').ColumnWidth = 11
 	$book.Activesheet.Range('C1').ColumnWidth = 3.5
@@ -536,40 +536,39 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
-	;logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
+	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
 
-	;loop over group
-	; ... groupname
-	; ... values
-	; ... line
-	; ... borders
-
-
-	; leva komora
-	;_Excel_RangeWrite($book, $book.Activesheet, 'Levá komora', 'A3')
-	;$book.Activesheet.Range('A3').Font.Bold = True
-	;_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvedd), 'C3')
-	;_Excel_RangeWrite($book, $book.Activesheet, 'LVEDD:', 'B3')
-	;$book.Activesheet.Range('B3').HorizontalAlignment = $xlRight;
-	;$book.Activesheet.Range('C3').HorizontalAlignment = $xlCenter;
-	;_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_lvedd), 'C3')
-	;$book.Activesheet.Range('B6:H6').MergeCells = True
-	;_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($input_lk_note), 'B6')
-	
-	;With $book.Activesheet.Range('A6:H6').Borders(9)
-	;	.LineStyle = 1
-	;	.Weight = 2
-	;EndWith
+	; generate data
+	for $group in Json_ObjGetKeys($buffer, '.group')
+		; group label
+		_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A3')
+		$book.Activesheet.Range('A3').Font.Bold = True
+		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' $member & '.label' , 'B3')
+			$book.Activesheet.Range('B3').HorizontalAlignment = $xlRight;
+			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' $member & '.value' , 'C3')
+			$book.Activesheet.Range('C3').HorizontalAlignment = $xlCenter;
+			; break
+		next
+		;note
+		$book.Activesheet.Range('B6:H6').MergeCells = True
+		_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.note')), 'B6')
+		; group line
+		With $book.Activesheet.Range('A6:H6').Borders(9)
+			.LineStyle = 1
+			.Weight = 2
+		EndWith
+	next
 
 	; clip
 	$range = $book.ActiveSheet.Range('A1:H21')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-	;logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
+	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
 func print()
