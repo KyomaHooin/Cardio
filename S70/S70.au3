@@ -316,7 +316,7 @@ for $group in Json_ObjGetKeys($buffer, '.group')
 	for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
 		; data
 		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.label'), 108, 46, 65, 17)
-		Json_Put($buffer, GUICtrlCreateInput(Json_Get($buffer, '.data.' & $member & '.value'), 172, 44, 41, 21, 1)
+		Json_Put($buffer,'.data.' & $group & '.' & $member & '.id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $member & '.value'), 172, 44, 41, 21, 1))
 		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.unit'), 218, 46, 100, 17)
 		; note
 		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
