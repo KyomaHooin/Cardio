@@ -380,9 +380,14 @@ While 1
 				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
 						
 					; update GUI from history
-					GUICtrlSetData($input_lk_note, Json_Get($buffer,'.note.lk'))
-					; ....
-					; ....
+					for $group in Json_ObjGetKeys($buffer, '.group')
+						; update note
+						GUICtrlSetData(Json_Get($buffer,'.group.' $group & '.id'), Json_Get($history,'.group.' & $group & '.note'))
+						; update data
+						for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+							GUICtrlSetData(Json_Get($buffer,'.data.' $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
+						next
+					next
 				endif
 			else
 				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
@@ -398,10 +403,14 @@ While 1
 		_Excel_Close($excel)
 
 		; update data buffer
-		Json_Put($buffer,'.note.lk', GUICtrlRead($input_lk_note))
-		;.....
-		;.....
-	
+		for $group in Json_ObjGetKeys($buffer, '.group')
+			; update note
+			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
+			; update data
+			for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+				Json_Put($buffer, '.data.'  & $group & '.' & $member & '.value', GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '.' & $member & '.id')))
+			next
+		next
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
 		FileWrite($out, Json_Encode($buffer))
