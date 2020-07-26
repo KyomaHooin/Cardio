@@ -320,11 +320,12 @@ for $group in Json_ObjGetKeys($buffer, '.group')
 		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.unit'), 218, 46, 100, 17)
 		; note
 		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
-		Json_Put($buffer, GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1)
-		; test line break
-		; update offset
+		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1)
+		; line break
+		; data offset
 	next
 	GUICtrlCreateGroup('', -99, -99, 1, 1)
+	; group offset
 next
 
 ; dekurz
