@@ -62,144 +62,133 @@ global $json_template = '{
 	"date",null,
 	"result":null,
 	"group":{
-		"lk":{
-			"label":"Levá komora",
-			"note":null,
-			"id":null
-		}
-		"ls":"Levá síň",
-		"pk":"Pravá komora",
-		"ps":"Pravá síň",
-		"ao":"Aorta",
-		"ach":"Aortální chlopeň",
-		"mch":"Mitrální chlopeň",
-		"pch":"Pulmonární chlopeň",
-		"tch":"Trikuspidální chlopeň",
-		"p":"Perikard",
-		"other":"Ostatní"
-
+		"lk":{"label":"Levá komora", "note":null, "id":null},
+		"ls":{"label":"Levá síň", "note":null, "id":null},
+		"pk":{"label":"Pravá komora", "note":null, "id":null},
+		"ps":{"label":"Pravá síň", "note":null, "id":null},
+		"ao":{"label":"Aorta", "note":null, "id":null},
+		"ach":{"label":"Aortální chlopeň", "note":null, "id":null},
+		"mch":{"label":"Mitrální chlopeň", "note":null, "id":null},
+		"pch":{"label":"Pulmonární chlopeň", "note":null, "id":null},
+		"tch":{"label":"Trikuspidální chlopeň", "note":null, "id":null},
+		"p":{"label":"Perikard", "note":null, "id":null},
+		"other":{"label":"Ostatní", "note":null, "id":null}
 	},
 	"data":{
 		"lk":{
-			"IVSd":{
-				"label":"IVS",
-				"unit":"mm",
-				"value":null,
-				"id":null
-			}
-			"LVIDd":null,;LVd
-			"LVd index":null,
-			"LVPWd":null,;ZS
-			"LVIDs":null,;LVs
-			"LVs index":null,
-			"LVEF % Teich.":null,
-			"LVEF % odhad":null,
-			"LVmass":null,
-			"LVmass-i^2.7":null,
-			"LVmass-BSA":null,
-			"RTW":null,
-			"FS":null,
-			"EF Biplane":null,;LVEF biplane
-			"SV MOD A4C":null,;.................. calculation
-			"SV MOD A2C":null,;.................. calculation
-			"SV-biplane":null,
-			"LVEDV MOD BP":null,;EDV
-			"LVESV MOD BP":null,;ESV
-			"EDVi":null,
-			"ESVi":null
-				
+			"IVSd":{"label":"IVS", "unit":null, "value":null, "id":null},
+			"LVIDd":{"label":"LVd", "unit":null, "value":null, "id":null},
+			"LVd index":{"label":"LDV index", "unit":null, "value":null, "id":null},
+			"LVPWd":{"label":"ZS", "unit":null, "value":null, "id":null},
+			"LVIDs"::{"label":"LVs", "unit":null, "value":null, "id":null},
+			"LVs index":{"label":"LVs index", "unit":null, "value":null, "id":null},
+			"LVEF % Teich.":{"label":"LVEF % Teich.", "unit":null, "value":null, "id":null},
+			"LVEF % odhad":{"label":"LVEF % odhad", "unit":null, "value":null, "id":null},
+			"LVmass":{"label":"LVmass", "unit":null, "value":null, "id":null},
+			"LVmass-i^2.7":{"label":"LVmass-i^2.7", "unit":null, "value":null, "id":null},
+			"LVmass-BSA":{"label":"LVmass-BSA", "unit":null, "value":null, "id":null},
+			"RTW":{"label":"RTW", "unit":null, "value":null, "id":null},
+			"FS":{"label":"FS", "unit":null, "value":null, "id":null},
+			"EF Biplane":{"label":"LVEF biplane", "unit":null, "value":null, "id":null},
+			"SV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"SV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"SV-biplane":{"label":"SV-biplane", "unit":null, "value":null, "id":null},
+			"LVEDV MOD BP":{"label":"EDV", "unit":null, "value":null, "id":null},
+			"LVESV MOD BP":{"label":"ESV", "unit":null, "value":null, "id":null},
+			"EDVi":{"label":"EDVi", "unit":null, "value":null, "id":null},
+			"ESVi":{"label":"ESVi", "unit":null, "value":null, "id":null}
 		},
 		"ls":{
-			"LA Diam":null,;Plax
-			"LAV-A4C":null,
-			"LAV-2D":null,
-			"LAVi-2D":null,
-			"LAEDV A-L A4C":null,;............... calculation
-			"LAEDV MOD A4C":null,;............... calculation
-			"LAEDV A-L A2C":null,;............... calculation
-			"LAEDV MOD A2C":null,;............... calculation
-			"LA Minor":null,; LA sirka
-			"LA Major":null,; LA delka
-			"LAVi":null;LAVi
+			"LA Diam":{"label":"Plax", "unit":null, "value":null, "id":null},
+			"LAV-A4C":{"label":"LAV-A4C", "unit":null, "value":null, "id":null},
+			"LAV-2D":{"label":"LAV-2D", "unit":null, "value":null, "id":null},
+			"LAVi-2D":{"label":"LAVi-2D", "unit":null, "value":null, "id":null},
+			"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"LAEDV A-L A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"LAEDV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"LA Minor":{"label":"LA šířka", "unit":null, "value":null, "id":null},
+			"LA Major":{"label":"LA délka", "unit":null, "value":null, "id":null},
+			"LAVi":{"label":"LAVi", "unit":null, "value":null, "id":null}
 		},
 		"pk":{
-			"RV Major":null,;RVplax
-			"RVIDd":null,;RVD1
-			"S-RV":null,
-			"EDA":null,
-			"ESA":null,
-			"FAC%":null,
-			"TAPSE":null;TAPSE
+			"RV Major":{"label":"RVplax", "unit":null, "value":null, "id":null},
+			"RVIDd":{"label":"RVD1", "unit":null, "value":null, "id":null},
+			"S-RV":{"label":"S-RV", "unit":null, "value":null, "id":null},
+			"EDA":{"label":"EDA", "unit":null, "value":null, "id":null},
+			"ESA":{"label":"ESA", "unit":null, "value":null, "id":null},
+			"FAC%":{"label":"FAC%", "unit":null, "value":null, "id":null},
+			"TAPSE":{"label":"TAPSE", "unit":null, "value":null, "id":null}
 		},
 		"ps":{
-			"RA Minor":null,;RA sirka
-			"RA Major":null,;RA delka
-			"RAV":null,;RAV
-			"RAVi":null;RAVi
+			"RA Minor":{"label":"RA šířka", "unit":null, "value":null, "id":null},
+			"RA Major":{"label":"RA délka", "unit":null, "value":null, "id":null},
+			"RAV":{"label":"RAV", "unit":null, "value":null, "id":null},
+			"RAVi":{"label":"RAVi", "unit":null, "value":null, "id":null}
 		},
 		"ao":{
-			"Ao Diam SVals":null,;Bulbus
-			"Ao Diam":null;Asc-Ao
+			"Ao Diam SVals":{"label":"Bulbus", "unit":null, "value":null, "id":null},
+			"Ao Diam":{"label":"Asc-Ao", "unit":null, "value":null, "id":null}
 		},
 		"ach":{
-			"LVOT Diam":null,;LVOT
-			"AR Rad":null,;PISA AR radius
-			"AV Vmax":null,;Vmax
-			"AV maxPG":null,;.................. calculation
-			"AV meanPG":null,;................. calculation
-			"AV max/meanPG":null,
-			"AV VTI":null,;Ao-VTI
-			"LVOT VTI":null,;LVOT-VTI
-			"SV/SVi":null,
-			"AVA":null,
-			"AVAi":null,
-			"VTI LVOT/Ao":null,
-			"AR VTI":null,;AR-VTI
-			"AR ERO":null,;AR-ERO
-			"AR RV":null;AR-RV
+			"LVOT Diam":{"label":"LVOT", "unit":null, "value":null, "id":null},
+			"AR Rad":{"label":"PSA AR radius", "unit":null, "value":null, "id":null},
+			"AV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},
+			"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"AV max/meanPG":{"label":"AV max/meanPG", "unit":null, "value":null, "id":null},
+			"AV VTI":{"label":"Ao-VTI", "unit":null, "value":null, "id":null},
+			"LVOT VTI":{"label":"LVOT-VTI", "unit":null, "value":null, "id":null},
+			"SV/SVi":{"label":"SV/SVi", "unit":null, "value":null, "id":null},
+			"AVA":{"label":"AVAi", "unit":null, "value":null, "id":null},
+			"AVAi":{"label":"AVAi", "unit":null, "value":null, "id":null},
+			"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":null, "value":null, "id":null},
+			"AR VTI":{"label":"AR-VTI", "unit":null, "value":null, "id":null},
+			"AR ERO":{"label":"AR-ERO", "unit":null, "value":null, "id":null},
+			"AR RV":{"label":"AR-RV", "unit":null, "value":null, "id":null}
 		},	
 		"mch":{
-			"MR Rad":null,;PISA MR radius
-			"MV E Vel":null,;E
-			"MV A Vel":null,;A
-			"MV E/A Ratio":null,;E/A
-			"MV DecT":null,;DecT
-			"MV1 PHT":null,;MV-PHT
-			"MV maxPG":null,;.................. calculation
-			"MV meanPG":null,;................. calculation
-			"MV max/meanPG":null,
-			"MVA-PHT":null,
-			"MVAi-PHT":null,
-			"EmSept":null,;EmSept
-			"EmLat":null,;EmLat
-			"E/Em":null,
-			"MR VTI":null,;MR-VTI
-			"MR ERO":null,;MR-ERO
-			"MR RV":null;MR-RV
+			"MR Rad":{"label":"PISA MR radius", "unit":null, "value":null, "id":null},
+			"MV E Vel":{"label":"E", "unit":null, "value":null, "id":null},
+			"MV A Vel":{"label":"A", "unit":null, "value":null, "id":null},
+			"MV E/A Ratio":{"label":"E/A", "unit":null, "value":null, "id":null},
+			"MV DecT":{"label":"DecT", "unit":null, "value":null, "id":null},
+			"MV1 PHT":{"label":"MR-PHT", "unit":null, "value":null, "id":null},
+			"MV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"MV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"MV max/meanPG":{"label":"MV max/meanPG", "unit":null, "value":null, "id":null},
+			"MVA-PHT":{"label":"MVA-PHT", "unit":null, "value":null, "id":null},
+			"MVAi-PHT":{"label":"MVAi-PHT", "unit":null, "value":null, "id":null},
+			"EmSept":{"label":"EmSept", "unit":null, "value":null, "id":null},
+			"EmLat":{"label":"EmLat", "unit":null, "value":null, "id":null},
+			"E/Em":{"label":"E/Em", "unit":null, "value":null, "id":null},
+			"MR VTI":{"label":"MR-VTI", "unit":null, "value":null, "id":null},
+			"MR ERO":{"label":"MR-ERO", "unit":null, "value":null, "id":null},
+			"MR RV":{"label":"MR-RV", "unit":null, "value":null, "id":null}
 		},
 		"pch":{
-			"PV Vmax":null,;Vmax
-			"PVAcc T":null,;ACT
-			"PV maxPG":null,;.................. calculation
-			"PV meanPG":null,;................. calculation
-			"PV max/meanPG":null,
-			"PRend PG":null,;PGed-reg
-			"PR maxPG":null,;.................. calculation
-			"PR meanPG":null,;................. calculation
-			"PR max/meanPG",null
+			"PV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},
+			"PVAcc T":{"label":"ACT", "unit":null, "value":null, "id":null},
+			"PV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"PV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
+			"PV max/meanPG":null,{"label":"PV max/meanPG", "unit":null, "value":null, "id":null},
+			"PRend PG":{"label":"PGed-reg", "unit":null, "value":null, "id":null},
+			"PR maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
+			"PR meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
+			"PR max/meanPG":{"label":"PR max/meanPG", "unit":null, "value":null, "id":null}
 		},
 		"tch":{
-			"TR maxPG":null,;PGmax-reg
-			"TR meanPG":null,;PGmean-reg
-			"TV maxPG":null,;.................. calculation
-			"TV meanPG":null,;................. calculation
-			"TV max/meanPG":null
+			"TR maxPG":{"label":"PGmax-reg", "unit":null, "value":null, "id":null},
+			"TR meanPG":{"label":"PGmean-reg", "unit":null, "value":null, "id":null},
+			"TV maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
+			"TV meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
+			"TV max/meanPG":{"label":"TV max/meanPG", "unit":null, "value":null, "id":null}
 		},
 		"p":{
 		},
 		"other":{
-			"IVC Diam Exp":null,;DDŽexp
-			"IVC diam Ins":null;DDŽinsp
+			"IVC Diam Exp":{"label":"DDŽexp", "unit":null, "value":null, "id":null},
+			"IVC diam Ins":{"label":"DDŽins", "unit":null, "value":null, "id":null}
 		}
 	}
 }'
