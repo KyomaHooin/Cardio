@@ -40,7 +40,7 @@
 ; -------------------------------------------------------------------------------------------
 
 $VERSION = '1.5'
-$HISTORY = 24; default stored data age in hours
+$AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
@@ -97,7 +97,7 @@ global $json_template='{' _
 			& '"LVESV MOD BP":{"label":"ESV", "unit":null, "value":null, "id":null},' _
 			& '"EDVi":{"label":"EDVi", "unit":null, "value":null, "id":null},' _
 			& '"ESVi":{"label":"ESVi", "unit":null, "value":null, "id":null}' _
-		& '},' _
+			& '},' _
 		& '"ls":{' _
 			& '"LA Diam":{"label":"Plax", "unit":null, "value":null, "id":null},' _
 			& '"LAV-A4C":{"label":"LAV-A4C", "unit":null, "value":null, "id":null},' _
@@ -194,8 +194,8 @@ global $json_template='{' _
 & '}'
 
 ;data
-global $buffer = Json_Decode($json_template)
 global $history = Json_Decode($json_template)
+global $buffer = Json_Decode($json_template)
 
 ;for $group in Json_Get($history, '.group')
 ;	for $member in Json_Get($history, '.data.' & $group)
@@ -204,6 +204,7 @@ global $history = Json_Decode($json_template)
 ;next
 
 ;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.lk'), 128))
+;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.' & $group), 128))
 ;exit
 
 ;XLS variable
@@ -250,6 +251,7 @@ DirCreate($archive_path)
 
 ; archive file full path
 global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+
 ; export  file full path
 global $export_file = get_export_file($export_path, $cmdline[1])
 if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1])
@@ -257,17 +259,13 @@ if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cm
 ; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file)
-	if @error then
-		MsgBox(0,"test","ERR: Archivig export file...")
-		;FileMove($export_file, $export_file & '.err', 1); overwrite
-		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
-	else
-		MsgBox(0,"test","OLD: Archivig export file...")
-		;FileMove($export_file, $export_file & '.old', 1); overwrite
-	endif
+;	if @error then
+;		FileMove($export_file, $export_file & '.err', 1); overwrite
+;		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
+;	else
+;		FileMove($export_file, $export_file & '.old', 1); overwrite
+;	endif
 endif
-
-exit
 
 ; update history buffer from archive
 if FileExists($archive_file) then
@@ -275,17 +273,21 @@ if FileExists($archive_file) then
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
+MsgBox(0,"debug", "Done.")
+
+exit
+
 ; update data buffer note from history
-if $history then
-	for $group in Json_Get($history,'.group')
-		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'))
-	next
-else
-	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
-endif
+;if $history then
+;	for $group in Json_Get($history,'.group')
+;		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'))
+;	next
+;else
+;	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
+;endif
 
 ; calculate complex variables
-calculate()
+;calculate()
 
 ; default result template
 ;if not Json_Get($export, 'result') then
@@ -383,7 +385,7 @@ While 1
 	; load history
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
-			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $HISTORY then
+			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $AGE then
 				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
 
 					; update GUI from history
@@ -450,7 +452,7 @@ func read_config_file($file)
 	for $i = 0 to UBound($cfg) - 1
 		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
 		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'history' then $HISTORY = $cfg[$i][1]
+		if $cfg[$i][0] == 'history' then $AGE = $cfg[$i][1]
 	next
 endfunc
 
@@ -469,20 +471,14 @@ func export_parse($export)
 	local $raw
 	_FileReadToArray($export, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
-	MsgBox(0,"test", "Paring..")
-	for $group in Json_Get($history, '.group')
-		MsgBox(0,"?", $group)
-		;for $member in Json_Get($history, '.data.' & $group)
-		;	MsgBox(0,"current", $group & ' -> '& $member)
-			;for $i = 0 to UBound($raw) - 1
-			;	if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-			;		MsgBox(0,"test", "Found match.. " & $member)
-			;		Json_Put($buffer, '.data.' & $group & '.' & $member & '.value', Number(StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')))
-			;		;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.' & $group & '.' & $member), 128))
-			;	endif
-			;next
-		;next
-		MsgBox(0,"?", "Going to next group...")
+	for $group in Json_ObjGet($history, '.group')
+		for $member in Json_ObjGet($history, '.data.' & $group)
+			for $i = 0 to UBound($raw) - 1
+				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
+					Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '^.*\t(.*)\t.*', '$1')), True); check exists
+				endif
+			next
+		next
 	next
 endfunc
 
