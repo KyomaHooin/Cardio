@@ -5,13 +5,6 @@ DESCRIPTION
 
 GE Vivid S70 Medicus 3 integration.
 
-TODO
-<pre>
--GUI
--dynamic print
--dynamic XLS
-</pre>
-
 MEDICUS SETUP
 
 ![Medicus](https://github.com/KyomaHooin/Cardio/raw/master/S70/Medicus.png "screenshot")
@@ -26,6 +19,7 @@ FILE
          S70.au3 - Main GUI source code.
        Print.au3 - Printing library by "martin".
         Json.au3 - JSON library by "Ward".
+  BinaryCall.au3 - JSON binary wrapper.
 
        print.dll - Printing DLL.
          S70.ini - Program configuration file.    
