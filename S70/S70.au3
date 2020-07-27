@@ -194,7 +194,17 @@ global $json_template='{' _
 & '}'
 
 ;data
-global $history, $buffer = Json_Decode($json_template)
+global $buffer = Json_Decode($json_template)
+global $history = Json_Decode($json_template)
+
+;for $group in Json_Get($history, '.group')
+;	for $member in Json_Get($history, '.data.' & $group)
+;		MsgBox(0,"debug", $member)
+;	next
+;next
+
+;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.lk'), 128))
+;exit
 
 ;XLS variable
 global $excel, $book
@@ -246,7 +256,7 @@ if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cm
 
 ; update data buffer from export
 if FileExists($export_file) then
-	$parse = export_parse($export_file, $buffer)
+	$parse = export_parse($export_file)
 	if @error then
 		MsgBox(0,"test","ERR: Archivig export file...")
 		;FileMove($export_file, $export_file & '.err', 1); overwrite
@@ -455,21 +465,24 @@ func get_export_file($export_path, $rc)
 endfunc
 
 ; parse S70 export file
-func export_parse($file, $buffer)
+func export_parse($export)
 	local $raw
+	_FileReadToArray($export, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
-	_ArrayDisplay($raw)
-	MsgBox(0,"test", "Filling buffer..")
-	for $group in Json_Get($buffer, '.group')
-		MsgBox(0,"test", "Parsing group.. " & $group)
-		for $member in Json_Get($buffer, '.data.' & $group)
-			MsgBox(0,"test", "Parsing member.. " & $member)
+	MsgBox(0,"test", "Paring..")
+	for $group in Json_Get($history, '.group')
+		MsgBox(0,"?", $group)
+		;for $member in Json_Get($history, '.data.' & $group)
+		;	MsgBox(0,"current", $group & ' -> '& $member)
 			;for $i = 0 to UBound($raw) - 1
 			;	if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-			;		Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1'))
+			;		MsgBox(0,"test", "Found match.. " & $member)
+			;		Json_Put($buffer, '.data.' & $group & '.' & $member & '.value', Number(StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1')))
+			;		;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.' & $group & '.' & $member), 128))
 			;	endif
 			;next
-		next
+		;next
+		MsgBox(0,"?", "Going to next group...")
 	next
 endfunc
 
