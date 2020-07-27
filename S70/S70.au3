@@ -26,12 +26,12 @@
 ; INCLUDE
 ; -------------------------------------------------------------------------------------------
 
-#include <GUIConstantsEx.au3>
-#include <Clipboard.au3>
-#include <Excel.au3>
-#include <ExcelConstants.au3>
-#include <File.au3>
-#include <Date.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\GUIConstantsEx.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\Clipboard.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\Excel.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\ExcelConstants.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\File.au3>
+#include <C:\Program Files (x86)\AutoIt3\Include\Date.au3>
 #include <Print.au3>
 #include <Json.au3>
 
@@ -52,153 +52,152 @@ global $archive_path = @ScriptDir & '\' & 'archiv'
 global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
 ;data template
-global $json_template = '{
-	"patient":null,
-	"name":null,
-	"poj":null,
-	"bsa":null,
-	"weight":null,
-	"height":null,
-	"date",null,
-	"result":null,
-	"group":{
-		"lk":{"label":"Levá komora", "note":null, "id":null},
-		"ls":{"label":"Levá síň", "note":null, "id":null},
-		"pk":{"label":"Pravá komora", "note":null, "id":null},
-		"ps":{"label":"Pravá síň", "note":null, "id":null},
-		"ao":{"label":"Aorta", "note":null, "id":null},
-		"ach":{"label":"Aortální chlopeň", "note":null, "id":null},
-		"mch":{"label":"Mitrální chlopeň", "note":null, "id":null},
-		"pch":{"label":"Pulmonární chlopeň", "note":null, "id":null},
-		"tch":{"label":"Trikuspidální chlopeň", "note":null, "id":null},
-		"p":{"label":"Perikard", "note":null, "id":null},
-		"other":{"label":"Ostatní", "note":null, "id":null}
-	},
-	"data":{
-		"lk":{
-			"IVSd":{"label":"IVS", "unit":null, "value":null, "id":null},
-			"LVIDd":{"label":"LVd", "unit":null, "value":null, "id":null},
-			"LVd index":{"label":"LDV index", "unit":null, "value":null, "id":null},
-			"LVPWd":{"label":"ZS", "unit":null, "value":null, "id":null},
-			"LVIDs"::{"label":"LVs", "unit":null, "value":null, "id":null},
-			"LVs index":{"label":"LVs index", "unit":null, "value":null, "id":null},
-			"LVEF % Teich.":{"label":"LVEF % Teich.", "unit":null, "value":null, "id":null},
-			"LVEF % odhad":{"label":"LVEF % odhad", "unit":null, "value":null, "id":null},
-			"LVmass":{"label":"LVmass", "unit":null, "value":null, "id":null},
-			"LVmass-i^2.7":{"label":"LVmass-i^2.7", "unit":null, "value":null, "id":null},
-			"LVmass-BSA":{"label":"LVmass-BSA", "unit":null, "value":null, "id":null},
-			"RTW":{"label":"RTW", "unit":null, "value":null, "id":null},
-			"FS":{"label":"FS", "unit":null, "value":null, "id":null},
-			"EF Biplane":{"label":"LVEF biplane", "unit":null, "value":null, "id":null},
-			"SV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"SV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"SV-biplane":{"label":"SV-biplane", "unit":null, "value":null, "id":null},
-			"LVEDV MOD BP":{"label":"EDV", "unit":null, "value":null, "id":null},
-			"LVESV MOD BP":{"label":"ESV", "unit":null, "value":null, "id":null},
-			"EDVi":{"label":"EDVi", "unit":null, "value":null, "id":null},
-			"ESVi":{"label":"ESVi", "unit":null, "value":null, "id":null}
-		},
-		"ls":{
-			"LA Diam":{"label":"Plax", "unit":null, "value":null, "id":null},
-			"LAV-A4C":{"label":"LAV-A4C", "unit":null, "value":null, "id":null},
-			"LAV-2D":{"label":"LAV-2D", "unit":null, "value":null, "id":null},
-			"LAVi-2D":{"label":"LAVi-2D", "unit":null, "value":null, "id":null},
-			"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"LAEDV A-L A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"LAEDV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"LA Minor":{"label":"LA šířka", "unit":null, "value":null, "id":null},
-			"LA Major":{"label":"LA délka", "unit":null, "value":null, "id":null},
-			"LAVi":{"label":"LAVi", "unit":null, "value":null, "id":null}
-		},
-		"pk":{
-			"RV Major":{"label":"RVplax", "unit":null, "value":null, "id":null},
-			"RVIDd":{"label":"RVD1", "unit":null, "value":null, "id":null},
-			"S-RV":{"label":"S-RV", "unit":null, "value":null, "id":null},
-			"EDA":{"label":"EDA", "unit":null, "value":null, "id":null},
-			"ESA":{"label":"ESA", "unit":null, "value":null, "id":null},
-			"FAC%":{"label":"FAC%", "unit":null, "value":null, "id":null},
-			"TAPSE":{"label":"TAPSE", "unit":null, "value":null, "id":null}
-		},
-		"ps":{
-			"RA Minor":{"label":"RA šířka", "unit":null, "value":null, "id":null},
-			"RA Major":{"label":"RA délka", "unit":null, "value":null, "id":null},
-			"RAV":{"label":"RAV", "unit":null, "value":null, "id":null},
-			"RAVi":{"label":"RAVi", "unit":null, "value":null, "id":null}
-		},
-		"ao":{
-			"Ao Diam SVals":{"label":"Bulbus", "unit":null, "value":null, "id":null},
-			"Ao Diam":{"label":"Asc-Ao", "unit":null, "value":null, "id":null}
-		},
-		"ach":{
-			"LVOT Diam":{"label":"LVOT", "unit":null, "value":null, "id":null},
-			"AR Rad":{"label":"PSA AR radius", "unit":null, "value":null, "id":null},
-			"AV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},
-			"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"AV max/meanPG":{"label":"AV max/meanPG", "unit":null, "value":null, "id":null},
-			"AV VTI":{"label":"Ao-VTI", "unit":null, "value":null, "id":null},
-			"LVOT VTI":{"label":"LVOT-VTI", "unit":null, "value":null, "id":null},
-			"SV/SVi":{"label":"SV/SVi", "unit":null, "value":null, "id":null},
-			"AVA":{"label":"AVAi", "unit":null, "value":null, "id":null},
-			"AVAi":{"label":"AVAi", "unit":null, "value":null, "id":null},
-			"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":null, "value":null, "id":null},
-			"AR VTI":{"label":"AR-VTI", "unit":null, "value":null, "id":null},
-			"AR ERO":{"label":"AR-ERO", "unit":null, "value":null, "id":null},
-			"AR RV":{"label":"AR-RV", "unit":null, "value":null, "id":null}
-		},	
-		"mch":{
-			"MR Rad":{"label":"PISA MR radius", "unit":null, "value":null, "id":null},
-			"MV E Vel":{"label":"E", "unit":null, "value":null, "id":null},
-			"MV A Vel":{"label":"A", "unit":null, "value":null, "id":null},
-			"MV E/A Ratio":{"label":"E/A", "unit":null, "value":null, "id":null},
-			"MV DecT":{"label":"DecT", "unit":null, "value":null, "id":null},
-			"MV1 PHT":{"label":"MR-PHT", "unit":null, "value":null, "id":null},
-			"MV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"MV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"MV max/meanPG":{"label":"MV max/meanPG", "unit":null, "value":null, "id":null},
-			"MVA-PHT":{"label":"MVA-PHT", "unit":null, "value":null, "id":null},
-			"MVAi-PHT":{"label":"MVAi-PHT", "unit":null, "value":null, "id":null},
-			"EmSept":{"label":"EmSept", "unit":null, "value":null, "id":null},
-			"EmLat":{"label":"EmLat", "unit":null, "value":null, "id":null},
-			"E/Em":{"label":"E/Em", "unit":null, "value":null, "id":null},
-			"MR VTI":{"label":"MR-VTI", "unit":null, "value":null, "id":null},
-			"MR ERO":{"label":"MR-ERO", "unit":null, "value":null, "id":null},
-			"MR RV":{"label":"MR-RV", "unit":null, "value":null, "id":null}
-		},
-		"pch":{
-			"PV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},
-			"PVAcc T":{"label":"ACT", "unit":null, "value":null, "id":null},
-			"PV maxPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"PV meanPG":{"label":null, "unit":null, "value":null, "id":null},; calculation
-			"PV max/meanPG":null,{"label":"PV max/meanPG", "unit":null, "value":null, "id":null},
-			"PRend PG":{"label":"PGed-reg", "unit":null, "value":null, "id":null},
-			"PR maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
-			"PR meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
-			"PR max/meanPG":{"label":"PR max/meanPG", "unit":null, "value":null, "id":null}
-		},
-		"tch":{
-			"TR maxPG":{"label":"PGmax-reg", "unit":null, "value":null, "id":null},
-			"TR meanPG":{"label":"PGmean-reg", "unit":null, "value":null, "id":null},
-			"TV maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
-			"TV meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},; calculation
-			"TV max/meanPG":{"label":"TV max/meanPG", "unit":null, "value":null, "id":null}
-		},
-		"p":{
-		},
-		"other":{
-			"IVC Diam Exp":{"label":"DDŽexp", "unit":null, "value":null, "id":null},
-			"IVC diam Ins":{"label":"DDŽins", "unit":null, "value":null, "id":null}
-		}
-	}
-}'
+global $json_template='{' _
+	& '"patient":null,' _
+	& '"name":null,' _
+	& '"poj":null,' _
+	& '"bsa":null,' _
+	& '"weight":null,' _
+	& '"height":null,' _
+	& '"date",null,' _
+	& '"result":null,' _
+	& '"group":{' _
+		& '"lk":{"label":"Levá komora", "note":null, "id":null},' _
+		& '"ls":{"label":"Levá síň", "note":null, "id":null},' _
+		& '"pk":{"label":"Pravá komora", "note":null, "id":null},' _
+		& '"ps":{"label":"Pravá síň", "note":null, "id":null},' _
+		& '"ao":{"label":"Aorta", "note":null, "id":null},' _
+		& '"ach":{"label":"Aortální chlopeň", "note":null, "id":null},' _
+		& '"mch":{"label":"Mitrální chlopeň", "note":null, "id":null},' _
+		& '"pch":{"label":"Pulmonární chlopeň", "note":null, "id":null},' _
+		& '"tch":{"label":"Trikuspidální chlopeň", "note":null, "id":null},' _
+		& '"p":{"label":"Perikard", "note":null, "id":null},' _
+		& '"other":{"label":"Ostatní", "note":null, "id":null}' _
+	& '},' _
+	& '"data":{' _
+		& '"lk":{' _
+			& '"IVSd":{"label":"IVS", "unit":null, "value":null, "id":null},' _
+			& '"LVIDd":{"label":"LVd", "unit":null, "value":null, "id":null},' _
+			& '"LVd index":{"label":"LDV index", "unit":null, "value":null, "id":null},' _
+			& '"LVPWd":{"label":"ZS", "unit":null, "value":null, "id":null},' _
+			& '"LVIDs"::{"label":"LVs", "unit":null, "value":null, "id":null},' _
+			& '"LVs index":{"label":"LVs index", "unit":null, "value":null, "id":null},' _
+			& '"LVEF % Teich.":{"label":"LVEF % Teich.", "unit":null, "value":null, "id":null},' _
+			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":null, "value":null, "id":null},' _
+			& '"LVmass":{"label":"LVmass", "unit":null, "value":null, "id":null},' _
+			& '"LVmass-i^2.7":{"label":"LVmass-i^2.7", "unit":null, "value":null, "id":null},' _
+			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":null, "value":null, "id":null},' _
+			& '"RTW":{"label":"RTW", "unit":null, "value":null, "id":null},' _
+			& '"FS":{"label":"FS", "unit":null, "value":null, "id":null},' _
+			& '"EF Biplane":{"label":"LVEF biplane", "unit":null, "value":null, "id":null},' _
+			& '"SV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"SV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"SV-biplane":{"label":"SV-biplane", "unit":null, "value":null, "id":null},' _
+			& '"LVEDV MOD BP":{"label":"EDV", "unit":null, "value":null, "id":null},' _
+			& '"LVESV MOD BP":{"label":"ESV", "unit":null, "value":null, "id":null},' _
+			& '"EDVi":{"label":"EDVi", "unit":null, "value":null, "id":null},' _
+			& '"ESVi":{"label":"ESVi", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"ls":{' _
+			& '"LA Diam":{"label":"Plax", "unit":null, "value":null, "id":null},' _
+			& '"LAV-A4C":{"label":"LAV-A4C", "unit":null, "value":null, "id":null},' _
+			& '"LAV-2D":{"label":"LAV-2D", "unit":null, "value":null, "id":null},' _
+			& '"LAVi-2D":{"label":"LAVi-2D", "unit":null, "value":null, "id":null},' _
+			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"LA Minor":{"label":"LA šířka", "unit":null, "value":null, "id":null},' _
+			& '"LA Major":{"label":"LA délka", "unit":null, "value":null, "id":null},' _
+			& '"LAVi":{"label":"LAVi", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"pk":{' _
+			& '"RV Major":{"label":"RVplax", "unit":null, "value":null, "id":null},' _
+			& '"RVIDd":{"label":"RVD1", "unit":null, "value":null, "id":null},' _
+			& '"S-RV":{"label":"S-RV", "unit":null, "value":null, "id":null},' _
+			& '"EDA":{"label":"EDA", "unit":null, "value":null, "id":null},' _
+			& '"ESA":{"label":"ESA", "unit":null, "value":null, "id":null},' _
+			& '"FAC%":{"label":"FAC%", "unit":null, "value":null, "id":null},' _
+			& '"TAPSE":{"label":"TAPSE", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"ps":{' _
+			& '"RA Minor":{"label":"RA šířka", "unit":null, "value":null, "id":null},' _
+			& '"RA Major":{"label":"RA délka", "unit":null, "value":null, "id":null},' _
+			& '"RAV":{"label":"RAV", "unit":null, "value":null, "id":null},' _
+			& '"RAVi":{"label":"RAVi", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"ao":{' _
+			& '"Ao Diam SVals":{"label":"Bulbus", "unit":null, "value":null, "id":null},' _
+			& '"Ao Diam":{"label":"Asc-Ao", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"ach":{' _
+			& '"LVOT Diam":{"label":"LVOT", "unit":null, "value":null, "id":null},' _
+			& '"AR Rad":{"label":"PSA AR radius", "unit":null, "value":null, "id":null},' _
+			& '"AV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},' _
+			& '"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":null, "value":null, "id":null},' _
+			& '"AV VTI":{"label":"Ao-VTI", "unit":null, "value":null, "id":null},' _
+			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":null, "value":null, "id":null},' _
+			& '"SV/SVi":{"label":"SV/SVi", "unit":null, "value":null, "id":null},' _
+			& '"AVA":{"label":"AVAi", "unit":null, "value":null, "id":null},' _
+			& '"AVAi":{"label":"AVAi", "unit":null, "value":null, "id":null},' _
+			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":null, "value":null, "id":null},' _
+			& '"AR VTI":{"label":"AR-VTI", "unit":null, "value":null, "id":null},' _
+			& '"AR ERO":{"label":"AR-ERO", "unit":null, "value":null, "id":null},' _
+			& '"AR RV":{"label":"AR-RV", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"mch":{' _
+			& '"MR Rad":{"label":"PISA MR radius", "unit":null, "value":null, "id":null},' _
+			& '"MV E Vel":{"label":"E", "unit":null, "value":null, "id":null},' _
+			& '"MV A Vel":{"label":"A", "unit":null, "value":null, "id":null},' _
+			& '"MV E/A Ratio":{"label":"E/A", "unit":null, "value":null, "id":null},' _
+			& '"MV DecT":{"label":"DecT", "unit":null, "value":null, "id":null},' _
+			& '"MV1 PHT":{"label":"MR-PHT", "unit":null, "value":null, "id":null},' _
+			& '"MV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"MV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":null, "value":null, "id":null},' _
+			& '"MVA-PHT":{"label":"MVA-PHT", "unit":null, "value":null, "id":null},' _
+			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":null, "value":null, "id":null},' _
+			& '"EmSept":{"label":"EmSept", "unit":null, "value":null, "id":null},' _
+			& '"EmLat":{"label":"EmLat", "unit":null, "value":null, "id":null},' _
+			& '"E/Em":{"label":"E/Em", "unit":null, "value":null, "id":null},' _
+			& '"MR VTI":{"label":"MR-VTI", "unit":null, "value":null, "id":null},' _
+			& '"MR ERO":{"label":"MR-ERO", "unit":null, "value":null, "id":null},' _
+			& '"MR RV":{"label":"MR-RV", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"pch":{' _
+			& '"PV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},' _
+			& '"PVAcc T":{"label":"ACT", "unit":null, "value":null, "id":null},' _
+			& '"PV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"PV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":null, "value":null, "id":null},' _
+			& '"PRend PG":{"label":"PGed-reg", "unit":null, "value":null, "id":null},' _
+			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"tch":{' _
+			& '"TR maxPG":{"label":"PGmax-reg", "unit":null, "value":null, "id":null},' _
+			& '"TR meanPG":{"label":"PGmean-reg", "unit":null, "value":null, "id":null},' _
+			& '"TV maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"TV meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":null, "value":null, "id":null}' _
+		& '},' _
+		& '"p":{' _
+		& '},' _
+		& '"other":{' _
+			& '"IVC Diam Exp":{"label":"DDŽexp", "unit":null, "value":null, "id":null},' _
+			& '"IVC diam Ins":{"label":"DDŽins", "unit":null, "value":null, "id":null}' _
+		& '}' _
+	& '}' _
+& '}'
 
 ;data
 global $history, $buffer = Json_Decode($json_template)
 
 ;XLS variable
 global $excel, $book
-
 
 ; -------------------------------------------------------------------------------------------
 ; CONTROL
@@ -242,7 +241,23 @@ DirCreate($archive_path)
 ; archive file full path
 global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
 ; export  file full path
-global $export_file = $export_path & '\' & get_export_file($export_path, $cmdline[1])
+global $export_file = get_export_file($export_path, $cmdline[1])
+if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1])
+
+; update data buffer from export
+if FileExists($export_file) then
+	$parse = export_parse($export_file, $buffer)
+	if @error then
+		MsgBox(0,"test","ERR: Archivig export file...")
+		;FileMove($export_file, $export_file & '.err', 1); overwrite
+		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
+	else
+		MsgBox(0,"test","OLD: Archivig export file...")
+		;FileMove($export_file, $export_file & '.old', 1); overwrite
+	endif
+endif
+
+exit
 
 ; update history buffer from archive
 if FileExists($archive_file) then
@@ -250,23 +265,10 @@ if FileExists($archive_file) then
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-; update data buffer from export
-if FileExists($export_file) then
-	$parse = export_parse($export_file, $buffer)
-	if @error then
-		; error
-		FileMove($export_file, $export_file & '.err', 1); overwrite
-		if @error then logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
-	else
-		; archive
-		FileMove($export_file, $export_file & '.old', 1); overwrite
-	endif
-endif
-
 ; update data buffer note from history
 if $history then
-	for $note in Json _ObjGetKeys($history, '.note')
-		Json_Put($buffer, '.note.' & $note, Json_Get($archive, '.note.' & $n))
+	for $group in Json_Get($history,'.group')
+		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'))
 	next
 else
 	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
@@ -301,16 +303,16 @@ $label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
 $input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
 
 ; groups
-for $group in Json_ObjGetKeys($buffer, '.group')
-	GUICtrlCreateGroup(Json_Get($buffer,'.group.' & $group), 8, 32, 610, 65)
-	for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+for $group in Json_Get($buffer, '.group')
+	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
+	for $member in Json_Get($buffer, '.data.' & $group)
 		; data
 		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.label'), 108, 46, 65, 17)
 		Json_Put($buffer,'.data.' & $group & '.' & $member & '.id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $member & '.value'), 172, 44, 41, 21, 1))
 		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.unit'), 218, 46, 100, 17)
 		; note
 		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
-		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1)
+		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
 		; line break
 		; data offset
 	next
@@ -371,25 +373,25 @@ While 1
 	; load history
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
-			if _DateDiff('h', $runtime, Json_Get($archive,'.date') < $HISTORY then
+			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $HISTORY then
 				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
-						
+
 					; update GUI from history
-					for $group in Json_ObjGetKeys($buffer, '.group')
+					for $group in Json_Get($buffer, '.group')
 						; update note
-						GUICtrlSetData(Json_Get($buffer,'.group.' $group & '.id'), Json_Get($history,'.group.' & $group & '.note'))
+						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
 						; update data
-						for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
-							GUICtrlSetData(Json_Get($buffer,'.data.' $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
+						for $member in Json_Get($buffer, '.data.' & $group)
+							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
 						next
 					next
 				endif
 			else
 				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
-			endif	
+			endif
 		else
 			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
-		endif		
+		endif
 	endif
 	; write & exit
 	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
@@ -398,11 +400,11 @@ While 1
 		_Excel_Close($excel)
 
 		; update data buffer
-		for $group in Json_ObjGetKeys($buffer, '.group')
+		for $group in Json_Get($buffer, '.group')
 			; update note
 			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
 			; update data
-			for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
+			for $member in Json_Get($buffer, '.data.' & $group)
 				Json_Put($buffer, '.data.'  & $group & '.' & $member & '.value', GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '.' & $member & '.id')))
 			next
 		next
@@ -430,20 +432,10 @@ func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
 
-; find export file
-func get_export_file($export_path, $rc)
-	local $list = _FileListToArray($export_path, '*.txt', 1); files only
-	if not @error then
-		for $i = 1 to ubound($list) - 1
-			if StringRegExp($list[$i], '^' & $rc & '_.*') then return $list[$i]
-		next
-	endif
-endfunc
-
-; read configuration file 
+; read configuration file
 func read_config_file($file)
 	local $cfg
-	_FileReadToArray($file, $cfg, 0, '='); no count, split by '='
+	_FileReadToArray($file, $cfg, 0, "=")
 	if @error then return SetError(1)
 	for $i = 0 to UBound($cfg) - 1
 		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
@@ -452,40 +444,53 @@ func read_config_file($file)
 	next
 endfunc
 
-; parse S70 export file 
+; find export file
+func get_export_file($export_path, $rc)
+	local $list = _FileListToArray($export_path, '*.txt', 1); files only
+	if @error then Return SetError(1)
+	for $i = 1 to ubound($list) - 1
+		if StringRegExp($list[$i], '^' & $rc & '_.*') then return $export_path & '\' & $list[$i]
+	next
+	return ''
+endfunc
+
+; parse S70 export file
 func export_parse($file, $buffer)
 	local $raw
-	_FileReadToArray($file, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
-	for $group in Json_ObjGetKeys($buffer, '.data')
-		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
-			for $i = 0 to UBound($raw) - 1
-				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-					Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1'))
-				endif
-			next
+	_ArrayDisplay($raw)
+	MsgBox(0,"test", "Filling buffer..")
+	for $group in Json_Get($buffer, '.group')
+		MsgBox(0,"test", "Parsing group.. " & $group)
+		for $member in Json_Get($buffer, '.data.' & $group)
+			MsgBox(0,"test", "Parsing member.. " & $member)
+			;for $i = 0 to UBound($raw) - 1
+			;	if StringRegExp($raw[$i], '^' & $member & '\t.*') then
+			;		Json_Put($buffer, '.data.' & $group & '.' & $member, StringRegExpReplace($raw[$i], '.*\t(.*)\t.*', '$1'))
+			;	endif
+			;next
 		next
 	next
 endfunc
 
 ; calculate aditional variables
-calculate()
+func calculate()
 	if $buffer then
 		; LVEF % Teich.
 		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.LVIDs') then
-			Json_Put($buffer, '.data.lk.LVEF % Teich', 7/(2.4 + Json_Get($buffer, '.data.lk.LVIDd')/10)*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3 - 7/(2.4 + Json_Get($buffer, '.data.lk.LVIDs')/10)*(Json_Get($buffer, '.data.lk.LVIDs')/10)^3)/(7/(2.4 + Json_Get($buffer, '.data.lk.LVIDd')/10)*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3)*100
+			Json_Put($buffer, '.data.lk.LVEF % Teich', 7/(2.4+Json_Get($buffer, '.data.lk.LVIDd')/10));*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3 - 7/(2.4+Json_Get($buffer, '.data.lk.LVIDs')/10)*(Json_Get($buffer, '.data.lk.LVIDs')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd')/10)*(Json_Get($buffer, '.data.lk.LVIDd')/10)^3)*100)
 		endif
 		; LVmass
 		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.IVSd') and Json_Get($buffer, '.data.lk.LVPWd') then
-			Json_Put($buffer, '.data.lk.LVmass', 1.04*((Json_get($buffer, '.data.lk.LVIDd')/10 + Json_Get($buffer, '.data.lk.IVSd')/10 + Json_Get($buffer, '.data.lk.LVPWd')/10)^3 - (Json_Get($buffer, '.data.lk.LVIDd')/10)^3) - 13.6
+			Json_Put($buffer, '.data.lk.LVmass', 1.04*((Json_get($buffer, '.data.lk.LVIDd')/10 + Json_Get($buffer, '.data.lk.IVSd')/10 + Json_Get($buffer, '.data.lk.LVPWd')/10)^3 - (Json_Get($buffer, '.data.lk.LVIDd')/10)^3) - 13.6)
 		endif
 		; LVmass-i^2,7
-		if Json_Get($buffer, '.height') and Json_Get($buffer, '.data.lk.LVmass') then
-			Json_Put($buffer, 'data.lk.LVmass-i^2.7', Json_Get($buffer, 'data.lk.LVmass')/(Json_Get($buffer, '.height')/100)^2.7
+		if Json_Get($buffer, '.height') <> '' and Json_Get($buffer, '.data.lk.LVmass') <> '' then
+			Json_Put($buffer, 'data.lk.LVmass-i^2.7', Json_Get($buffer, 'data.lk.LVmass')/(Json_Get($buffer, '.height')/100)^2.7)
 		endif
 		; LVmass-BSA
 		if Json_Get($buffer, '.bsa') and Json_Get($buffer, '.data.lk.LVmass') then
-			Json_Put($buffer,'.data.lk.LVmass-BSA', Json_Get($buffer, '.data.lk.LVmass')/Json_Get($buffer, '.bsa')
+			Json_Put($buffer,'.data.lk.LVmass-BSA', Json_Get($buffer, '.data.lk.LVmass')/Json_Get($buffer, '.bsa'))
 		endif
 		; RTW
 		if Json_Get($buffer, '.data.lk.LVIDd') and Json_Get($buffer, '.data.lk.LVPWd') then
@@ -504,6 +509,7 @@ calculate()
 			Json_Put($buffer,'.data.ls.LAV-A4C', (Json_Get($buffer, '.data.ls.LAEDV A-L A4C') + Json_Get($buffer, '.data.ls.LAEDV MOD A4C'))/2)
 		endif
 	endif
+EndFunc
 
 ; initialize XLS template
 func dekurz_init()
@@ -537,14 +543,14 @@ func dekurz()
 	_ClipBoard_Close()
 
 	; generate data
-	for $group in Json_ObjGetKeys($buffer, '.group')
+	for $group in Json_Get($buffer, '.group')
 		; group label
 		_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A3')
 		$book.Activesheet.Range('A3').Font.Bold = True
-		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' $member & '.label' , 'B3')
+		for $member in Json_Get($buffer, '.data.' & $group)
+			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' & $member & '.label'), 'B3')
 			$book.Activesheet.Range('B3').HorizontalAlignment = $xlRight;
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' $member & '.value' , 'C3')
+			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' & $member & '.value') , 'C3')
 			$book.Activesheet.Range('C3').HorizontalAlignment = $xlCenter;
 			; break
 		next
@@ -566,8 +572,13 @@ func dekurz()
 EndFunc
 
 func print()
-	local $printer,$printer_error,$marginx,$marginy
+	local $printer,$printer_error
+
+	local $text,$x,$y
+
 	;priner init
+
+
 	$printer = _PrintDllStart($printer_error)
 	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
 
@@ -581,47 +592,46 @@ func print()
 	$page_width=_PrintGetPageWidth($printer)
 	; header
 	_PrintSetFont($printer,'Arial',18,0,'bold,underline')
-	_PrintText($printer, text, x, y)
+	_PrintText($printer, $text, $x, $y)
 	;logo [ bmp | jpg | ico ]
-	_PrintImage($printer,"logo.bmp",x, y,300,350)
+	_PrintImage($printer,"logo.bmp", $x, $y,300,350)
 	; company
-	_PrintText($printer, 'Julian Delphiki', x, y)
-	_PrintText($printer, 'Street 23', x, y)
-	_PrintText($printer, 'Rotterdam 31415', x, y)
-	_PrintText($printer, 'Tel: 314-159-265', x, y)
+	_PrintText($printer, 'Julian Delphiki', $x, $y)
+	_PrintText($printer, 'Street 23', $x, $y)
+	_PrintText($printer, 'Rotterdam 31415', $x, $y)
+	_PrintText($printer, 'Tel: 314-159-265', $x, $y)
 	; patient
-	_PrintText($printer, Json_Get($buffer,'.name'), x, y)
-	_PrintText($printer, Json_Get($buffer,'.id'), x, y)
-	_PrintText($printer, Json_Get($buffer,'.bsa'), x, y)
-	_PrintText($printer, Json_Get($buffer,'.weight'), x, y)
-	_PrintText($printer, Json_Get($buffer,'.height'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.name'), $x, $y)
+	_PrintText($printer, Json_Get($buffer,'.id'), $x, $y)
+	_PrintText($printer, Json_Get($buffer,'.bsa'), $x, $y)
+	_PrintText($printer, Json_Get($buffer,'.weight'), $x, $y)
+	_PrintText($printer, Json_Get($buffer,'.height'), $x, $y)
 	; separator
 	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, x, y x, y)
+	_PrintLine($printer, $x, $y, $x, $y)
 
 	; data
 	_PrintSetFont($printer,'Times New Roman',12,0,'')
-	for $group in Json_ObjGetKeys($buffer, '.group')
+	for $group in Json_Get($buffer, '.group')
 		; group name
-		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), x, y)
-		; group data		
-		for $member in Json_ObjGetKeys($buffer, '.data.' & $group)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label'), x, y)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.value'), x, y)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), x, y)
-			; break	
+		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), $x, $y)
+		; group data
+		for $member in Json_Get($buffer, '.data.' & $group)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label'), $x, $y)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.value'), $x, $y)
+			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), $x, $y)
+			; break
 		next
 		; separator
 		_PrintSetLineWid($printer, 2)
-		_PrintLine($printer, x, y x, y)
+		_PrintLine($printer, $x, $y, $x, $y)
 	next
 
 	; result
-	_PrintText($printer, Json_Get($buffer,'.result'), x, y)
+	_PrintText($printer, Json_Get($buffer,'.result'), $x, $y)
 
 	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
 EndFunc
-
