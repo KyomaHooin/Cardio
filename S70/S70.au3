@@ -47,7 +47,7 @@ global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
 global $result_file = @ScriptDir & '\' & 'zaver.txt'
 
-global $export_path = 'c:\ECHOREPORTY'
+global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archiv'
 
 global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
@@ -276,19 +276,18 @@ endif
 ; calculate values
 calculate()
 
+; default result template
+if not Json_Get($buffer, '.result') then
+	$result_text = FileRead($result_file)
+	if @error then
+		logger('Načtení výchozího závěru selhalo.')
+	else
+		Json_Put($buffer, '.result', $result_text, True)
+	endif
+endif
+
 MsgBox(0,"debug", "Done.")
 exit
-
-; default result template
-;if Json_Get($export, '.result') == '' then
-;	if  FileExists($result_file) then
-;		$result_text = FileRead($result_file)
-;		if @error then
-;			logger('Načtení výchozího závěru selhalo: ' & $result_text)
-;		else
-;			Json_Put($buffer, '.result', $result_text, True)
-;		endif
-;endif
 
 ; -------------------------------------------------------------------------------------------
 ; GUI
@@ -442,6 +441,7 @@ func read_config_file($file)
 	for $i = 0 to UBound($cfg) - 1
 		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
 		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
+		if $cfg[$i][0] == 'result' then $result_file = $cfg[$i][1]
 		if $cfg[$i][0] == 'history' then $AGE = $cfg[$i][1]
 	next
 endfunc
