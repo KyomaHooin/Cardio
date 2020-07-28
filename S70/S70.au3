@@ -91,8 +91,8 @@ global $json_template='{' _
 			& '"RTW":{"label":"RTW", "unit":"?", "value":null, "id":null},' _
 			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
 			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
-			& '"SV MOD A4C":{"label":null, "unit":null, "value":10, "id":null},' _; calculation
-			& '"SV MOD A2C":{"label":null, "unit":null, "value":20, "id":null},' _; calculation
+			& '"SV MOD A4C":{"label":null, "unit":null, "value":10},' _; calculation
+			& '"SV MOD A2C":{"label":null, "unit":null, "value":20},' _; calculation
 			& '"SV-biplane":{"label":"SV-biplane", "unit":"ml", "value":null, "id":null},' _
 			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":10, "id":null},' _
 			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":20, "id":null},' _
@@ -104,10 +104,10 @@ global $json_template='{' _
 			& '"LAV-A4C":{"label":"LAV-A4C", "unit":"ml", "value":null, "id":null},' _
 			& '"LAV-2D":{"label":"LAV-2D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
-			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":120, "id":null},' _; calculation
-			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":130, "id":null},' _; calculation
+			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":120},' _; calculation
+			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":130},' _; calculation
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAVi":{"label":"LAVi", "unit":"ml/m²", "value":null, "id":null}' _
@@ -135,13 +135,13 @@ global $json_template='{' _
 			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":3.2, "id":null},' _
 			& '"AR Rad":{"label":"PSA AR radius", "unit":"mm", "value":0.54, "id":null},' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
-			& '"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
 			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":1.5, "id":null},' _
-			& '"SV":{"label":"SV", "unit":"ml/m²", "value":null, "id":null},' _
-			& '"SVi":{"label":"SVi", "unit":"ml/m²", "value":null, "id":null},' _
+			& '"SV":{"label":"SV", "unit":"ml/m²", "value":null},' _; calculation
+			& '"SVi":{"label":"SVi", "unit":"ml/m²", "value":null},' _; calculation
 			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"AVA":{"label":"AVAi", "unit":"cm", "value":null, "id":null},' _
 			& '"AVAi":{"label":"AVAi", "unit":"cm²", "value":null, "id":null},' _
@@ -157,8 +157,8 @@ global $json_template='{' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
 			& '"MV PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV maxPG":{"label":null, "unit":null, "value":1, "id":null},' _; calculation
-			& '"MV meanPG":{"label":null, "unit":null, "value":23, "id":null},' _; calculation
+			& '"MV maxPG":{"label":null, "unit":null, "value":1},' _; calculation
+			& '"MV meanPG":{"label":null, "unit":null, "value":23},' _; calculation
 			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
@@ -172,19 +172,19 @@ global $json_template='{' _
 		& '"pch":{' _
 			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":66, "id":null},' _
 			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
-			& '"PV maxPG":{"label":null, "unit":null, "value":3, "id":null},' _; calculation
-			& '"PV meanPG":{"label":null, "unit":null, "value":14, "id":null},' _; calculation
+			& '"PV maxPG":{"label":null, "unit":null, "value":3},' _; calculation
+			& '"PV meanPG":{"label":null, "unit":null, "value":14},' _; calculation
 			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":2, "id":null},' _; calculation
-			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":17, "id":null},' _; calculation
+			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":2},' _; calculation
+			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":17},' _; calculation
 			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"tch":{' _
 			& '"TR maxPG":{"label":"PGmax-reg", "unit":"torr", "value":null, "id":null},' _
 			& '"TR meanPG":{"label":"PGmean-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"TV maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
-			& '"TV meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"TV maxPG":{"label":"LAVi", "unit":null, "value":null},' _; calculation
+			& '"TV meanPG":{"label":"LAVi", "unit":null, "value":null},' _; calculation
 			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"p":{' _
