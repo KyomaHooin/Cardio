@@ -94,8 +94,8 @@ global $json_template='{' _
 			& '"SV MOD A4C":{"label":null, "unit":null, "value":10, "id":null},' _; calculation
 			& '"SV MOD A2C":{"label":null, "unit":null, "value":20, "id":null},' _; calculation
 			& '"SV-biplane":{"label":"SV-biplane", "unit":"ml", "value":null, "id":null},' _
-			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":null, "id":null},' _
-			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":null, "id":null},' _
+			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":10, "id":null},' _
+			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":20, "id":null},' _
 			& '"EDVi":{"label":"EDVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"ESVi":{"label":"ESVi", "unit":"ml/m²", "value":null, "id":null}' _
 		& '},' _
@@ -106,8 +106,8 @@ global $json_template='{' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":120, "id":null},' _; calculation
+			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":130, "id":null},' _; calculation
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAVi":{"label":"LAVi", "unit":"ml/m²", "value":null, "id":null}' _
@@ -133,7 +133,7 @@ global $json_template='{' _
 		& '},' _
 		& '"ach":{' _
 			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
-			& '"AR Rad":{"label":"PSA AR radius", "unit":"mm", "value":null, "id":null},' _
+			& '"AR Rad":{"label":"PSA AR radius", "unit":"mm", "value":0.54, "id":null},' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
@@ -154,9 +154,9 @@ global $json_template='{' _
 			& '"MV A Vel":{"label":"A", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV1 PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"MV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"MV PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
+			& '"MV maxPG":{"label":null, "unit":null, "value":1, "id":null},' _; calculation
+			& '"MV meanPG":{"label":null, "unit":null, "value":23, "id":null},' _; calculation
 			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
@@ -168,14 +168,14 @@ global $json_template='{' _
 			& '"MR RV":{"label":"MR-RV", "unit":"ml", "value":null, "id":null}' _
 		& '},' _
 		& '"pch":{' _
-			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
+			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":66, "id":null},' _
 			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
-			& '"PV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"PV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
+			& '"PV maxPG":{"label":null, "unit":null, "value":3, "id":null},' _; calculation
+			& '"PV meanPG":{"label":null, "unit":null, "value":14, "id":null},' _; calculation
 			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
-			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
+			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":2, "id":null},' _; calculation
+			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":17, "id":null},' _; calculation
 			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"tch":{' _
@@ -493,7 +493,7 @@ func calculate()
 ;	MsgBox(0,"Teich", Json_Get($buffer,'.data.lk."LVmass-i^2,7".value'))
 	; LVmass-BSA
 	if Number(Json_Get($buffer, '.bsa')) and Number(Json_Get($buffer, '.data.lk.LVmass.value')) then
-		Json_Put($buffer,'.data.lk.LVmass-BSA.value', Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), True)
+		Json_Put($buffer, '.data.lk.LVmass-BSA.value', Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), True)
 	endif
 ;	MsgBox(0,"LVmass-BSA", Json_Get($buffer,'.data.lk.LVmass-BSA.value'))
 	; RTW
@@ -508,17 +508,88 @@ func calculate()
 ;	MsgBox(0,"FS", Json_Get($buffer,'.data.lk.FS.value'))
 	; SV-biplane
 	if Number(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and Number(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
-		Json_Put($buffer,'.data.lk.SV-biplane.value', (Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, True)
+		Json_Put($buffer, '.data.lk.SV-biplane.value', (Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, True)
 	endif
 ;	MsgBox(0,"SV-biplane", Json_Get($buffer,'.data.lk.SV-biplane.value'))
+	;EDVi
+	if Number(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')) and Number(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.lk.EDVi.value', Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), True)
+	endif
+;	MsgBox(0,"EDVi", Json_Get($buffer,'.data.lk.EDVi.value'))
+	;ESVi
+	if Number(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')) and Number(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.lk.ESVi.value', Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), True)
+	endif
+;	MsgBox(0,"ESVi", Json_Get($buffer,'.data.lk.ESVi.value'))
 	; LAV-A4C
 	if Number(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and Number(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
-		Json_Put($buffer,'.data.ls.LAV-A4C.value', (Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, True)
+		Json_Put($buffer, '.data.ls.LAV-A4C.value', (Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, True)
 	endif
+;	MsgBox(0,"LAV-A4C", Json_Get($buffer,'.data.ls.LAV-A4C.value'))
+	; LAV-2D
+	if Number(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and Number(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and Number(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
+		Json_Put($buffer, '.data.ls.LAV-2D.value',(Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, True)
+	endif
+	;MsgBox(0,"LAV-2D", Json_Get($buffer,'.data.ls.LAV-2D.value'))
+	; LAVi-2D
+	if Number(Json_Get($buffer,'.data.ls.LAV-2D.value')) and Number(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ls.LAVi-2D.value', Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), True)
+	endif
+;	MsgBox(0,"LAVi-2D", Json_Get($buffer,'.data.ls.LAVi-2D.value'))
+	;MR Rad
+	if Number(Json_Get($buffer,'.data.mch."MR Rad".value')) then
+		Json_Put($buffer, '.data.mch."MR Rad".value', Json_Get($buffer, '.data.mch."MR Rad".value')*100, True)
+	endif
+;	MsgBox(0,"MR Rad", Json_Get($buffer,'.data.mch."MR Rad".value'))
+	;AR Rad
+	if Number(Json_Get($buffer,'.data.ach."AR Rad".value')) then
+		Json_Put($buffer, '.data.ach."AR Rad".value', Json_Get($buffer, '.data.ach."AR Rad".value')*100, True)
+	endif
+;	MsgBox(0,"AR Rad", Json_Get($buffer,'.data.ach."AR Rad".value'))
+	;PV Vmax
+	if Number(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
+		Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
+	endif
+;	MsgBox(0,"PV Vmax", Json_Get($buffer,'.data.pch."PV Vmax".value'))
+	; PV max/meanPG
+	if Number(Json_Get($buffer,'.data.pch."PV maxPG".value')) and Number(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
+		Json_Put($buffer, '.data.pch."PV max/meanPG".value', Json_Get($buffer, '.data.pch."PV maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PV meanPG".value'), True)
+	endif
+;	MsgBox(0,"PV max/meanPG", Json_Get($buffer,'.data.pch."PV max/meanPG".value'))
+	; PR max/meanPG
+	if Number(Json_Get($buffer,'.data.pch."PR maxPG".value')) and Number(Json_Get($buffer, '.data.pch."PR maxPG".value')) then
+		Json_Put($buffer, '.data.pch."PR max/meanPG".value', Json_Get($buffer, '.data.pch."PR maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PR meanPG".value'), True)
+	endif
+;	MsgBox(0,"PR max/meanPG", Json_Get($buffer,'.data.pch."PR max/meanPG".value'))
+	; MV max/meanPG
+	if Number(Json_Get($buffer,'.data.mch."MV maxPG".value')) and Number(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
+		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Json_Get($buffer, '.data.mch."MV maxPG".value') & '/' & Json_Get($buffer, '.data.mch."MV meanPG".value'), True)
+	endif
+;	MsgBox(0,"MV max/meanPG", Json_Get($buffer,'.data.mch."MV max/meanPG".value'))
+	; MVA-PHT
+	if Number(Json_Get($buffer,'.data.mch."MV PHT".value')) then
+		Json_Put($buffer, '.data.mch."MVA-PHT".value', 220/Json_Get($buffer, '.data.mch."MV PHT".value'), True)
+	endif
+	;MsgBox(0,"MVA-PHT", Json_Get($buffer,'.data.mch."MVA-PHT".value'))
+	; MVAi-PHT
+	if Number(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and Number(Json_Get($buffer,'.bsa')) then
+		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), True)
+	endif
+;	MsgBox(0,"MVAi-PHT", Json_Get($buffer,'.data.mch."MVAi-PHT".value'))
+	; TV max/meanPG
+	if Number(Json_Get($buffer,'.data.tch."TV maxPG".value')) and Number(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
+		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Json_Get($buffer, '.data.tch."TV maxPG".value') & '/' & Json_Get($buffer, '.data.tch."TV meanPG".value'), True)
+	endif
+;	MsgBox(0,"TV max/meanPG", Json_Get($buffer,'.data.tch."TV max/meanPG".value'))
+
+;	MsgBox(0,"BSA", Json_Get($buffer,'.bsa'))
+;	MsgBox(0,"LAV-2D", Json_Get($buffer,'.data.ls.LAV-2D.value'))
+;	MsgBox(0,"LAV-A4C", Json_Get($buffer,'.data.ls.LAV-A4C.value'))
+;	MsgBox(0,"LEADV A-L A2C", Json_Get($buffer,'.data.ls."LAEDV A-L A2C".value'))
+;	MsgBox(0,"LEADV MOD A2C", Json_Get($buffer,'.data.ls."LAEDV MOD A2C".value'))
 ;	MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.lk')))
 ;	MsgBox(0,"LAV-A4C", Json_Get($buffer,'.data.ls."LAEDV A-L A4C".value'))
 ;	MsgBox(0,"LAV-A4C", Json_Get($buffer,'.data.ls."LAEDV MOD A4C".value'))
-;	MsgBox(0,"LAV-A4C", Json_Get($buffer,'.data.ls.LAV-A4C.value'))
 EndFunc
 
 ; initialize XLS template
