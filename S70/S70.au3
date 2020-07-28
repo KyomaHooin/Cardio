@@ -76,119 +76,119 @@ global $json_template='{' _
 	& '},' _
 	& '"data":{' _
 		& '"lk":{' _
-			& '"IVSd":{"label":"IVS", "unit":null, "value":null, "id":null},' _
-			& '"LVIDd":{"label":"LVd", "unit":null, "value":null, "id":null},' _
-			& '"LVd index":{"label":"LDV index", "unit":null, "value":null, "id":null},' _
-			& '"LVPWd":{"label":"ZS", "unit":null, "value":null, "id":null},' _
-			& '"LVIDs"::{"label":"LVs", "unit":null, "value":null, "id":null},' _
-			& '"LVs index":{"label":"LVs index", "unit":null, "value":null, "id":null},' _
-			& '"LVEF % Teich.":{"label":"LVEF % Teich.", "unit":null, "value":null, "id":null},' _
-			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":null, "value":null, "id":null},' _
-			& '"LVmass":{"label":"LVmass", "unit":null, "value":null, "id":null},' _
-			& '"LVmass-i^2.7":{"label":"LVmass-i^2.7", "unit":null, "value":null, "id":null},' _
-			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":null, "value":null, "id":null},' _
-			& '"RTW":{"label":"RTW", "unit":null, "value":null, "id":null},' _
-			& '"FS":{"label":"FS", "unit":null, "value":null, "id":null},' _
-			& '"EF Biplane":{"label":"LVEF biplane", "unit":null, "value":null, "id":null},' _
+			& '"IVSd":{"label":"IVS", "unit":"mm", "value":null, "id":null},' _
+			& '"LVIDd":{"label":"LVd", "unit":"mm", "value":null, "id":null},' _
+			& '"LVd index":{"label":"LDV index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVPWd":{"label":"ZS", "unit":"mm", "value":null, "id":null},' _
+			& '"LVIDs"::{"label":"LVs", "unit":"mm", "value":null, "id":null},' _
+			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVEF % Teich.":{"label":"LVEF % Teich.", "unit":"%", "value":null, "id":null},' _
+			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":"%", "value":null, "id":null},' _
+			& '"LVmass":{"label":"LVmass", "unit":"g", "value":null, "id":null},' _
+			& '"LVmass-i^2.7":{"label":"LVmass-i^2.7", "unit":"g/m2.7", "value":null, "id":null},' _
+			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":"g/m²", "value":null, "id":null},' _
+			& '"RTW":{"label":"RTW", "unit":"?", "value":null, "id":null},' _
+			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
+			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
 			& '"SV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"SV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"SV-biplane":{"label":"SV-biplane", "unit":null, "value":null, "id":null},' _
-			& '"LVEDV MOD BP":{"label":"EDV", "unit":null, "value":null, "id":null},' _
-			& '"LVESV MOD BP":{"label":"ESV", "unit":null, "value":null, "id":null},' _
-			& '"EDVi":{"label":"EDVi", "unit":null, "value":null, "id":null},' _
-			& '"ESVi":{"label":"ESVi", "unit":null, "value":null, "id":null}' _
-			& '},' _
+			& '"SV-biplane":{"label":"SV-biplane", "unit":"ml", "value":null, "id":null},' _
+			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":null, "id":null},' _
+			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":null, "id":null},' _
+			& '"EDVi":{"label":"EDVi", "unit":"ml/m²", "value":null, "id":null},' _
+			& '"ESVi":{"label":"ESVi", "unit":"ml/m²", "value":null, "id":null}' _
+		& '},' _
 		& '"ls":{' _
-			& '"LA Diam":{"label":"Plax", "unit":null, "value":null, "id":null},' _
-			& '"LAV-A4C":{"label":"LAV-A4C", "unit":null, "value":null, "id":null},' _
-			& '"LAV-2D":{"label":"LAV-2D", "unit":null, "value":null, "id":null},' _
-			& '"LAVi-2D":{"label":"LAVi-2D", "unit":null, "value":null, "id":null},' _
+			& '"LA Diam":{"label":"Plax", "unit":"mm", "value":null, "id":null},' _
+			& '"LAV-A4C":{"label":"LAV-A4C", "unit":"ml", "value":null, "id":null},' _
+			& '"LAV-2D":{"label":"LAV-2D", "unit":"ml", "value":null, "id":null},' _
+			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"LA Minor":{"label":"LA šířka", "unit":null, "value":null, "id":null},' _
-			& '"LA Major":{"label":"LA délka", "unit":null, "value":null, "id":null},' _
-			& '"LAVi":{"label":"LAVi", "unit":null, "value":null, "id":null}' _
+			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
+			& '"LAVi":{"label":"LAVi", "unit":"ml/m²", "value":null, "id":null}' _
 		& '},' _
 		& '"pk":{' _
-			& '"RV Major":{"label":"RVplax", "unit":null, "value":null, "id":null},' _
-			& '"RVIDd":{"label":"RVD1", "unit":null, "value":null, "id":null},' _
-			& '"S-RV":{"label":"S-RV", "unit":null, "value":null, "id":null},' _
-			& '"EDA":{"label":"EDA", "unit":null, "value":null, "id":null},' _
-			& '"ESA":{"label":"ESA", "unit":null, "value":null, "id":null},' _
-			& '"FAC%":{"label":"FAC%", "unit":null, "value":null, "id":null},' _
-			& '"TAPSE":{"label":"TAPSE", "unit":null, "value":null, "id":null}' _
+			& '"RV Major":{"label":"RVplax", "unit":"mm", "value":null, "id":null},' _
+			& '"RVIDd":{"label":"RVD1", "unit":"mm", "value":null, "id":null},' _
+			& '"S-RV":{"label":"S-RV", "unit":"cm/s", "value":null, "id":null},' _
+			& '"EDA":{"label":"EDA", "unit":"?", "value":null, "id":null},' _
+			& '"ESA":{"label":"ESA", "unit":"?", "value":null, "id":null},' _
+			& '"FAC%":{"label":"FAC%", "unit":"%", "value":null, "id":null},' _
+			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
 		& '"ps":{' _
-			& '"RA Minor":{"label":"RA šířka", "unit":null, "value":null, "id":null},' _
-			& '"RA Major":{"label":"RA délka", "unit":null, "value":null, "id":null},' _
-			& '"RAV":{"label":"RAV", "unit":null, "value":null, "id":null},' _
-			& '"RAVi":{"label":"RAVi", "unit":null, "value":null, "id":null}' _
+			& '"RA Minor":{"label":"RA šířka", "unit":"mm", "value":null, "id":null},' _
+			& '"RA Major":{"label":"RA délka", "unit":"mm", "value":null, "id":null},' _
+			& '"RAV":{"label":"RAV", "unit":"ml", "value":null, "id":null},' _
+			& '"RAVi":{"label":"RAVi", "unit":"ml/m²", "value":null, "id":null}' _
 		& '},' _
 		& '"ao":{' _
-			& '"Ao Diam SVals":{"label":"Bulbus", "unit":null, "value":null, "id":null},' _
-			& '"Ao Diam":{"label":"Asc-Ao", "unit":null, "value":null, "id":null}' _
+			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
+			& '"Ao Diam":{"label":"Asc-Ao", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
-			& '"LVOT Diam":{"label":"LVOT", "unit":null, "value":null, "id":null},' _
-			& '"AR Rad":{"label":"PSA AR radius", "unit":null, "value":null, "id":null},' _
-			& '"AV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},' _
+			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
+			& '"AR Rad":{"label":"PSA AR radius", "unit":"mm", "value":null, "id":null},' _
+			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":null, "value":null, "id":null},' _
-			& '"AV VTI":{"label":"Ao-VTI", "unit":null, "value":null, "id":null},' _
-			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":null, "value":null, "id":null},' _
-			& '"SV/SVi":{"label":"SV/SVi", "unit":null, "value":null, "id":null},' _
-			& '"AVA":{"label":"AVAi", "unit":null, "value":null, "id":null},' _
-			& '"AVAi":{"label":"AVAi", "unit":null, "value":null, "id":null},' _
-			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":null, "value":null, "id":null},' _
-			& '"AR VTI":{"label":"AR-VTI", "unit":null, "value":null, "id":null},' _
-			& '"AR ERO":{"label":"AR-ERO", "unit":null, "value":null, "id":null},' _
-			& '"AR RV":{"label":"AR-RV", "unit":null, "value":null, "id":null}' _
+			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":"Torr", "value":null, "id":null},' _
+			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
+			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
+			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
+			& '"AVA":{"label":"AVAi", "unit":"cm", "value":null, "id":null},' _
+			& '"AVAi":{"label":"AVAi", "unit":"cm², "value":null, "id":null},' _
+			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":"ratio", "value":null, "id":null},' _
+			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"AR ERO":{"label":"AR-ERO", "unit":"cm²", "value":null, "id":null},' _
+			& '"AR RV":{"label":"AR-RV", "unit":"ml", "value":null, "id":null}' _
 		& '},' _
 		& '"mch":{' _
-			& '"MR Rad":{"label":"PISA MR radius", "unit":null, "value":null, "id":null},' _
-			& '"MV E Vel":{"label":"E", "unit":null, "value":null, "id":null},' _
-			& '"MV A Vel":{"label":"A", "unit":null, "value":null, "id":null},' _
-			& '"MV E/A Ratio":{"label":"E/A", "unit":null, "value":null, "id":null},' _
-			& '"MV DecT":{"label":"DecT", "unit":null, "value":null, "id":null},' _
-			& '"MV1 PHT":{"label":"MR-PHT", "unit":null, "value":null, "id":null},' _
+			& '"MR Rad":{"label":"PISA MR radius", "unit":"mm", "value":null, "id":null},' _
+			& '"MV E Vel":{"label":"E", "unit":"cm/s", "value":null, "id":null},' _
+			& '"MV A Vel":{"label":"A", "unit":"cm/s", "value":null, "id":null},' _
+			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
+			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
+			& '"MV1 PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":null, "value":null, "id":null},' _
-			& '"MVA-PHT":{"label":"MVA-PHT", "unit":null, "value":null, "id":null},' _
-			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":null, "value":null, "id":null},' _
-			& '"EmSept":{"label":"EmSept", "unit":null, "value":null, "id":null},' _
-			& '"EmLat":{"label":"EmLat", "unit":null, "value":null, "id":null},' _
-			& '"E/Em":{"label":"E/Em", "unit":null, "value":null, "id":null},' _
-			& '"MR VTI":{"label":"MR-VTI", "unit":null, "value":null, "id":null},' _
-			& '"MR ERO":{"label":"MR-ERO", "unit":null, "value":null, "id":null},' _
-			& '"MR RV":{"label":"MR-RV", "unit":null, "value":null, "id":null}' _
+			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":"Torr", "value":null, "id":null},' _
+			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
+			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
+			& '"EmSept":{"label":"EmSept", "unit":"cm/s", "value":null, "id":null},' _
+			& '"EmLat":{"label":"EmLat", "unit":"cm/s", "value":null, "id":null},' _
+			& '"E/Em":{"label":"E/Em", "unit":"ratio", "value":null, "id":null},' _
+			& '"MR VTI":{"label":"MR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"MR ERO":{"label":"MR-ERO", "unit":"cm²", "value":null, "id":null},' _
+			& '"MR RV":{"label":"MR-RV", "unit":"ml", "value":null, "id":null}' _
 		& '},' _
 		& '"pch":{' _
-			& '"PV Vmax":{"label":"Vmax", "unit":null, "value":null, "id":null},' _
-			& '"PVAcc T":{"label":"ACT", "unit":null, "value":null, "id":null},' _
+			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
+			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
 			& '"PV maxPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
 			& '"PV meanPG":{"label":null, "unit":null, "value":null, "id":null},' _; calculation
-			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":null, "value":null, "id":null},' _
-			& '"PRend PG":{"label":"PGed-reg", "unit":null, "value":null, "id":null},' _
+			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":"Torr", "value":null, "id":null},' _
+			& '"PRend PG":{"label":"PGed-reg", "unit":"Torr", "value":null, "id":null},' _
 			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
 			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
-			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":null, "value":null, "id":null}' _
+			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"Torr", "value":null, "id":null}' _
 		& '},' _
 		& '"tch":{' _
-			& '"TR maxPG":{"label":"PGmax-reg", "unit":null, "value":null, "id":null},' _
-			& '"TR meanPG":{"label":"PGmean-reg", "unit":null, "value":null, "id":null},' _
+			& '"TR maxPG":{"label":"PGmax-reg", "unit":"Torr", "value":null, "id":null},' _
+			& '"TR meanPG":{"label":"PGmean-reg", "unit":"Torr", "value":null, "id":null},' _
 			& '"TV maxPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
 			& '"TV meanPG":{"label":"LAVi", "unit":null, "value":null, "id":null},' _; calculation
-			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":null, "value":null, "id":null}' _
+			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":"Torr", "value":null, "id":null}' _
 		& '},' _
 		& '"p":{' _
 		& '},' _
 		& '"other":{' _
-			& '"IVC Diam Exp":{"label":"DDŽexp", "unit":null, "value":null, "id":null},' _
-			& '"IVC diam Ins":{"label":"DDŽins", "unit":null, "value":null, "id":null}' _
+			& '"IVC Diam Exp":{"label":"DDŽexp", "unit":"mm", "value":null, "id":null},' _
+			& '"IVC diam Ins":{"label":"DDŽins", "unit":"mm", "value":null, "id":null}' _
 		& '}' _
 	& '}' _
 & '}'
@@ -203,7 +203,7 @@ global $buffer = Json_Decode($json_template)
 ;	next
 ;next
 
-;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.lk'), 128))
+MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.pch'), 128))
 ;MsgBox(0,"debug", Json_Encode(Json_Get($buffer,'.data.' & $group), 128))
 ;exit
 
@@ -273,21 +273,24 @@ if FileExists($archive_file) then
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-MsgBox(0,"debug", "Done.")
+; update data buffer note from history
+if $history then
+	for $group in Json_Get($history,'.group')
+		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'), True)
+	next
+endif
+
+;$div = 1  Null
+;if IsNumber($div) then MsgBox(0,"debug", "zero division")
+;if $div == Null then MsgBox(0,"debug", "Null")
+;MsgBox(0,"debug", $div)
 
 exit
 
-; update data buffer note from history
-;if $history then
-;	for $group in Json_Get($history,'.group')
-;		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'))
-;	next
-;else
-;	msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Historie není dostupná.')
-;endif
 
 ; calculate complex variables
-;calculate()
+calculate()
+
 
 ; default result template
 ;if not Json_Get($export, 'result') then
@@ -483,6 +486,9 @@ func export_parse($export)
 endfunc
 
 ; calculate aditional variables
+;
+; CM --> MM!
+;
 func calculate()
 	if $buffer then
 		; LVEF % Teich.
