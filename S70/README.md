@@ -1,9 +1,9 @@
 
-![S70](https://github.com/KyomaHooin/Cardio/raw/master/S70/S70.png "screenshot")
-
 DESCRIPTION
 
 GE Vivid S70 Medicus 3 integration.
+
+![S70](https://github.com/KyomaHooin/Cardio/raw/master/S70/S70.png "screenshot")
 
 MEDICUS SETUP
 
