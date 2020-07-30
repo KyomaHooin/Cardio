@@ -79,7 +79,7 @@ global $json_template='{' _
 		& '"lk":{' _
 			& '"IVSd":{"label":"IVS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDd":{"label":"LVd", "unit":"mm", "value":null, "id":null},' _
-			& '"LVd index":{"label":"LDV index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVd index":{"label":"LVD index", "unit":"mm/m²", "value":null, "id":null},' _
 			& '"LVPWd":{"label":"ZS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDs"::{"label":"LVs", "unit":"mm", "value":null, "id":null},' _
 			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
@@ -140,10 +140,10 @@ global $json_template='{' _
 			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
 			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":1.5, "id":null},' _
-			& '"SV":{"label":"SV", "unit":"ml/m²", "value":null},' _; calculation
-			& '"SVi":{"label":"SVi", "unit":"ml/m²", "value":null},' _; calculation
+			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
+			& '"SVi":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
 			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
-			& '"AVA":{"label":"AVAi", "unit":"cm", "value":null, "id":null},' _
+			& '"AVA":{"label":"AVA", "unit":"cm", "value":null, "id":null},' _
 			& '"AVAi":{"label":"AVAi", "unit":"cm²", "value":null, "id":null},' _
 			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":"ratio", "value":null, "id":null},' _
 			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
@@ -176,15 +176,15 @@ global $json_template='{' _
 			& '"PV meanPG":{"label":null, "unit":null, "value":14},' _; calculation
 			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"PR maxPG":{"label":"LAVi", "unit":null, "value":2},' _; calculation
-			& '"PR meanPG":{"label":"LAVi", "unit":null, "value":17},' _; calculation
+			& '"PR maxPG":{"label":null, "unit":null, "value":2},' _; calculation
+			& '"PR meanPG":{"label":null, "unit":null, "value":17},' _; calculation
 			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"tch":{' _
 			& '"TR maxPG":{"label":"PGmax-reg", "unit":"torr", "value":null, "id":null},' _
 			& '"TR meanPG":{"label":"PGmean-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"TV maxPG":{"label":"LAVi", "unit":null, "value":null},' _; calculation
-			& '"TV meanPG":{"label":"LAVi", "unit":null, "value":null},' _; calculation
+			& '"TV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"TV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"p":{' _
@@ -286,14 +286,15 @@ if not Json_Get($buffer, '.result') then
 	endif
 endif
 
-MsgBox(0,"debug", "Done.")
-exit
-
 ; -------------------------------------------------------------------------------------------
 ; GUI
 ; -------------------------------------------------------------------------------------------
 
-$gui = GUICreate("S70 Echo " & $VERSION, 626, 880, 900, 11)
+$gui_top_offset = 33
+$gui_left_offset = 10
+$gui_index = 1
+
+$gui = GUICreate("S70 Echo " & $VERSION, 750, 900, 900, 11)
 
 ; header
 $label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
@@ -304,49 +305,67 @@ $label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
 $input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
 
 ; groups
-for $group in Json_Get($buffer, '.group')
-	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
-	for $member in Json_Get($buffer, '.data.' & $group)
-		; data
-		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.label'), 108, 46, 65, 17)
-		Json_Put($buffer,'.data.' & $group & '.' & $member & '.id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $member & '.value'), 172, 44, 41, 21, 1))
-		GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $member & '.unit'), 218, 46, 100, 17)
-		; note
-		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
-		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
-		; line break
-		; data offset
+for $group in Json_Get($history, '.group')
+;	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
+	for $member in Json_Get($history, '.data.' & $group)
+;		; data
+		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
+			; label
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, 3 + $gui_top_offset, 90, 21, 0x0002); align right
+			; input
+			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 96 + $gui_left_offset, $gui_top_offset, 41, 21, 1), True)
+			; unit
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 144 + $gui_left_offset, 3 + $gui_top_offset, 45, 21)
+			; update tokens
+			if Mod($gui_index, 4) = 0 then
+				$gui_top_offset+=33
+				$gui_left_offset=10
+			Else
+				$gui_left_offset+=185
+			Endif
+			$gui_index+=1
+		endif
+;		; note
+;		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
+;		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
+;		; line break
+;		; data offset
 	next
-	GUICtrlCreateGroup('', -99, -99, 1, 1)
-	; group offset
+	; update tokens
+	;if Mod($gui_index, 4) <> 1 then
+	$gui_top_offset+=33
+	$gui_left_offset=10
+	$gui_index=1
+;	GUICtrlCreateGroup('', -99, -99, 1, 1)
+;	; group offset
 next
 
 ; dekurz
-$label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
-$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+;$label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
+;$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
-$label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
-$label_datetime = GUICtrlCreateLabel($runtime, 51, 853, 100, 17)
+;$label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
+;$label_datetime = GUICtrlCreateLabel($runtime, 51, 853, 100, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 305, 846, 75, 25)
-$button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 463, 846, 75, 25)
-$button_konec = GUICtrlCreateButton('Konec', 542, 846, 75, 25)
+;$button_history = GUICtrlCreateButton('Historie', 305, 846, 75, 25)
+;$button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
+;$button_dekurz = GUICtrlCreateButton('Dekurz', 463, 846, 75, 25)
+;$button_konec = GUICtrlCreateButton('Konec', 542, 846, 75, 25)
 
 ; GUI tune
-GUICtrlSetBkColor($input_pacient, 0xC0DCC0)
-GUICtrlSetBkColor($input_rc, 0xC0DCC0)
-GUICtrlSetBkColor($input_poj, 0xC0DCC0)
-GUICtrlSetState($button_konec, $GUI_FOCUS)
+;GUICtrlSetBkColor($input_pacient, 0xC0DCC0)
+;GUICtrlSetBkColor($input_rc, 0xC0DCC0)
+;GUICtrlSetBkColor($input_poj, 0xC0DCC0)
+;GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
 GUISetState(@SW_SHOW)
 
 ; dekurz initialize
-$dekurz_init = dekurz_init()
-if @error then logger($dekurz_init)
+;$dekurz_init = dekurz_init()
+;if @error then logger($dekurz_init)
 
 ; -------------------------------------------------------------------------------------------
 ; MAIN
@@ -356,64 +375,67 @@ if @error then logger($dekurz_init)
 While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
-	if $msg = $button_dekurz then
-		$dekurz = dekurz()
-		if @error then
-			logger($dekurz)
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
-		endif
-	endif
-	; print data
-	if $msg = $button_tisk Then
-		$print = print()
-		if @error then
-			logger($print)
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
-		endif
-	endif
-	; load history
-	if $msg = $button_history Then
-		if FileExists($archive_file) then
-			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $AGE then
-				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
-
-					; update GUI from history
-					for $group in Json_Get($buffer, '.group')
-						; update note
-						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
-						; update data
-						for $member in Json_Get($buffer, '.data.' & $group)
-							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
-						next
-					next
-				endif
-			else
-				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
-			endif
-		else
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
-		endif
-	endif
+;	if $msg = $button_dekurz then
+;		$dekurz = dekurz()
+;		if @error then
+;			logger($dekurz)
+;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
+;		endif
+;	endif
+;	; print data
+;	if $msg = $button_tisk Then
+;		$print = print()
+;		if @error then
+;			logger($print)
+;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
+;		endif
+;	endif
+;	; load history
+;	if $msg = $button_history Then
+;		if FileExists($archive_file) then
+;			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $AGE then
+;				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
+;
+;					; update GUI from history
+;					for $group in Json_Get($buffer, '.group')
+;						; update note
+;						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
+;						; update data
+;						for $member in Json_Get($buffer, '.data.' & $group)
+;							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
+;						next
+;					next
+;				endif
+;			else
+;				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
+;			endif
+;		else
+;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
+;		endif
+;	endif
 	; write & exit
-	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
+;	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
+	if $msg = $GUI_EVENT_CLOSE then
 		; close dekurz
-		_Excel_BookClose($book)
-		_Excel_Close($excel)
+	;	_Excel_BookClose($book)
+	;	_Excel_Close($excel)
 
 		; update data buffer
-		for $group in Json_Get($buffer, '.group')
-			; update note
-			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
-			; update data
-			for $member in Json_Get($buffer, '.data.' & $group)
-				Json_Put($buffer, '.data.'  & $group & '.' & $member & '.value', GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '.' & $member & '.id')))
-			next
-		next
+	;	for $group in Json_Get($buffer, '.group')
+	;		; update note
+	;		Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
+	;		; update data
+	;		for $member in Json_Get($buffer, '.data.' & $group)
+	;			Json_Put($buffer, '.data.'  & $group & '.' & $member & '.value', GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '.' & $member & '.id')))
+	;		next
+	;	next
 		; write data buffer to archive
-		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
-		FileWrite($out, Json_Encode($buffer))
-		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
-		FileClose($out)
+	;	$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
+	;	FileWrite($out, Json_Encode($buffer))
+	;	if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
+	;	FileClose($out)
+		; exit
+		exitloop
 	endif
 wend
 
@@ -457,6 +479,9 @@ func get_export_file($export_path, $rc)
 endfunc
 
 ; parse S70 export file
+;
+; FIX: 'dot' variables
+;
 func export_parse($export)
 	local $raw
 	_FileReadToArray($export, $raw, 0); no count
@@ -465,7 +490,12 @@ func export_parse($export)
 		for $member in Json_ObjGet($history, '.data.' & $group)
 			for $i = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-					Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '^.*\t(.*)\t.*', '$1')), True); check exists
+					StringReplace($raw[$i], @TAB, '')
+					if @extended == 2 Then
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '^.*\t(.*)\t.*', '$1')), True); check exists
+					elseif @extended == 1 then
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '.*\t(.*)$', '$1')), True)
+					endif
 				endif
 			next
 		next
@@ -475,116 +505,116 @@ endfunc
 ; calculate aditional variables
 func calculate()
 	; LVEF % Teich.
-	if Number(Json_Get($buffer, '.data.lk.LVIDd.value')) and Number(Json_Get($buffer, '.data.lk.LVIDs.value')) then
-		Json_Put($buffer, '.data.lk."LVEF % Teich".value', (7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-7/(2.4+Json_Get($buffer, '.data.lk.LVIDs.value')/10)*(Json_Get($buffer, '.data.lk.LVIDs.value')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3)*100, True)
+	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
+		Json_Put($buffer, '.data.lk."LVEF % Teich".value', Round((7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-7/(2.4+Json_Get($buffer, '.data.lk.LVIDs.value')/10)*(Json_Get($buffer, '.data.lk.LVIDs.value')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3)*100, 2), True)
 	endif
 	; LVmass
-	if Number(Json_Get($buffer, '.data.lk.LVIDd.value')) and Number(Json_Get($buffer, '.data.lk.IVSd.value')) and Number(Json_Get($buffer, '.data.lk.LVPWd.value')) then
-		Json_Put($buffer, '.data.lk.LVmass.value', 1.04*(Json_get($buffer, '.data.lk.LVIDd.value')/10 + Json_Get($buffer, '.data.lk.IVSd.value')/10 + Json_Get($buffer, '.data.lk.LVPWd.value')/10)^3-(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-13.6, True)
+	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.IVSd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
+		Json_Put($buffer, '.data.lk.LVmass.value', Round(1.04*(Json_get($buffer, '.data.lk.LVIDd.value')/10 + Json_Get($buffer, '.data.lk.IVSd.value')/10 + Json_Get($buffer, '.data.lk.LVPWd.value')/10)^3-(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-13.6, 2), True)
 	endif
 	; LVmass-i^2,7
-	if Number(Json_Get($buffer, '.height')) and Number(Json_Get($buffer, '.data.lk.LVmass.value')) then
-		Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Json_Get($buffer, '.data.lk.LVmass.value')/(Json_Get($buffer, '.height')/100)^2.7, True)
+	if IsNumber(Json_Get($buffer, '.height')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
+		Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/(Json_Get($buffer, '.height')/100)^2.7, 2), True)
 	endif
 	; LVmass-BSA
-	if Number(Json_Get($buffer, '.bsa')) and Number(Json_Get($buffer, '.data.lk.LVmass.value')) then
-		Json_Put($buffer, '.data.lk.LVmass-BSA.value', Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), True)
+	if IsNumber(Json_Get($buffer, '.bsa')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
+		Json_Put($buffer, '.data.lk.LVmass-BSA.value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	; RTW
-	if Number(Json_Get($buffer, '.data.lk.LVIDd.value')) and Number(Json_Get($buffer, '.data.lk.LVPWd.value')) then
-		Json_Put($buffer, '.data.lk.RTW.value', 2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), True)
+	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
+		Json_Put($buffer, '.data.lk.RTW.value', Round(2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), 2), True)
 	endif
 	; FS
-	if Number(Json_Get($buffer, '.data.lk.LVIDd.value')) and Number(Json_Get($buffer, '.data.lk.LVIDs.value')) then
-		Json_Put($buffer, '.data.lk.FS.value', (Json_Get($buffer, '.data.lk.LVIDd.value')-Json_Get($buffer, '.data.lk.LVIDs.value'))/Json_Get($buffer, '.data.lk.LVIDd.value')*100, True)
+	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
+		Json_Put($buffer, '.data.lk.FS.value', Round((Json_Get($buffer, '.data.lk.LVIDd.value')-Json_Get($buffer, '.data.lk.LVIDs.value'))/Json_Get($buffer, '.data.lk.LVIDd.value')*100, 2), True)
 	endif
 	; SV-biplane
-	if Number(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and Number(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
-		Json_Put($buffer, '.data.lk.SV-biplane.value', (Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, True)
+	if IsNumber(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and IsNumber(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
+		Json_Put($buffer, '.data.lk.SV-biplane.value', Round((Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, 2), True)
 	endif
 	;EDVi
-	if Number(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')) and Number(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.lk.EDVi.value', Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), True)
+	if IsNumber(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.lk.EDVi.value', Round(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	;ESVi
-	if Number(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')) and Number(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.lk.ESVi.value', Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), True)
+	if IsNumber(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.lk.ESVi.value', Round(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	; LAV-A4C
-	if Number(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and Number(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
-		Json_Put($buffer, '.data.ls.LAV-A4C.value', (Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, True)
+	if IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
+		Json_Put($buffer, '.data.ls.LAV-A4C.value', Round((Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, 2), True)
 	endif
 	; LAV-2D
-	if Number(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and Number(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and Number(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
-		Json_Put($buffer, '.data.ls.LAV-2D.value',(Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, True)
+	if IsNumber(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
+		Json_Put($buffer, '.data.ls.LAV-2D.value',Round((Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, 2), True)
 	endif
 	; LAVi-2D
-	if Number(Json_Get($buffer,'.data.ls.LAV-2D.value')) and Number(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ls.LAVi-2D.value', Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), True)
+	if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	;MR Rad
-	if Number(Json_Get($buffer,'.data.mch."MR Rad".value')) then
-		Json_Put($buffer, '.data.mch."MR Rad".value', Json_Get($buffer, '.data.mch."MR Rad".value')*100, True)
+	if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
+		Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 2), True)
 	endif
 	;AR Rad
-	if Number(Json_Get($buffer,'.data.ach."AR Rad".value')) then
-		Json_Put($buffer, '.data.ach."AR Rad".value', Json_Get($buffer, '.data.ach."AR Rad".value')*100, True)
+	if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
+		Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 2), True)
 	endif
 	;PV Vmax
-	if Number(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-		Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
+	if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
+		Json_Put($buffer, '.data.pch."PV Vmax".value', Round(Json_Get($buffer, '.data.pch."PV Vmax".value')/100, 2), True)
 	endif
 	; PV max/meanPG
-	if Number(Json_Get($buffer,'.data.pch."PV maxPG".value')) and Number(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
 		Json_Put($buffer, '.data.pch."PV max/meanPG".value', Json_Get($buffer, '.data.pch."PV maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PV meanPG".value'), True)
 	endif
 	; PR max/meanPG
-	if Number(Json_Get($buffer,'.data.pch."PR maxPG".value')) and Number(Json_Get($buffer, '.data.pch."PR maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PR maxPG".value')) then
 		Json_Put($buffer, '.data.pch."PR max/meanPG".value', Json_Get($buffer, '.data.pch."PR maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PR meanPG".value'), True)
 	endif
 	; MV max/meanPG
-	if Number(Json_Get($buffer,'.data.mch."MV maxPG".value')) and Number(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
 		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Json_Get($buffer, '.data.mch."MV maxPG".value') & '/' & Json_Get($buffer, '.data.mch."MV meanPG".value'), True)
 	endif
 	; MVA-PHT
-	if Number(Json_Get($buffer,'.data.mch."MV PHT".value')) then
-		Json_Put($buffer, '.data.mch."MVA-PHT".value', 220/Json_Get($buffer, '.data.mch."MV PHT".value'), True)
+	if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
+		Json_Put($buffer, '.data.mch."MVA-PHT".value', Round(220/Json_Get($buffer, '.data.mch."MV PHT".value'), 2), True)
 	endif
 	; MVAi-PHT
-	if Number(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and Number(Json_Get($buffer,'.bsa')) then
-		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), True)
+	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
+		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	; TV max/meanPG
-	if Number(Json_Get($buffer,'.data.tch."TV maxPG".value')) and Number(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
 		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Json_Get($buffer, '.data.tch."TV maxPG".value') & '/' & Json_Get($buffer, '.data.tch."TV meanPG".value'), True)
 	endif
 	; AV max/meanPG
-	if Number(Json_Get($buffer,'.data.ach."AV maxPG".value')) and Number(Json_Get($buffer, '.data.ach."AV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV maxPG".value')) then
 		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Json_Get($buffer, '.data.ach."AV maxPG".value') & '/' & Json_Get($buffer, '.data.ach."AV meanPG".value'), True)
 	endif
 	; SV
-	if Number(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and Number(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
 		Json_Put($buffer, '.data.ach.SV.value', Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/100, True)
 	endif
 	; SVi
-	if Number(Json_Get($buffer,'.data.ach.SV.value')) and Number(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ach.SVi.value', Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), True)
+	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ach.SVi.value', Round(Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), 2), True)
 	endif
 	; SV/SVi
-	if Number(Json_Get($buffer,'.data.ach.SV.value')) and Number(Json_Get($buffer, '.data.ach.SVi.value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
 		Json_Put($buffer, '.data.ach."SV/SVi".value', Json_Get($buffer,'.data.ach.SV.value') & '/' & Json_Get($buffer,'.data.ach.SVi.value'), True)
 	endif
 	; AVA
-	if Number(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and Number(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and Number(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-		Json_Put($buffer, '.data.ach.AVA.value', Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, True)
+	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
+		Json_Put($buffer, '.data.ach.AVA.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, 2), True)
 	endif
 	; AVAi
-	if Number(Json_Get($buffer,'.data.ach.AVA.value')) and Number(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ach.AVAi.value', Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), True)
+	if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ach.AVAi.value', Round(Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), 2), True)
 	endif
 	; VTI LVOT/Ao
-	if Number(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and Number(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), True)
+	if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
+		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), 2), True)
 	endif
 EndFunc
 
