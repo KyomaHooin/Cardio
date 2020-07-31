@@ -290,9 +290,9 @@ endif
 ; GUI
 ; -------------------------------------------------------------------------------------------
 
-$gui_top_offset = 33
-$gui_left_offset = 10
-$gui_index = 1
+$gui_index = 0
+$gui_top_offset = 0
+$gui_left_offset = 0
 
 $gui = GUICreate("S70 Echo " & $VERSION, 750, 900, 900, 11)
 
@@ -306,38 +306,37 @@ $input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
 
 ; groups
 for $group in Json_Get($history, '.group')
-;	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
+	; group begin
+	;GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
 	for $member in Json_Get($history, '.data.' & $group)
 ;		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
-			; label
-			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, 3 + $gui_top_offset, 90, 21, 0x0002); align right
-			; input
-			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 96 + $gui_left_offset, $gui_top_offset, 41, 21, 1), True)
-			; unit
-			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 144 + $gui_left_offset, 3 + $gui_top_offset, 45, 21)
-			; update tokens
+;			; update index / offset
 			if Mod($gui_index, 4) = 0 then
 				$gui_top_offset+=33
 				$gui_left_offset=10
 			Else
 				$gui_left_offset+=185
-			Endif
+			endif
+;			; label
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, 3 + $gui_top_offset, 90, 21, 0x0002); align right
+;			; input
+			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 96 + $gui_left_offset, $gui_top_offset, 41, 21, 1), True)
+;			; unit
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 144 + $gui_left_offset, 3 + $gui_top_offset, 45, 21)
+			; update index
 			$gui_index+=1
 		endif
-;		; note
-;		GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
-;		Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
-;		; line break
-;		; data offset
+
+		; note
+		;GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
+		;Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
 	next
-	; update tokens
-	;if Mod($gui_index, 4) <> 1 then
-	$gui_top_offset+=33
+	; update index / offset
 	$gui_left_offset=10
-	$gui_index=1
-;	GUICtrlCreateGroup('', -99, -99, 1, 1)
-;	; group offset
+	$gui_index=0
+	;group end
+	;GUICtrlCreateGroup('', -99, -99, 1, 1)
 next
 
 ; dekurz
@@ -574,7 +573,7 @@ func calculate()
 	endif
 	; MV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
-		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Json_Get($buffer, '.data.mch."MV maxPG".value') & '/' & Json_Get($buffer, '.data.mch."MV meanPG".value'), True)
+		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 2), True)
 	endif
 	; MVA-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
@@ -586,15 +585,15 @@ func calculate()
 	endif
 	; TV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
-		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Json_Get($buffer, '.data.tch."TV maxPG".value') & '/' & Json_Get($buffer, '.data.tch."TV meanPG".value'), True)
+		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 2), True)
 	endif
 	; AV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV maxPG".value')) then
-		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Json_Get($buffer, '.data.ach."AV maxPG".value') & '/' & Json_Get($buffer, '.data.ach."AV meanPG".value'), True)
+		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 2), True)
 	endif
 	; SV
 	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
-		Json_Put($buffer, '.data.ach.SV.value', Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/100, True)
+		Json_Put($buffer, '.data.ach.SV.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/100, 2), True)
 	endif
 	; SVi
 	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
@@ -602,7 +601,7 @@ func calculate()
 	endif
 	; SV/SVi
 	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
-		Json_Put($buffer, '.data.ach."SV/SVi".value', Json_Get($buffer,'.data.ach.SV.value') & '/' & Json_Get($buffer,'.data.ach.SVi.value'), True)
+		Json_Put($buffer, '.data.ach."SV/SVi".value', Round(Json_Get($buffer,'.data.ach.SV.value'), 2) & '/' & Round(Json_Get($buffer,'.data.ach.SVi.value'), 2), True)
 	endif
 	; AVA
 	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
