@@ -27,6 +27,7 @@
 ; INCLUDE
 ; -------------------------------------------------------------------------------------------
 
+#include <C:\Program Files (x86)\AutoIt3\Include\ScreenCapture.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\GUIConstantsEx.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\Clipboard.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\Excel.au3>
@@ -291,10 +292,12 @@ endif
 ; -------------------------------------------------------------------------------------------
 
 $gui_index = 0
-$gui_top_offset = 0
+$gui_top_offset = 33
 $gui_left_offset = 0
+$gui_group_top_offset = 33 + 10
+$gui_group_index = 0
 
-$gui = GUICreate("S70 Echo " & $VERSION, 750, 900, 900, 11)
+$gui = GUICreate("S70 Echo " & $VERSION, 950, 990, 100, 10)
 
 ; header
 $label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
@@ -306,14 +309,12 @@ $input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
 
 ; groups
 for $group in Json_Get($history, '.group')
-	; group begin
-	;GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group), 8, 32, 610, 65)
 	for $member in Json_Get($history, '.data.' & $group)
 ;		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
 ;			; update index / offset
-			if Mod($gui_index, 4) = 0 then
-				$gui_top_offset+=33
+			if Mod($gui_index, 5) = 0 then
+				$gui_top_offset+=26
 				$gui_left_offset=10
 			Else
 				$gui_left_offset+=185
@@ -327,16 +328,20 @@ for $group in Json_Get($history, '.group')
 			; update index
 			$gui_index+=1
 		endif
-
-		; note
-		;GUICtrlCreateLabel('Poznámka:', 108, 46, 65, 17)
-		;Json_Put($buffer, '.group' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $member & '.note'), 172, 44, 41, 21, 1))
 	next
+	; note
+	GUICtrlCreateLabel('Poznámka', 10, 28 + $gui_top_offset, 90, 21, 0x0002)
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 106, 26 + $gui_top_offset, 830, 21, 1))
+	$gui_top_offset+=26 - 13
+
+	; group
+	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 940, 21 + 26 * (gui_get_group_index($gui_index,5)+ 1))
+	$gui_group_top_offset += 10 + 13 + 26 + 26 * gui_get_group_index($gui_index, 5)
+
 	; update index / offset
+	$gui_top_offset+=26 + 10
 	$gui_left_offset=10
 	$gui_index=0
-	;group end
-	;GUICtrlCreateGroup('', -99, -99, 1, 1)
 next
 
 ; dekurz
@@ -365,6 +370,8 @@ GUISetState(@SW_SHOW)
 ; dekurz initialize
 ;$dekurz_init = dekurz_init()
 ;if @error then logger($dekurz_init)
+
+_ScreenCapture_Capture(@ScriptDir & "\gui.jpg")
 
 ; -------------------------------------------------------------------------------------------
 ; MAIN
@@ -614,6 +621,15 @@ func calculate()
 	; VTI LVOT/Ao
 	if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
 		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), 2), True)
+	endif
+EndFunc
+
+; gui get group index
+func gui_get_group_index($i, $mod)
+	if mod($i, $mod) == 0 then
+		return int($i/5)
+	Else
+		return int($i/5+ 1)
 	endif
 EndFunc
 
