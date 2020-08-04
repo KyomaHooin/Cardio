@@ -1,6 +1,6 @@
 ;
 ; GE Vivid S70 - Medicus 3 integration
-; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %POJ%
+; CMD: S70.exe %RODCISN% %CELEJMENO% %VYSKA% %VAHA%
 ;
 ; Copyright (c) 2020 Kyoma Hooin
 ;
@@ -27,7 +27,6 @@
 ; INCLUDE
 ; -------------------------------------------------------------------------------------------
 
-#include <C:\Program Files (x86)\AutoIt3\Include\ScreenCapture.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\GUIConstantsEx.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\Clipboard.au3>
 #include <C:\Program Files (x86)\AutoIt3\Include\Excel.au3>
@@ -58,9 +57,9 @@ global $json_template='{' _
 	& '"patient":null,' _
 	& '"name":null,' _
 	& '"poj":null,' _
-	& '"bsa":1.9,' _
-	& '"weight":75,' _
-	& '"height":191,' _
+	& '"bsa":null,' _
+	& '"weight":null,' _
+	& '"height":null,' _
 	& '"date",null,' _
 	& '"result":null,' _
 	& '"group":{' _
@@ -102,7 +101,7 @@ global $json_template='{' _
 		& '},' _
 		& '"ls":{' _
 			& '"LA Diam":{"label":"Plax", "unit":"mm", "value":null, "id":null},' _
-			& '"LAV-A4C":{"label":"LAV-A4C", "unit":"ml", "value":null, "id":null},' _
+			& '"LAV-A4C":{"label":"LAV-1D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAV-2D":{"label":"LAV-2D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null},' _; calculation
@@ -111,7 +110,7 @@ global $json_template='{' _
 			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":130},' _; calculation
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
-			& '"LAVi":{"label":"LAVi", "unit":"ml/m²", "value":null, "id":null}' _
+			& '"LAVi":{"label":"LAVi-1D", "unit":"ml/m²", "value":null, "id":null}' _
 		& '},' _
 		& '"pk":{' _
 			& '"RV Major":{"label":"RVplax", "unit":"mm", "value":null, "id":null},' _
@@ -134,11 +133,11 @@ global $json_template='{' _
 		& '},' _
 		& '"ach":{' _
 			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":3.2, "id":null},' _
-			& '"AR Rad":{"label":"PSA AR radius", "unit":"mm", "value":0.54, "id":null},' _
+			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":0.54, "id":null},' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"AV max/meanPG":{"label":"AV max/meanPG", "unit":"torr", "value":null, "id":null},' _
+			& '"AV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
 			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":1.5, "id":null},' _
 			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
@@ -152,7 +151,7 @@ global $json_template='{' _
 			& '"AR RV":{"label":"AR-RV", "unit":"ml", "value":null, "id":null}' _
 		& '},' _
 		& '"mch":{' _
-			& '"MR Rad":{"label":"PISA MR radius", "unit":"mm", "value":null, "id":null},' _
+			& '"MR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
 			& '"MV E Vel":{"label":"E", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV A Vel":{"label":"A", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
@@ -160,7 +159,7 @@ global $json_template='{' _
 			& '"MV PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":1},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":23},' _; calculation
-			& '"MV max/meanPG":{"label":"MV max/meanPG", "unit":"torr", "value":null, "id":null},' _
+			& '"MV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
 			& '"EmSept":{"label":"EmSept", "unit":"cm/s", "value":null, "id":null},' _
@@ -175,7 +174,7 @@ global $json_template='{' _
 			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
 			& '"PV maxPG":{"label":null, "unit":null, "value":3},' _; calculation
 			& '"PV meanPG":{"label":null, "unit":null, "value":14},' _; calculation
-			& '"PV max/meanPG":{"label":"PV max/meanPG", "unit":"torr", "value":null, "id":null},' _
+			& '"PV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
 			& '"PR maxPG":{"label":null, "unit":null, "value":2},' _; calculation
 			& '"PR meanPG":{"label":null, "unit":null, "value":17},' _; calculation
@@ -186,7 +185,7 @@ global $json_template='{' _
 			& '"TR meanPG":{"label":"PGmean-reg", "unit":"torr", "value":null, "id":null},' _
 			& '"TV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"TV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"TV max/meanPG":{"label":"TV max/meanPG", "unit":"torr", "value":null, "id":null}' _
+			& '"TV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"p":{' _
 		& '},' _
@@ -222,10 +221,12 @@ if @error then
 endif
 
 ; cmdline
-if UBound($cmdline) <> 5 then
-	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
-	exit
-endif
+;if UBound($cmdline) < 3 then; minimum RC + NAME
+;	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
+;	exit
+;endif
+
+global $cmdline = ['demo', '8204010012','Tomas', 'Okurka', '191', '75cmd']
 
 ; -------------------------------------------------------------------------------------------
 ; INIT
@@ -274,6 +275,12 @@ if $history then
 	next
 endif
 
+; update height & weight if missing export
+if UBound($cmdline) == 6  Then
+		if not Json_Get($buffer, '.height') then Json_Put($buffer, '.height', Number($cmdline[4]), True)
+		if not Json_Get($buffer, '.weight') then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
+endif
+
 ; calculate values
 calculate()
 
@@ -292,20 +299,28 @@ endif
 ; -------------------------------------------------------------------------------------------
 
 $gui_index = 0
-$gui_top_offset = 33
+$gui_top_offset = 15; offset from basic
 $gui_left_offset = 0
-$gui_group_top_offset = 33 + 10
+$gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate("S70 Echo " & $VERSION, 950, 990, 100, 10)
+$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
 
 ; header
-$label_pacient = GUICtrlCreateLabel('Pacient', 60, 9, 40, 17)
-$input_pacient = GUICtrlCreateInput($cmdline[3] & ' ' & $cmdline[2], 106, 6, 121, 21, 1); read only
-$label_rc = GUICtrlCreateLabel('r.č.', 268, 9, 19, 17)
-$input_rc = GUICtrlCreateInput(StringRegExpReplace($cmdline[1], '(^\d{6})(.*)', '$1 \/ $2'), 290, 6, 105, 21, 1); read only
-$label_poj = GUICtrlCreateLabel('Poj.', 452, 9, 22, 17)
-$input_poj = GUICtrlCreateInput($cmdline[4], 476, 6, 41, 21, 1); read only
+
+$label_height = GUICtrlCreateLabel('Víška', 0, 5, 90, 17, 0x0002); right
+$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 92, 2, 34, 19, 1)
+$input_height_unit = GUICtrlCreateLabel('cm', 132, 4, 45, 21)
+
+$label_wegiht = GUICtrlCreateLabel('Váha', 185, 5, 90, 17, 0x0002); right
+$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 92, 2, 34, 19, 1)
+$input_weight_unit = GUICtrlCreateLabel('kg', 10 + 185 + 132, 4, 45, 21)
+
+$label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 90, 17, 0x0002); right
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19, 1)
+$input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 132, 4, 45, 21)
+
+$button_refill = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
 
 ; groups
 for $group in Json_Get($history, '.group')
@@ -313,55 +328,56 @@ for $group in Json_Get($history, '.group')
 ;		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
 ;			; update index / offset
-			if Mod($gui_index, 5) = 0 then
-				$gui_top_offset+=26
-				$gui_left_offset=10
+			if Mod($gui_index, 5) = 0 then; = both start or end offset!
+				$gui_top_offset+=21; member spacing
+				$gui_left_offset=0; reset
 			Else
-				$gui_left_offset+=185
+				$gui_left_offset+=185; column offset
 			endif
 ;			; label
-			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, 3 + $gui_top_offset, 90, 21, 0x0002); align right
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
 ;			; input
-			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 96 + $gui_left_offset, $gui_top_offset, 41, 21, 1), True)
+			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 90 + $gui_left_offset, $gui_top_offset, 34, 19, 1), True)
 ;			; unit
-			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 144 + $gui_left_offset, 3 + $gui_top_offset, 45, 21)
+			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset, $gui_top_offset + 3, 45, 21)
 			; update index
 			$gui_index+=1
 		endif
 	next
 	; note
-	GUICtrlCreateLabel('Poznámka', 10, 28 + $gui_top_offset, 90, 21, 0x0002)
-	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 106, 26 + $gui_top_offset, 830, 21, 1))
-	$gui_top_offset+=26 - 13
+	GUICtrlCreateLabel('Poznámka:', 0, 21 + $gui_top_offset + 3, 85, 21, 0x0002)
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 825, 21))
+
+	$gui_top_offset+=18; group spacing
 
 	; group
-	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 940, 21 + 26 * (gui_get_group_index($gui_index,5)+ 1))
-	$gui_group_top_offset += 10 + 13 + 26 + 26 * gui_get_group_index($gui_index, 5)
+	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 920, 21 + 21 * (gui_get_group_index($gui_index,5)+ 1))
+	GUICtrlSetFont(-1, 8, 800, 0, "MS Sans Serif")
+	$gui_group_top_offset += 21 + 21 * (gui_get_group_index($gui_index, 5) + 1)
 
 	; update index / offset
-	$gui_top_offset+=26 + 10
-	$gui_left_offset=10
-	$gui_index=0
+	$gui_top_offset+=24; group spacing
+	$gui_left_offset=0; reset
+	$gui_index=0; reset
 next
 
 ; dekurz
-;$label_dekurz = GUICtrlCreateLabel('Závěr:', 15, 722 , 70, 17)
-;$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 8, 740, 609, 97, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 10, 85, 21,0x0002); align right
+$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 90, $gui_group_top_offset + 10, 830, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
-;$label_date = GUICtrlCreateLabel('Datum:', 15, 852, 50, 17)
-;$label_datetime = GUICtrlCreateLabel($runtime, 51, 853, 100, 17)
+$label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 150, 17)
 
 ; button
-;$button_history = GUICtrlCreateButton('Historie', 305, 846, 75, 25)
-;$button_tisk = GUICtrlCreateButton('Tisk', 384, 846, 75, 25)
-;$button_dekurz = GUICtrlCreateButton('Dekurz', 463, 846, 75, 25)
-;$button_konec = GUICtrlCreateButton('Konec', 542, 846, 75, 25)
+$button_history = GUICtrlCreateButton('Historie', 612, $gui_group_top_offset + 104, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 690, $gui_group_top_offset + 104, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 768, $gui_group_top_offset + 104, 75, 21)
+$button_konec = GUICtrlCreateButton('Konec', 846, $gui_group_top_offset + 104, 75, 21)
 
 ; GUI tune
-;GUICtrlSetBkColor($input_pacient, 0xC0DCC0)
-;GUICtrlSetBkColor($input_rc, 0xC0DCC0)
-;GUICtrlSetBkColor($input_poj, 0xC0DCC0)
+GUICtrlSetBkColor($input_height, 0xC0DCC0)
+GUICtrlSetBkColor($input_weight, 0xC0DCC0)
+GUICtrlSetBkColor($input_bsa, 0xC0DCC0)
 ;GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
@@ -370,8 +386,6 @@ GUISetState(@SW_SHOW)
 ; dekurz initialize
 ;$dekurz_init = dekurz_init()
 ;if @error then logger($dekurz_init)
-
-_ScreenCapture_Capture(@ScriptDir & "\gui.jpg")
 
 ; -------------------------------------------------------------------------------------------
 ; MAIN
@@ -492,15 +506,22 @@ func export_parse($export)
 	local $raw
 	_FileReadToArray($export, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
+	; parse basic
+	for $i = 0 to UBound($raw) - 1
+		if StringRegExp($raw[$i], '(*UCP)^BSA\h.*') then Json_Put($buffer, '.bsa', Number(StringRegExpReplace($raw[$i], '(*UCP)^BSA\h(.*) .*', '$1')), True)
+		if StringRegExp($raw[$i], '(*UCP)^Height\h.*') then Json_Put($buffer, '.height', Number(StringRegExpReplace($raw[$i], '(*UCP)^Height\h(.*) .*', '$1')), True)
+		if StringRegExp($raw[$i], '(*UCP)^Weight\h.*') then Json_Put($buffer, '.weight', Number(StringRegExpReplace($raw[$i], '(*UCP)^Weight\h(.*) .*', '$1')), True)
+	next
+	; parse data
 	for $group in Json_ObjGet($history, '.group')
 		for $member in Json_ObjGet($history, '.data.' & $group)
-			for $i = 0 to UBound($raw) - 1
-				if StringRegExp($raw[$i], '^' & $member & '\t.*') then
-					StringReplace($raw[$i], @TAB, '')
+			for $j = 0 to UBound($raw) - 1
+				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
+					StringReplace($raw[$j], @TAB, '')
 					if @extended == 2 Then
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '^.*\t(.*)\t.*', '$1')), True); check exists
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), True); check exists
 					elseif @extended == 1 then
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$i], '.*\t(.*)$', '$1')), True)
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), True)
 					endif
 				endif
 			next
@@ -510,6 +531,10 @@ endfunc
 
 ; calculate aditional variables
 func calculate()
+	; BSA
+	if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
+		Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 2), True)
+	EndIf
 	; LVEF % Teich.
 	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
 		Json_Put($buffer, '.data.lk."LVEF % Teich".value', Round((7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-7/(2.4+Json_Get($buffer, '.data.lk.LVIDs.value')/10)*(Json_Get($buffer, '.data.lk.LVIDs.value')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3)*100, 2), True)
