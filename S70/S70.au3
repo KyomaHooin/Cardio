@@ -20,6 +20,8 @@
 ; TODO:
 ;
 ; Fix "dot" varliable parsing
+; Red missing BSA
+;
 
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
@@ -445,10 +447,10 @@ While 1
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
+		; update result
+		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz))
 		; update data buffer
 		for $group in Json_Get($history, '.group')
-			; update result
-			Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz))
 			; update note
 			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
 			; update data
@@ -745,8 +747,9 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'A' & $row_index)
 
 	; clip
-	$range = $book.ActiveSheet.Range('A1:P32')
-	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
+	;$range = $book.ActiveSheet.Range('A1:P32')
+	;_Excel_RangeCopyPaste($book.ActiveSheet, $range)
+	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:P' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
