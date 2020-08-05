@@ -17,6 +17,9 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;
+; TODO:
+;
+; Fix "dot" varliable parsing
 
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
@@ -27,12 +30,12 @@
 ; INCLUDE
 ; -------------------------------------------------------------------------------------------
 
-#include <C:\Program Files (x86)\AutoIt3\Include\GUIConstantsEx.au3>
-#include <C:\Program Files (x86)\AutoIt3\Include\Clipboard.au3>
-#include <C:\Program Files (x86)\AutoIt3\Include\Excel.au3>
-#include <C:\Program Files (x86)\AutoIt3\Include\ExcelConstants.au3>
-#include <C:\Program Files (x86)\AutoIt3\Include\File.au3>
-#include <C:\Program Files (x86)\AutoIt3\Include\Date.au3>
+#include <GUIConstantsEx.au3>
+#include <Clipboard.au3>
+#include <Excel.au3>
+#include <ExcelConstants.au3>
+#include <File.au3>
+#include <Date.au3>
 #include <Print.au3>
 #include <Json.au3>
 
@@ -40,7 +43,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-$VERSION = '1.5'
+$VERSION = '1.6'
 $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -91,11 +94,11 @@ global $json_template='{' _
 			& '"RTW":{"label":"RTW", "unit":"?", "value":null, "id":null},' _
 			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
 			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
-			& '"SV MOD A4C":{"label":null, "unit":null, "value":10},' _; calculation
-			& '"SV MOD A2C":{"label":null, "unit":null, "value":20},' _; calculation
+			& '"SV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"SV MOD A2C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"SV-biplane":{"label":"SV-biplane", "unit":"ml", "value":null, "id":null},' _
-			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":10, "id":null},' _
-			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":20, "id":null},' _
+			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":null, "id":null},' _
+			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":null, "id":null},' _
 			& '"EDVi":{"label":"EDVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"ESVi":{"label":"ESVi", "unit":"ml/m²", "value":null, "id":null}' _
 		& '},' _
@@ -106,8 +109,8 @@ global $json_template='{' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":120},' _; calculation
-			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":130},' _; calculation
+			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAVi":{"label":"LAVi-1D", "unit":"ml/m²", "value":null, "id":null}' _
@@ -132,14 +135,14 @@ global $json_template='{' _
 			& '"Ao Diam":{"label":"Asc-Ao", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
-			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":3.2, "id":null},' _
-			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":0.54, "id":null},' _
+			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
+			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
-			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":1.5, "id":null},' _
+			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
 			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
 			& '"SVi":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
 			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
@@ -157,8 +160,8 @@ global $json_template='{' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
 			& '"MV PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV maxPG":{"label":null, "unit":null, "value":1},' _; calculation
-			& '"MV meanPG":{"label":null, "unit":null, "value":23},' _; calculation
+			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"MV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
@@ -170,14 +173,14 @@ global $json_template='{' _
 			& '"MR RV":{"label":"MR-RV", "unit":"ml", "value":null, "id":null}' _
 		& '},' _
 		& '"pch":{' _
-			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":66, "id":null},' _
+			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
-			& '"PV maxPG":{"label":null, "unit":null, "value":3},' _; calculation
-			& '"PV meanPG":{"label":null, "unit":null, "value":14},' _; calculation
+			& '"PV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"PV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"PV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"PR maxPG":{"label":null, "unit":null, "value":2},' _; calculation
-			& '"PR meanPG":{"label":null, "unit":null, "value":17},' _; calculation
+			& '"PR maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"PR meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null}' _
 		& '},' _
 		& '"tch":{' _
@@ -221,12 +224,10 @@ if @error then
 endif
 
 ; cmdline
-;if UBound($cmdline) < 3 then; minimum RC + NAME
-;	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
-;	exit
-;endif
-
-global $cmdline = ['demo', '8204010012','Tomas', 'Okurka', '191', '75cmd']
+if UBound($cmdline) < 3 then; minimum RC + NAME
+	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
+	exit
+endif
 
 ; -------------------------------------------------------------------------------------------
 ; INIT
@@ -249,7 +250,7 @@ global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
 
 ; export  file full path
 global $export_file = get_export_file($export_path, $cmdline[1])
-if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1])
+if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1] & '.txt')
 
 ; update data buffer from export
 if FileExists($export_file) then
@@ -268,23 +269,19 @@ if FileExists($archive_file) then
 	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
 endif
 
-; update data buffer note from history
-if $history then
-	for $group in Json_Get($history,'.group')
-		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, 'group.' & $group & '.note'), True)
-	next
-endif
+; update note from history
+for $group in Json_Get($history, '.group')
+	Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, '.group.' & $group & '.note'), True)
+next
 
-; update height & weight if missing export
+; update height & weight if not export
 if UBound($cmdline) == 6  Then
 		if not Json_Get($buffer, '.height') then Json_Put($buffer, '.height', Number($cmdline[4]), True)
 		if not Json_Get($buffer, '.weight') then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
 endif
 
-; calculate values
-calculate()
-
-; default result template
+; update result from history or template
+Json_Put($buffer, '.result', Json_Get($history, '.result'), True)
 if not Json_Get($buffer, '.result') then
 	$result_text = FileRead($result_file)
 	if @error then
@@ -293,6 +290,9 @@ if not Json_Get($buffer, '.result') then
 		Json_Put($buffer, '.result', $result_text, True)
 	endif
 endif
+
+; calculate values
+calculate()
 
 ; -------------------------------------------------------------------------------------------
 ; GUI
@@ -304,23 +304,24 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
+;$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
+$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, 100, 0)
 
 ; header
 
-$label_height = GUICtrlCreateLabel('Víška', 0, 5, 90, 17, 0x0002); right
-$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 92, 2, 34, 19, 1)
-$input_height_unit = GUICtrlCreateLabel('cm', 132, 4, 45, 21)
+$label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
+$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 90, 2, 34, 19, 1)
+$input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
 
-$label_wegiht = GUICtrlCreateLabel('Váha', 185, 5, 90, 17, 0x0002); right
-$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 92, 2, 34, 19, 1)
-$input_weight_unit = GUICtrlCreateLabel('kg', 10 + 185 + 132, 4, 45, 21)
+$label_wegiht = GUICtrlCreateLabel('Váha', 185, 5, 85, 17, 0x0002); right
+$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 90, 2, 34, 19, 1)
+$input_weight_unit = GUICtrlCreateLabel('kg', 185 + 130, 4, 45, 21)
 
-$label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 90, 17, 0x0002); right
+$label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
 $input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19, 1)
-$input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 132, 4, 45, 21)
+$input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 
-$button_refill = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
+$button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
 
 ; groups
 for $group in Json_Get($history, '.group')
@@ -362,30 +363,30 @@ for $group in Json_Get($history, '.group')
 next
 
 ; dekurz
-$label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 10, 85, 21,0x0002); align right
-$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.data.result'), 90, $gui_group_top_offset + 10, 830, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 85, 21,0x0002); align right
+$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 90, $gui_group_top_offset + 8, 832, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
 $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 150, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 612, $gui_group_top_offset + 104, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 690, $gui_group_top_offset + 104, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 768, $gui_group_top_offset + 104, 75, 21)
-$button_konec = GUICtrlCreateButton('Konec', 846, $gui_group_top_offset + 104, 75, 21)
+$button_history = GUICtrlCreateButton('Historie', 616, $gui_group_top_offset + 104, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 694, $gui_group_top_offset + 104, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 772, $gui_group_top_offset + 104, 75, 21)
+$button_konec = GUICtrlCreateButton('Konec', 850, $gui_group_top_offset + 104, 75, 21)
 
 ; GUI tune
 GUICtrlSetBkColor($input_height, 0xC0DCC0)
 GUICtrlSetBkColor($input_weight, 0xC0DCC0)
 GUICtrlSetBkColor($input_bsa, 0xC0DCC0)
-;GUICtrlSetState($button_konec, $GUI_FOCUS)
+GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
 GUISetState(@SW_SHOW)
 
 ; dekurz initialize
-;$dekurz_init = dekurz_init()
-;if @error then logger($dekurz_init)
+$dekurz_init = dekurz_init()
+if @error then logger($dekurz_init)
 
 ; -------------------------------------------------------------------------------------------
 ; MAIN
@@ -395,65 +396,75 @@ GUISetState(@SW_SHOW)
 While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
-;	if $msg = $button_dekurz then
-;		$dekurz = dekurz()
-;		if @error then
-;			logger($dekurz)
-;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
-;		endif
-;	endif
-;	; print data
-;	if $msg = $button_tisk Then
-;		$print = print()
-;		if @error then
-;			logger($print)
-;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
-;		endif
-;	endif
-;	; load history
-;	if $msg = $button_history Then
-;		if FileExists($archive_file) then
-;			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $AGE then
-;				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?' & @CRLF & '(Popisy se načítají vždy.)') = 6 then
-;
-;					; update GUI from history
-;					for $group in Json_Get($buffer, '.group')
-;						; update note
-;						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
-;						; update data
-;						for $member in Json_Get($buffer, '.data.' & $group)
-;							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id'), Json_Get($history,'.data.' & $group & '.' & $member & '.value'))
-;						next
-;					next
-;				endif
-;			else
-;				msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
-;			endif
-;		else
-;			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
-;		endif
-;	endif
+	if $msg = $button_dekurz then
+		$dekurz = dekurz()
+		if @error then
+			logger($dekurz)
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
+		endif
+	endif
+	; print data
+	if $msg = $button_tisk Then
+		$print = print()
+		if @error then
+			logger($print)
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
+		endif
+	endif
+	; re-calculate
+	if $msg = $button_recount Then
+		; read height/ weight
+		;calculate()
+		;re-fill
+	endif
+	; load history
+	if $msg = $button_history Then
+		MsgBox(0,"debug", _DateDiff('h', $runtime, Json_Get($history,'.date')))
+		if FileExists($archive_file) then
+			if _DateDiff('h', $runtime, Json_Get($history,'.date')) < $AGE then
+				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?') = 6 then
+					; update GUI from history
+					for $group in Json_Get($buffer, '.group')
+						; update note
+						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
+						; update data
+						for $member in Json_Get($buffer, '.data.' & $group)
+							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'), Json_Get($history,'.data.' & $group & '."' & $member & '".value'))
+						next
+					next
+				endif
+			else
+				msgbox(48, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
+			endif
+		else
+			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
+		endif
+	endif
 	; write & exit
-;	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
-	if $msg = $GUI_EVENT_CLOSE then
+	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
 		; close dekurz
-	;	_Excel_BookClose($book)
-	;	_Excel_Close($excel)
-
+		_Excel_BookClose($book)
+		_Excel_Close($excel)
 		; update data buffer
-	;	for $group in Json_Get($buffer, '.group')
-	;		; update note
-	;		Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
-	;		; update data
-	;		for $member in Json_Get($buffer, '.data.' & $group)
-	;			Json_Put($buffer, '.data.'  & $group & '.' & $member & '.value', GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '.' & $member & '.id')))
-	;		next
-	;	next
+		for $group in Json_Get($history, '.group')
+			; update result
+			Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz))
+			; update note
+			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
+			; update data
+			for $member in Json_Get($history, '.data.' & $group)
+				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null)
+				else
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))))
+				endif
+			next
+		next
 		; write data buffer to archive
-	;	$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM
-	;	FileWrite($out, Json_Encode($buffer))
-	;	if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
-	;	FileClose($out)
+		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM overwrite
+		FileWrite($out, Json_Encode($buffer))
+		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
+		FileClose($out)
 		; exit
 		exitloop
 	endif
@@ -499,18 +510,15 @@ func get_export_file($export_path, $rc)
 endfunc
 
 ; parse S70 export file
-;
-; FIX: 'dot' variables
-;
 func export_parse($export)
 	local $raw
 	_FileReadToArray($export, $raw, 0); no count
 	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
 	; parse basic
 	for $i = 0 to UBound($raw) - 1
-		if StringRegExp($raw[$i], '(*UCP)^BSA\h.*') then Json_Put($buffer, '.bsa', Number(StringRegExpReplace($raw[$i], '(*UCP)^BSA\h(.*) .*', '$1')), True)
-		if StringRegExp($raw[$i], '(*UCP)^Height\h.*') then Json_Put($buffer, '.height', Number(StringRegExpReplace($raw[$i], '(*UCP)^Height\h(.*) .*', '$1')), True)
-		if StringRegExp($raw[$i], '(*UCP)^Weight\h.*') then Json_Put($buffer, '.weight', Number(StringRegExpReplace($raw[$i], '(*UCP)^Weight\h(.*) .*', '$1')), True)
+		if StringRegExp($raw[$i], '^BSA\h.*') then Json_Put($buffer, '.bsa', Number(StringRegExpReplace($raw[$i], '^BSA\h(.*) .*', '$1')), True)
+		if StringRegExp($raw[$i], '^Height\h.*') then Json_Put($buffer, '.height', Number(StringRegExpReplace($raw[$i], '^Height\h(.*) .*', '$1')), True)
+		if StringRegExp($raw[$i], '^Weight\h.*') then Json_Put($buffer, '.weight', Number(StringRegExpReplace($raw[$i], '^Weight\h(.*) .*', '$1')), True)
 	next
 	; parse data
 	for $group in Json_ObjGet($history, '.group')
@@ -532,68 +540,68 @@ endfunc
 ; calculate aditional variables
 func calculate()
 	; BSA
-	if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
-		Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 2), True)
+	if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) and not IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 1), True)
 	EndIf
 	; LVEF % Teich.
 	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
-		Json_Put($buffer, '.data.lk."LVEF % Teich".value', Round((7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-7/(2.4+Json_Get($buffer, '.data.lk.LVIDs.value')/10)*(Json_Get($buffer, '.data.lk.LVIDs.value')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3)*100, 2), True)
+		Json_Put($buffer, '.data.lk."LVEF % Teich".value', Round((7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-7/(2.4+Json_Get($buffer, '.data.lk.LVIDs.value')/10)*(Json_Get($buffer, '.data.lk.LVIDs.value')/10)^3)/(7/(2.4+Json_Get($buffer, '.data.lk.LVIDd.value')/10)*(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3)*100, 1), True)
 	endif
 	; LVmass
 	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.IVSd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
-		Json_Put($buffer, '.data.lk.LVmass.value', Round(1.04*(Json_get($buffer, '.data.lk.LVIDd.value')/10 + Json_Get($buffer, '.data.lk.IVSd.value')/10 + Json_Get($buffer, '.data.lk.LVPWd.value')/10)^3-(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-13.6, 2), True)
+		Json_Put($buffer, '.data.lk.LVmass.value', Round(1.04*(Json_get($buffer, '.data.lk.LVIDd.value')/10 + Json_Get($buffer, '.data.lk.IVSd.value')/10 + Json_Get($buffer, '.data.lk.LVPWd.value')/10)^3-(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-13.6, 1), True)
 	endif
 	; LVmass-i^2,7
 	if IsNumber(Json_Get($buffer, '.height')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
-		Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/(Json_Get($buffer, '.height')/100)^2.7, 2), True)
+		Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/(Json_Get($buffer, '.height')/100)^2.7, 1), True)
 	endif
 	; LVmass-BSA
 	if IsNumber(Json_Get($buffer, '.bsa')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
-		Json_Put($buffer, '.data.lk.LVmass-BSA.value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), 2), True)
+		Json_Put($buffer, '.data.lk.LVmass-BSA.value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	; RTW
 	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
-		Json_Put($buffer, '.data.lk.RTW.value', Round(2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), 2), True)
+		Json_Put($buffer, '.data.lk.RTW.value', Round(2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), 1), True)
 	endif
 	; FS
 	if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
-		Json_Put($buffer, '.data.lk.FS.value', Round((Json_Get($buffer, '.data.lk.LVIDd.value')-Json_Get($buffer, '.data.lk.LVIDs.value'))/Json_Get($buffer, '.data.lk.LVIDd.value')*100, 2), True)
+		Json_Put($buffer, '.data.lk.FS.value', Round((Json_Get($buffer, '.data.lk.LVIDd.value')-Json_Get($buffer, '.data.lk.LVIDs.value'))/Json_Get($buffer, '.data.lk.LVIDd.value')*100, 1), True)
 	endif
 	; SV-biplane
 	if IsNumber(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and IsNumber(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
-		Json_Put($buffer, '.data.lk.SV-biplane.value', Round((Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, 2), True)
+		Json_Put($buffer, '.data.lk.SV-biplane.value', Round((Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, 1), True)
 	endif
 	;EDVi
 	if IsNumber(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.lk.EDVi.value', Round(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), 2), True)
+		Json_Put($buffer, '.data.lk.EDVi.value', Round(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	;ESVi
 	if IsNumber(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.lk.ESVi.value', Round(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), 2), True)
+		Json_Put($buffer, '.data.lk.ESVi.value', Round(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	; LAV-A4C
 	if IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
-		Json_Put($buffer, '.data.ls.LAV-A4C.value', Round((Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, 2), True)
+		Json_Put($buffer, '.data.ls.LAV-A4C.value', Round((Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, 1), True)
 	endif
 	; LAV-2D
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
-		Json_Put($buffer, '.data.ls.LAV-2D.value',Round((Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, 2), True)
+		Json_Put($buffer, '.data.ls.LAV-2D.value',Round((Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, 1), True)
 	endif
 	; LAVi-2D
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 2), True)
+		Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	;MR Rad
 	if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
-		Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 2), True)
+		Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 1), True)
 	endif
 	;AR Rad
 	if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
-		Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 2), True)
+		Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 1), True)
 	endif
 	;PV Vmax
 	if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-		Json_Put($buffer, '.data.pch."PV Vmax".value', Round(Json_Get($buffer, '.data.pch."PV Vmax".value')/100, 2), True)
+		Json_Put($buffer, '.data.pch."PV Vmax".value', Round(Json_Get($buffer, '.data.pch."PV Vmax".value')/100, 1), True)
 	endif
 	; PV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
@@ -605,47 +613,47 @@ func calculate()
 	endif
 	; MV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
-		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 2), True)
+		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 1), True)
 	endif
 	; MVA-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
-		Json_Put($buffer, '.data.mch."MVA-PHT".value', Round(220/Json_Get($buffer, '.data.mch."MV PHT".value'), 2), True)
+		Json_Put($buffer, '.data.mch."MVA-PHT".value', Round(220/Json_Get($buffer, '.data.mch."MV PHT".value'), 1), True)
 	endif
 	; MVAi-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
-		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 2), True)
+		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	; TV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
-		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 2), True)
+		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 1), True)
 	endif
 	; AV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV maxPG".value')) then
-		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 2), True)
+		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 1), True)
 	endif
 	; SV
 	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
-		Json_Put($buffer, '.data.ach.SV.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/100, 2), True)
+		Json_Put($buffer, '.data.ach.SV.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/100, 1), True)
 	endif
 	; SVi
 	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ach.SVi.value', Round(Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), 2), True)
+		Json_Put($buffer, '.data.ach.SVi.value', Round(Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), 1), True)
 	endif
 	; SV/SVi
 	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
-		Json_Put($buffer, '.data.ach."SV/SVi".value', Round(Json_Get($buffer,'.data.ach.SV.value'), 2) & '/' & Round(Json_Get($buffer,'.data.ach.SVi.value'), 2), True)
+		Json_Put($buffer, '.data.ach."SV/SVi".value', Round(Json_Get($buffer,'.data.ach.SV.value'), 2) & '/' & Round(Json_Get($buffer,'.data.ach.SVi.value'), 1), True)
 	endif
 	; AVA
 	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-		Json_Put($buffer, '.data.ach.AVA.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, 2), True)
+		Json_Put($buffer, '.data.ach.AVA.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, 1), True)
 	endif
 	; AVAi
 	if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ach.AVAi.value', Round(Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), 2), True)
+		Json_Put($buffer, '.data.ach.AVAi.value', Round(Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), 1), True)
 	endif
 	; VTI LVOT/Ao
 	if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), 2), True)
+		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), 1), True)
 	endif
 EndFunc
 
@@ -661,24 +669,22 @@ EndFunc
 ; initialize XLS template
 func dekurz_init()
 	; excel
-	$excel = _Excel_Open(False, False, False, False, True)
+;	$excel = _Excel_Open(False, False, False, False, True)
+	$excel = _Excel_Open()
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
 	; default font
-	$book.Activesheet.Range('A1:A21').Font.Size = 6
+	$book.Activesheet.Range('A1:P32').Font.Size = 8
 	; columns height
-	$book.Activesheet.Range('A1:A21').RowHeight = 13
-	; columns width [ group. label | memeber.label | mameber.value | ... ]
-	$book.Activesheet.Range('A1').ColumnWidth = 20
-	$book.Activesheet.Range('B1').ColumnWidth = 11
-	$book.Activesheet.Range('C1').ColumnWidth = 3.5
-	$book.Activesheet.Range('D1').ColumnWidth = 9
-	$book.Activesheet.Range('E1').ColumnWidth = 3.5
-	$book.Activesheet.Range('F1').ColumnWidth = 9
-	$book.Activesheet.Range('G1').ColumnWidth = 3.5
-	$book.Activesheet.Range('H1').ColumnWidth = 3.5
-
+	$book.Activesheet.Range('A1:P32').RowHeight = 13
+	; columns width [ group. label | member.label | member.value | member.unit | ... ]
+	$book.Activesheet.Range('A1').ColumnWidth = 20; group A-P
+	for $i = 0 to 4; five columns starts B[66]
+		$book.Activesheet.Range(Chr(66 + 3*$i) & '1').ColumnWidth = 10
+		$book.Activesheet.Range(Chr(66 + 3*$i + 1) & '1').ColumnWidth = 5
+		$book.Activesheet.Range(Chr(66 + 3*$i + 2) & '1').ColumnWidth = 5
+	Next
 endFunc
 
 ; update XLS data & write clipboard
@@ -689,30 +695,57 @@ func dekurz()
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
 
+	$row_index = 1
+	$column_index = 65; A ... 66-68 BCD, 69-71 EFG, 72-74 HIJ, 75-77 KLM, 78-80 NOP
+
 	; generate data
-	for $group in Json_Get($buffer, '.group')
+	for $group in Json_Get($history, '.group')
 		; group label
-		_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A3')
-		$book.Activesheet.Range('A3').Font.Bold = True
-		for $member in Json_Get($buffer, '.data.' & $group)
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' & $member & '.label'), 'B3')
-			$book.Activesheet.Range('B3').HorizontalAlignment = $xlRight;
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '.' & $member & '.value') , 'C3')
-			$book.Activesheet.Range('C3').HorizontalAlignment = $xlCenter;
-			; break
+		MsgBox(0,"group label", Chr($column_index) & $row_index)
+		_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), Chr($column_index) & $row_index)
+		$book.Activesheet.Range(Chr($column_index) & $row_index).Font.Bold = True
+		for $member in Json_Get($history, '.data.' & $group)
+			if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
+				; data
+				MsgBox(0,"XLS member label", Chr($column_index + 1) & $row_index)
+				_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), Chr($column_index + 1) & $row_index)
+;				$book.Activesheet.Range(Chr($column_index + 1) & $row_index).HorizontalAlignment = $xlRight;
+				MsgBox(0,"XLS member value", Chr($column_index + 2) & $row_index)
+				_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) , Chr($column_index + 2) & $row_index)
+;				$book.Activesheet.Range(Chr($column_index + 2) & $row_index).HorizontalAlignment = $xlCenter;
+				MsgBox(0,"XLS member unit", Chr($column_index + 3) & $row_index)
+				_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit') , Chr($column_index + 3) & $row_index)
+				; update index
+				if $column_index == 78 Then; reset
+					$column_index = 66
+					$row_index+=1
+				else
+					$column_index+=3
+				endif
+			endif
 		next
 		;note
-		$book.Activesheet.Range('B6:H6').MergeCells = True
-		_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.note')), 'B6')
+		MsgBox(0,"XLS note", 'B' & ($row_index + 1) & ':P' & ($row_index + 1))
+		_Excel_RangeWrite($book, $book.Activesheet, 'Poznámka:', 'A' & ($row_index + 1))
+		$book.Activesheet.Range('A' & ($row_index + 1)).HorizontalAlignment = $xlRight;
+		$book.Activesheet.Range('B' & ($row_index + 1) & ':P' & ($row_index + 1)).MergeCells = True
+		_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), 'B' & ($row_index + 1))
 		; group line
-		With $book.Activesheet.Range('A6:H6').Borders(9)
+		With $book.Activesheet.Range('A' & ($row_index + 1) & ':P' & ($row_index + 1)).Borders(9)
 			.LineStyle = 1
 			.Weight = 2
 		EndWith
+		; update index
+		$row_index+=1
 	next
 
+	; result
+	MsgBox(0,"XLS dekurz", 'A' & $row_index & ':P' & $row_index )
+	$book.Activesheet.Range('A' & $row_index & ':P' & $row_index).MergeCells = True
+	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'A' & $row_index)
+
 	; clip
-	$range = $book.ActiveSheet.Range('A1:H21')
+	$range = $book.ActiveSheet.Range('A1:P32')
 	_Excel_RangeCopyPaste($book.ActiveSheet,$range)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
