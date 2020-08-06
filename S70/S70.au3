@@ -684,12 +684,14 @@ func dekurz_init()
 	$book.Activesheet.Range('A1:P32').Font.Size = 8
 	; columns height
 	$book.Activesheet.Range('A1:P32').RowHeight = 13
+	; number format
+	$book.Activesheet.Range('A1:P32').NumberFormat = "@"; string
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
-	$book.Activesheet.Range('A1').ColumnWidth = 20; group A-P
+	$book.Activesheet.Range('A1').ColumnWidth = 15; group A-P
 	for $i = 0 to 4; five columns starts B[66]
-		$book.Activesheet.Range(Chr(66 + 3*$i) & '1').ColumnWidth = 8
-		$book.Activesheet.Range(Chr(66 + 3*$i + 1) & '1').ColumnWidth = 2.5
-		$book.Activesheet.Range(Chr(66 + 3*$i + 2) & '1').ColumnWidth = 3
+		$book.Activesheet.Range(Chr(66 + 3*$i) & '1').ColumnWidth = 9
+		$book.Activesheet.Range(Chr(66 + 3*$i + 1) & '1').ColumnWidth = 3.5
+		$book.Activesheet.Range(Chr(66 + 3*$i + 2) & '1').ColumnWidth = 4.5
 	Next
 endFunc
 
