@@ -19,10 +19,13 @@
 ;
 ; TODO:
 ;
-; Red missing BSA
+; gui: Red missing BSA
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; parse: dot var bug
 ; recount: fix cm mm conversion dup.
+; print: superscript m2
+; print: in-memory bitmap
+;
 
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
@@ -789,7 +792,7 @@ func dekurz()
 EndFunc
 
 func print(); 2100 x 2970
-	logger('Generuji tisk: ' & @MIN & ':' & @SEC)
+;	logger('Generuji tisk: ' & @MIN & ':' & @SEC)
 	local $printer, $printer_error
 	;priner init
 	$printer = _PrintDllStart($printer_error)
@@ -908,5 +911,5 @@ func print(); 2100 x 2970
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
-	logger('Tisknu: ' & @MIN & ':' & @SEC)
+;	logger('Tisknu: ' & @MIN & ':' & @SEC)
 EndFunc
