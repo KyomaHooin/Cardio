@@ -789,8 +789,8 @@ func dekurz()
 EndFunc
 
 func print(); 2100 x 2970
+	logger('Generuji tisk: ' & @MIN & ':' & @SEC)
 	local $printer, $printer_error
-
 	;priner init
 	$printer = _PrintDllStart($printer_error)
 	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
@@ -799,13 +799,9 @@ func print(); 2100 x 2970
 
 	$max_height = _PrintGetPageHeight($printer) - _PrintGetYOffset($printer)
 	$max_width = _PrintGetPageWidth($printer) - _PrintGetXOffset($printer)
-
-	$top_offset = 0
-
 	$line_offset = 5
 	$line_max = $max_width - 100
-
-	; HEADER
+	$top_offset = 0
 
 	;logo
 	_PrintImage($printer,@ScriptDir & '\' & 'logo_128x128.bmp', 50,50,300,300)
@@ -827,77 +823,90 @@ func print(); 2100 x 2970
 	_PrintSetLineWid($printer, 2)
 	_PrintLine($printer, 50, $top_offset + 85, $max_width - 50, $top_offset + 85)
 	$top_offset+=85
-	; patient label
-	_PrintSetFont($printer, 'Arial',10, Default, 'bold')
+	; patient
+	_PrintSetFont($printer, 'Arial',10, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset += 50
-	_PrintText($printer, 'Jmeno: ', 50, $top_offset)
+	_PrintText($printer, 'Jmeno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
+	_PrintText($printer, 'Vyska: ' & GUICtrlRead($input_height) & ' cm', 550, $top_offset)
+	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	;_PrintText($printer, Json_Get($buffer,'.id'), $x, $y)
-	;_PrintText($printer, Json_Get($buffer,'.bsa'), $x, $y)
-	;_PrintText($printer, Json_Get($buffer,'.weight'), $x, $y)
-	;_PrintText($printer, Json_Get($buffer,'.height'), $x, $y)
-
+	_PrintText($printer, 'Rodne cislo: ' & $cmdline[1], 50, $top_offset)
+	_PrintText($printer, 'Vaha: ' & GUICtrlRead($input_weight) & ' kg', 550, $top_offset)
 	; separator
 	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, 50, $top_offset + 85, $max_width - 50, $top_offset + 85)
-	$top_offset+=85
-
-	; DATA
-
-	;$memeber_index = 0
-	;$line_len = 0
-
-	;for $group in Json_Get($history, '.group')
-	;	if not_empty_group($$group) then
-	;		; group name
-	;		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), $x, $y)
-	;		; group data
-	;		for $member in Json_Get($history, '.data.' & $group)
-	;			if $memeber_index = 4 Then
-	;				$memeber_index = 0
-	;				$top_offset += _PrintFontHeight($current_font)
-	;			endif
-	;			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label') & ' ' & ($printer, GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id')) & ' ' & Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), $x, $top_offset)
-	;			$memeber_index+=1
-	;		next
-	;		; note
-	;		if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))> 1 then
-	;			for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ')
-	;				if StringLen(' ' + $word + $line_len) > $line_max Then
-	;					$line_len=0
-	;					$top_offset += _PrintFontHeight($current_font)
-	;				EndIf
-	;				_PrintText(' ' + $word, $line_len, $top_offset)
-	;				$line_len+=StringLen(' ' + $word)
-	;			next
-	;		endif
-	;	endif
-	;next
+	_PrintLine($printer, 50, $top_offset + 90, $max_width - 50, $top_offset + 90)
+	$top_offset+=90
+	; data
+	_PrintSetFont($printer, 'Arial',10, Default, Default)
+	$text_height = _PrintGetTextHeight($printer, 'Arial')
+	$top_offset += 50
+	for $group in Json_Get($history, '.group')
+		if not_empty_group($group) then
+			; line index
+			$line_index = 1
+			; group name
+			_PrintSetFont($printer, 'Arial',10, Default, 'bold')
+			_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), 50, $top_offset)
+			$top_offset += $text_height + $line_offset
+			_PrintSetFont($printer, 'Arial',10, Default, Default)
+			; group data
+			for $member in Json_Get($history, '.data.' & $group)
+				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
+					if $line_index = 5 Then
+						$line_index = 1
+						$top_offset += $text_height + $line_offset
+					endif
+					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ' ' & String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))) & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
+					$line_index+=1
+				endif
+			next
+			; update offset [?]
+			$top_offset += $text_height + $line_offset
+			; note
+			$line_len = 50
+			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')))> 1 then
+				for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ', 2); no count
+					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $line_max Then
+						$line_len=50
+						$top_offset+=$text_height + $line_offset
+					EndIf
+					_PrintText($printer, ' ' & $word, $line_len, $top_offset)
+					$line_len+=_PrintGetTextWidth($printer, ' ' & $word)
+				next
+				; update offset
+				$top_offset += $text_height + $line_offset
+			endif
+		endif
+	next
 	; separator
-	;_PrintSetLineWid($printer, 2)
-	;_PrintLine($printer, $x, $y, $x, $y)
+	_PrintSetLineWid($printer, 2)
+	_PrintLine($printer, 50, $top_offset + 50, $max_width - 50, $top_offset + 50)
+	$top_offset += 50
 	; result
-	;$line_len = 0
-
-	; RESULT
-
-	;for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ')
-	;	if StringLen(' ' + $word + $line_len) > $line_max Then
-	;		$line_len=0
-	;		$top_offset += _PrintFontHeight($current_font)
-	;	EndIf
-	;	_PrintText(' ' + $word, $line_len, $top_offset)
-	;	$line_len+=StringLen(' ' + $word)
-	;next
-
-	; FOOTER
-
+	_PrintSetFont($printer, 'Arial',10, Default, Default)
+	$text_height = _PrintGetTextHeight($printer, 'Arial')
+	$top_offset += 50
+	$line_len = 50
+	for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ', 2); no count
+		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $line_max Then
+			$line_len=50
+			$top_offset+=$text_height + $line_offset
+		EndIf
+		_PrintText($printer, ' ' & $word, $line_len, $top_offset)
+		$line_len+=_PrintGetTextWidth($printer, ' ' & $word)
+	next
+	$top_offset += $text_height + $line_offset
 	; date
+	$top_offset += 10
+	_PrintText($printer, 'Datum: ' & $runtime, 50, $max_height - 100)
 	; singnature
-
+	_PrintText($printer, 'Podpis:', 1500, $max_height - 100)
+	_PrintSetLineWid($printer, 2)
+	_PrintLine($printer, 1650, $max_height - 80, $max_width - 50, $max_height - 80)
 	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
+	logger('Tisknu: ' & @MIN & ':' & @SEC)
 EndFunc
