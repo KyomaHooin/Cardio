@@ -318,7 +318,7 @@ $input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 90, 2, 34
 $input_weight_unit = GUICtrlCreateLabel('kg', 185 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19,BitOr(0x0001,0x0800)); read-only
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
@@ -326,20 +326,20 @@ $button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
 ; groups
 for $group in Json_Get($history, '.group')
 	for $member in Json_Get($history, '.data.' & $group)
-;		; data
+		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
-;			; update index / offset
+			; update index / offset
 			if Mod($gui_index, 5) = 0 then; = both start or end offset!
 				$gui_top_offset+=21; member spacing
 				$gui_left_offset=0; reset
 			Else
 				$gui_left_offset+=185; column offset
 			endif
-;			; label
+			; label
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
-;			; input
+			; input
 			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 90 + $gui_left_offset, $gui_top_offset, 34, 19, 1), True)
-;			; unit
+			; unit
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset, $gui_top_offset + 3, 45, 21)
 			; update index
 			$gui_index+=1
@@ -429,7 +429,7 @@ While 1
 		; re-calculate
 		calculate()
 		; re-fill BSA
-		GUICtrlSetData($input_bsa, Json_Get($buffer,'.bsa'))
+		GUICtrlSetData($input_bsa, Json_Get($buffer, '.bsa'))
 		; re-fill data
 		for $group in Json_Get($history, '.group')
 			for $member in Json_Get($history, '.data.' & $group)
@@ -550,7 +550,7 @@ func export_parse($export)
 		for $member in Json_ObjGet($history, '.data.' & $group)
 			for $j = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
-					StringReplace($raw[$j], @TAB, '')
+					StringReplace($raw[$j], @TAB, ''); test tabs
 					if @extended == 2 Then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True); check exists
 					elseif @extended == 1 then
@@ -687,7 +687,7 @@ func gui_get_group_index($i, $mod)
 	if mod($i, $mod) == 0 then
 		return int($i/5)
 	Else
-		return int($i/5+ 1)
+		return int($i/5 + 1)
 	endif
 EndFunc
 
