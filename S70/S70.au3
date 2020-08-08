@@ -19,13 +19,10 @@
 ;
 ; TODO:
 ;
-; Dekurz "it's number" not date.. bug
-; Fix "dot" varliable parsing
 ; Red missing BSA
-; Duplicty parse bug (Ao Diam, PV Vmax..)
-; RTW -> RWT
-; print linebreake()
-; recount() -> update_buffer()[bcp()] -> cacl() -> refill ()[hist()]
+; parse: dup bug (Ao Diam, PV Vmax..)
+; parse: dot var bug
+; recount: fix cm mm conversion dup.
 
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
@@ -63,9 +60,6 @@ global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & 
 
 ;data template
 global $json_template='{' _
-	& '"patient":null,' _
-	& '"name":null,' _
-	& '"poj":null,' _
 	& '"bsa":null,' _
 	& '"weight":null,' _
 	& '"height":null,' _
@@ -310,8 +304,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
-$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ': ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, 100, 0)
+;$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ' : ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
+$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ' : ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, 120, 0)
 
 ; header
 
@@ -324,7 +318,7 @@ $input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 90, 2, 34
 $input_weight_unit = GUICtrlCreateLabel('kg', 185 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19, 1)
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19,BitOr(0x0001,0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
@@ -419,9 +413,29 @@ While 1
 	endif
 	; re-calculate
 	if $msg = $button_recount Then
-		; read height/ weight
-		;calculate()
-		;re-fill
+		; update height / weight
+		Json_Put($buffer, '.height', GuiCtrlRead($input_height), True)
+		Json_Put($buffer, '.weight', GuiCtrlRead($input_weight), True)
+		; update data buffer
+		for $group in Json_Get($history, '.group')
+			for $member in Json_Get($history, '.data.' & $group)
+				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null)
+				else
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))))
+				endif
+			next
+		next
+		; re-calculate
+		calculate()
+		; re-fill BSA
+		GUICtrlSetData($input_bsa, Json_Get($buffer,'.bsa'))
+		; re-fill data
+		for $group in Json_Get($history, '.group')
+			for $member in Json_Get($history, '.data.' & $group)
+				GUICtrlSetData(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id'), Json_Get($buffer,'.data.' & $group & '."' & $member & '".value'))
+			next
+		next
 	endif
 	; load history
 	if $msg = $button_history Then
@@ -452,7 +466,10 @@ While 1
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
 		; update result
-		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz))
+		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz), True)
+		; update height / weight
+		Json_Put($buffer, '.height', GuiCtrlRead($input_height), True)
+		Json_Put($buffer, '.weight', GuiCtrlRead($input_weight), True)
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			; update note
@@ -466,6 +483,8 @@ While 1
 				endif
 			next
 		next
+		; update timestamp
+		Json_Put($buffer, '.date', $runtime, True)
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM overwrite
 		FileWrite($out, Json_Encode($buffer))
@@ -533,9 +552,9 @@ func export_parse($export)
 				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
 					StringReplace($raw[$j], @TAB, '')
 					if @extended == 2 Then
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), True); check exists
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True); check exists
 					elseif @extended == 1 then
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), True)
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), 1), True)
 					endif
 				endif
 			next
@@ -705,7 +724,7 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
-	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
+;	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
@@ -766,67 +785,116 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:P' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
+;	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
-func print()
-	local $printer,$printer_error
-
-	local $text,$x,$y
+func print(); 2100 x 2970
+	local $printer, $printer_error
 
 	;priner init
-
-
 	$printer = _PrintDllStart($printer_error)
 	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
-
-	; page title
-	_PrintSetDocTitle($printer,"S70 Dekurz - Pacient: " & $cmdline[1])
-
 	; printer create page
 	_PrintStartPrint($printer)
 
-	$page_hegiht=_PrintGetPageHeight($printer)
-	$page_width=_PrintGetPageWidth($printer)
-	; header
-	_PrintSetFont($printer,'Arial',18,0,'bold,underline')
-	_PrintText($printer, $text, $x, $y)
-	;logo [ bmp | jpg | ico ]
-	_PrintImage($printer,"logo.bmp", $x, $y,300,350)
-	; company
-	_PrintText($printer, 'Julian Delphiki', $x, $y)
-	_PrintText($printer, 'Street 23', $x, $y)
-	_PrintText($printer, 'Rotterdam 31415', $x, $y)
-	_PrintText($printer, 'Tel: 314-159-265', $x, $y)
-	; patient
-	_PrintText($printer, Json_Get($buffer,'.name'), $x, $y)
-	_PrintText($printer, Json_Get($buffer,'.id'), $x, $y)
-	_PrintText($printer, Json_Get($buffer,'.bsa'), $x, $y)
-	_PrintText($printer, Json_Get($buffer,'.weight'), $x, $y)
-	_PrintText($printer, Json_Get($buffer,'.height'), $x, $y)
+	$max_height = _PrintGetPageHeight($printer) - _PrintGetYOffset($printer)
+	$max_width = _PrintGetPageWidth($printer) - _PrintGetXOffset($printer)
+
+	$top_offset = 0
+
+	$line_offset = 5
+	$line_max = $max_width - 100
+
+	; HEADER
+
+	;logo
+	_PrintImage($printer,@ScriptDir & '\' & 'logo_128x128.bmp', 50,50,300,300)
+	; QR code
+	_PrintImage($printer,@ScriptDir & '\' & 'vcard.bmp', $max_width - 300 - 50, 50, 300,300)
+	; address
+	_PrintSetFont($printer,'Arial',12, Default, Default)
+	$text_height = _PrintGetTextHeight($printer, 'Arial')
+	$top_offset += 125
+	_PrintText($printer, 'Cardiologie - Petr Vesely', ($max_width - _PrintGetTextWidth($printer, 'Cardiologie - Petr Vesely'))/2, $top_offset)
+	$top_offset+=$text_height + $line_offset
+	_PrintText($printer, 'Kounicova 1350 / 15', ($max_width - _PrintGetTextWidth($printer, 'Kounicova 1350 / 15'))/2, $top_offset)
+	$top_offset+=$text_height + $line_offset
+	_PrintText($printer, 'Praha 17 16300', ($max_width - _PrintGetTextWidth($printer, 'Praha 17 16300'))/2, $top_offset)
+	$top_offset+=$text_height + $line_offset
+	_PrintText($printer, 'Tel: +420315159265', ($max_width - _PrintGetTextWidth($printer, 'Tel: +420315159265'))/2, $top_offset)
+	$top_offset+=$text_height + $line_offset
 	; separator
 	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, $x, $y, $x, $y)
+	_PrintLine($printer, 50, $top_offset + 85, $max_width - 50, $top_offset + 85)
+	$top_offset+=85
+	; patient label
+	_PrintSetFont($printer, 'Arial',10, Default, 'bold')
+	$text_height = _PrintGetTextHeight($printer, 'Arial')
+	$top_offset += 50
+	_PrintText($printer, 'Jmeno: ', 50, $top_offset)
+	$top_offset+=$text_height + $line_offset
+	;_PrintText($printer, Json_Get($buffer,'.id'), $x, $y)
+	;_PrintText($printer, Json_Get($buffer,'.bsa'), $x, $y)
+	;_PrintText($printer, Json_Get($buffer,'.weight'), $x, $y)
+	;_PrintText($printer, Json_Get($buffer,'.height'), $x, $y)
 
-	; data
-	_PrintSetFont($printer,'Times New Roman',12,0,'')
-	for $group in Json_Get($buffer, '.group')
-		; group name
-		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), $x, $y)
-		; group data
-		for $member in Json_Get($buffer, '.data.' & $group)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label'), $x, $y)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.value'), $x, $y)
-			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), $x, $y)
-			; break
-		next
-		; separator
-		_PrintSetLineWid($printer, 2)
-		_PrintLine($printer, $x, $y, $x, $y)
-	next
+	; separator
+	_PrintSetLineWid($printer, 2)
+	_PrintLine($printer, 50, $top_offset + 85, $max_width - 50, $top_offset + 85)
+	$top_offset+=85
 
+	; DATA
+
+	;$memeber_index = 0
+	;$line_len = 0
+
+	;for $group in Json_Get($history, '.group')
+	;	if not_empty_group($$group) then
+	;		; group name
+	;		_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), $x, $y)
+	;		; group data
+	;		for $member in Json_Get($history, '.data.' & $group)
+	;			if $memeber_index = 4 Then
+	;				$memeber_index = 0
+	;				$top_offset += _PrintFontHeight($current_font)
+	;			endif
+	;			_PrintText($printer, Json_Get($buffer,'.data.' & $group & '.' & $member & '.label') & ' ' & ($printer, GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '.' & $member & '.id')) & ' ' & Json_Get($buffer,'.data.' & $group & '.' & $member & '.unit'), $x, $top_offset)
+	;			$memeber_index+=1
+	;		next
+	;		; note
+	;		if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))> 1 then
+	;			for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ')
+	;				if StringLen(' ' + $word + $line_len) > $line_max Then
+	;					$line_len=0
+	;					$top_offset += _PrintFontHeight($current_font)
+	;				EndIf
+	;				_PrintText(' ' + $word, $line_len, $top_offset)
+	;				$line_len+=StringLen(' ' + $word)
+	;			next
+	;		endif
+	;	endif
+	;next
+	; separator
+	;_PrintSetLineWid($printer, 2)
+	;_PrintLine($printer, $x, $y, $x, $y)
 	; result
-	_PrintText($printer, Json_Get($buffer,'.result'), $x, $y)
+	;$line_len = 0
+
+	; RESULT
+
+	;for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ')
+	;	if StringLen(' ' + $word + $line_len) > $line_max Then
+	;		$line_len=0
+	;		$top_offset += _PrintFontHeight($current_font)
+	;	EndIf
+	;	_PrintText(' ' + $word, $line_len, $top_offset)
+	;	$line_len+=StringLen(' ' + $word)
+	;next
+
+	; FOOTER
+
+	; date
+	; singnature
 
 	; print
 	_PrintEndPrint($printer)
