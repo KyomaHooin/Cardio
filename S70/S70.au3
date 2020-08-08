@@ -22,9 +22,9 @@
 ; gui: Red missing BSA
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; parse: dot var bug
-; recount: fix cm mm conversion dup.
 ; print: superscript m2
 ; print: in-memory bitmap
+; main: history date
 ;
 
 #AutoIt3Wrapper_Icon=S70.ico
@@ -55,6 +55,9 @@ $AGE = 24; default stored data age in hours
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
 global $result_file = @ScriptDir & '\' & 'zaver.txt'
+global $logo_file = @ScriptDir & '\' & 'logo_128x128.bmp'
+global $qr_file = @ScriptDir & '\' & 'vcard.bmp'
+
 
 global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archiv'
@@ -295,7 +298,7 @@ if not Json_Get($buffer, '.result') then
 endif
 
 ; calculate values
-calculate()
+calculate(True)
 
 ; -------------------------------------------------------------------------------------------
 ; GUI
@@ -417,8 +420,8 @@ While 1
 	; re-calculate
 	if $msg = $button_recount Then
 		; update height / weight
-		Json_Put($buffer, '.height', GuiCtrlRead($input_height), True)
-		Json_Put($buffer, '.weight', GuiCtrlRead($input_weight), True)
+		Json_Put($buffer, '.height', Number(GuiCtrlRead($input_height)), True)
+		Json_Put($buffer, '.weight', Number(GuiCtrlRead($input_weight)), True)
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			for $member in Json_Get($history, '.data.' & $group)
@@ -430,7 +433,7 @@ While 1
 			next
 		next
 		; re-calculate
-		calculate()
+		calculate(False)
 		; re-fill BSA
 		GUICtrlSetData($input_bsa, Json_Get($buffer, '.bsa'))
 		; re-fill data
@@ -471,8 +474,8 @@ While 1
 		; update result
 		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz), True)
 		; update height / weight
-		Json_Put($buffer, '.height', GuiCtrlRead($input_height), True)
-		Json_Put($buffer, '.weight', GuiCtrlRead($input_weight), True)
+		Json_Put($buffer, '.height', Number(GuiCtrlRead($input_height)), True)
+		Json_Put($buffer, '.weight', Number(GuiCtrlRead($input_weight)), True)
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			; update note
@@ -566,9 +569,9 @@ func export_parse($export)
 endfunc
 
 ; calculate aditional variables
-func calculate()
+func calculate($is_export)
 	; BSA
-	if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) and not IsNumber(Json_Get($buffer, '.bsa')) then
+	if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
 		Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 1), True)
 	EndIf
 	; LVEF % Teich.
@@ -619,17 +622,19 @@ func calculate()
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 		Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
-	;MR Rad
-	if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
-		Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 1), True)
-	endif
-	;AR Rad
-	if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
-		Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 1), True)
-	endif
-	;PV Vmax
-	if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-		Json_Put($buffer, '.data.pch."PV Vmax".value', Round(Json_Get($buffer, '.data.pch."PV Vmax".value')/100, 1), True)
+	if $is_export then
+		;MR Rad
+		if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
+			Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 1), True)
+		endif
+		;AR Rad
+		if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
+			Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 1), True)
+		endif
+		;PV Vmax
+		if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
+			Json_Put($buffer, '.data.pch."PV Vmax".value', Round(Json_Get($buffer, '.data.pch."PV Vmax".value')/100, 1), True)
+		endif
 	endif
 	; PV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
@@ -727,7 +732,6 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
-;	logger('Generuji dekurz: ' & @MIN & ':' & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
@@ -788,11 +792,9 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:P' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-;	logger('Zápis dokončen: ' & @MIN & ':' & @SEC)
 EndFunc
 
 func print(); 2100 x 2970
-;	logger('Generuji tisk: ' & @MIN & ':' & @SEC)
 	local $printer, $printer_error
 	;priner init
 	$printer = _PrintDllStart($printer_error)
@@ -803,24 +805,23 @@ func print(); 2100 x 2970
 	$max_height = _PrintGetPageHeight($printer) - _PrintGetYOffset($printer)
 	$max_width = _PrintGetPageWidth($printer) - _PrintGetXOffset($printer)
 	$line_offset = 5
-	$line_max = $max_width - 100
 	$top_offset = 0
 
 	;logo
-	_PrintImage($printer,@ScriptDir & '\' & 'logo_128x128.bmp', 50,50,300,300)
+	_PrintImage($printer, $logo_file, 50,50,300,300)
 	; QR code
-	_PrintImage($printer,@ScriptDir & '\' & 'vcard.bmp', $max_width - 300 - 50, 50, 300,300)
+	_PrintImage($printer, $qr_file, $max_width - 300 - 50, 50, 300,300)
 	; address
 	_PrintSetFont($printer,'Arial',12, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset += 125
-	_PrintText($printer, 'Cardiologie - Petr Vesely', ($max_width - _PrintGetTextWidth($printer, 'Cardiologie - Petr Vesely'))/2, $top_offset)
+	_PrintText($printer, 'Kardiologie - Petr Veselý', ($max_width - _PrintGetTextWidth($printer, 'Kardiologie - Petr Veselý'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Kounicova 1350 / 15', ($max_width - _PrintGetTextWidth($printer, 'Kounicova 1350 / 15'))/2, $top_offset)
+	_PrintText($printer, 'Kounicova 1350/15', ($max_width - _PrintGetTextWidth($printer, 'Kounicova 1350/15'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'Praha 17 16300', ($max_width - _PrintGetTextWidth($printer, 'Praha 17 16300'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Tel: +420315159265', ($max_width - _PrintGetTextWidth($printer, 'Tel: +420315159265'))/2, $top_offset)
+	_PrintText($printer, 'Tel: +420/314159265', ($max_width - _PrintGetTextWidth($printer, 'Tel: +420/314159265'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	; separator
 	_PrintSetLineWid($printer, 2)
@@ -830,12 +831,12 @@ func print(); 2100 x 2970
 	_PrintSetFont($printer, 'Arial',10, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset += 50
-	_PrintText($printer, 'Jmeno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
-	_PrintText($printer, 'Vyska: ' & GUICtrlRead($input_height) & ' cm', 550, $top_offset)
+	_PrintText($printer, 'Jméno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
+	_PrintText($printer, 'Výška: ' & GUICtrlRead($input_height) & ' cm', 550, $top_offset)
 	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Rodne cislo: ' & $cmdline[1], 50, $top_offset)
-	_PrintText($printer, 'Vaha: ' & GUICtrlRead($input_weight) & ' kg', 550, $top_offset)
+	_PrintText($printer, 'Rodné číslo: ' & $cmdline[1], 50, $top_offset)
+	_PrintText($printer, 'Váha: ' & GUICtrlRead($input_weight) & ' kg', 550, $top_offset)
 	; separator
 	_PrintSetLineWid($printer, 2)
 	_PrintLine($printer, 50, $top_offset + 90, $max_width - 50, $top_offset + 90)
@@ -848,11 +849,11 @@ func print(); 2100 x 2970
 		if not_empty_group($group) then
 			; line index
 			$line_index = 1
-			; group name
+			; group label
 			_PrintSetFont($printer, 'Arial',10, Default, 'bold')
 			_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), 50, $top_offset)
-			$top_offset += $text_height + $line_offset
-			_PrintSetFont($printer, 'Arial',10, Default, Default)
+			$top_offset += $text_height + $line_offset; step down
+			_PrintSetFont($printer, 'Arial',8, Default, Default)
 			; group data
 			for $member in Json_Get($history, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
@@ -860,18 +861,20 @@ func print(); 2100 x 2970
 						$line_index = 1
 						$top_offset += $text_height + $line_offset
 					endif
-					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ' ' & String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))) & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
+					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ': ' & String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))) & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
 					$line_index+=1
 				endif
 			next
-			; update offset [?]
-			$top_offset += $text_height + $line_offset
+			; update offset
+			if $line_index <> 1 then $top_offset += $text_height + $line_offset
 			; note
-			$line_len = 50
+			_PrintSetFont($printer, 'Arial',10, Default, Default)
+			$text_height = _PrintGetTextHeight($printer, 'Arial')
+			$line_len = 395
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')))> 1 then
 				for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ', 2); no count
-					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $line_max Then
-						$line_len=50
+					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 395 Then
+						$line_len=395
 						$top_offset+=$text_height + $line_offset
 					EndIf
 					_PrintText($printer, ' ' & $word, $line_len, $top_offset)
@@ -885,14 +888,17 @@ func print(); 2100 x 2970
 	; separator
 	_PrintSetLineWid($printer, 2)
 	_PrintLine($printer, 50, $top_offset + 50, $max_width - 50, $top_offset + 50)
-	$top_offset += 50
+	$top_offset += 100
+	; result label
+	_PrintSetFont($printer, 'Arial',10, Default, 'bold')
+	_PrintText($printer, 'Závěr', 50, $top_offset)
+	$top_offset += $text_height + $line_offset
 	; result
 	_PrintSetFont($printer, 'Arial',10, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
-	$top_offset += 50
 	$line_len = 50
 	for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ', 2); no count
-		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $line_max Then
+		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 100 Then
 			$line_len=50
 			$top_offset+=$text_height + $line_offset
 		EndIf
@@ -906,10 +912,9 @@ func print(); 2100 x 2970
 	; singnature
 	_PrintText($printer, 'Podpis:', 1500, $max_height - 100)
 	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, 1650, $max_height - 80, $max_width - 50, $max_height - 80)
+	_PrintLine($printer, 1650, $max_height - 70, $max_width - 50, $max_height - 70)
 	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
 	_printDllClose($printer)
-;	logger('Tisknu: ' & @MIN & ':' & @SEC)
 EndFunc
