@@ -26,6 +26,8 @@ FILE
          LICENSE - License & disclaimer.
 
 logo_128x128.png - Printing logo.
+logo_128x128.bmp - Printing logo bitmap.
+       vcard.bmp - vCard v3 QR code bitmap.
      Medicus.png - Medicus 3 external app configuration screen.
          S70.png - Program GUI screen.
          S70.ico - Program icon.
