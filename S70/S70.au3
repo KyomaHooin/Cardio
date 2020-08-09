@@ -19,6 +19,7 @@
 ;
 ; TODO:
 ;
+; func: recount "round" bug
 ; prog: default INI dropper
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
