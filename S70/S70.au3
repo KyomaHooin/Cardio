@@ -20,7 +20,6 @@
 ; TODO:
 ;
 ; func: recount "round" bug
-; prog: default INI dropper
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
 ; var "" to ''?
@@ -2278,6 +2277,10 @@ logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' 
 if FileExists($config_file) then
 	read_config_file($config_file)
 	if @error then logger('Načtení konfiguračního souboru selhalo.')
+Else
+	$c = FileOpen($config_file, 2+256); UTF8 / NOBOM overwrite
+	FileWrite($c, 'export=' & @CRLF & 'archiv=' & @CRLF & 'result=' & @CRLF & 'history=')
+	FileClose($c)
 endif
 
 ; create archive directory
@@ -2531,7 +2534,7 @@ While 1
 		; update timestamp
 		Json_Put($buffer, '.date', $runtime, True)
 		; write data buffer to archive
-		$out = FileOpen($archive_file, 2 + 256); UTF8 / BOM overwrite
+		$out = FileOpen($archive_file, 2 + 256); UTF8 / NOBOM overwrite
 		FileWrite($out, Json_Encode($buffer))
 		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
 		FileClose($out)
