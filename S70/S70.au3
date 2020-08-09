@@ -21,6 +21,7 @@
 ;
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
+; var "" to ''?
 ;
 
 #AutoIt3Wrapper_Icon=S70.ico
@@ -46,15 +47,12 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-$VERSION = '1.6'
+$VERSION = '1.7'
 $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
 global $result_file = @ScriptDir & '\' & 'zaver.txt'
-global $logo_file = @ScriptDir & '\' & 'logo_128x128.bmp'
-global $qr_file = @ScriptDir & '\' & 'vcard.bmp'
-
 
 global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archiv'
@@ -1729,7 +1727,7 @@ global $qr_file_one = '0x424d663b0100000000003600000028000000a4000000a4000000010
 & '00000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000' _
 & '000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffff00000000000000000000000000000000000000000000'
 
-$qr_file_two = '0000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffff000000000000000000000000ffff' _
+global $qr_file_two = '0000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffff000000000000000000000000ffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000ffffffffffffffffffffffff000000000000000000000000ffffffffffff' _
 & 'ffffffffffff000000000000000000000000000000000000000000000000ffffffffffffffffffffffff00000000000000000000000000000000000000000000' _
 & '0000ffffffffffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffff0000' _
@@ -2343,7 +2341,7 @@ $gui_group_top_offset = 20
 $gui_group_index = 0
 
 ;$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ' : ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
-$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ' : ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, 120, 0)
+$gui = GUICreate("S70 Echo " & $VERSION & ' [' & $cmdline[2] & ' '  & $cmdline[3] & ' : ' & $cmdline[1]& ']', 930, 1010, 120, 0)
 
 ; header
 
@@ -2435,19 +2433,23 @@ While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
 	if $msg = $button_dekurz then
+		gui_enable(False)
 		$dekurz = dekurz()
 		if @error then
 			logger($dekurz)
 			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
 		endif
+		gui_enable(True)
 	endif
 	; print data
 	if $msg = $button_tisk Then
+		gui_enable(False)
 		$print = print()
 		if @error then
 			logger($print)
 			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
 		endif
+		gui_enable(True)
 	endif
 	; re-calculate
 	if $msg = $button_recount Then
@@ -2482,6 +2484,10 @@ While 1
 				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?') = 6 then
 					; update GUI from history
 					for $group in Json_Get($buffer, '.group')
+						; update basic
+						GUICtrlSetData($input_height, Json_Get($history, '.height'))
+						GUICtrlSetData($input_weight, Json_Get($history, '.weight'))
+						GUICtrlSetData($input_bsa, Json_Get($history, '.bsa'))
 						; update note
 						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
 						; update data
@@ -2547,6 +2553,15 @@ exit
 func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
+
+func gui_enable($visible)
+	if $visible = True then $state = $GUI_ENABLE
+	If $visible = False then $state = $GUI_DISABLE
+	GUICtrlSetState($button_history, $state)
+	GUICtrlSetState($button_tisk, $state)
+	GUICtrlSetState($button_dekurz, $state)
+	GUICtrlSetState($button_konec, $state)
+EndFunc
 
 ; read configuration file
 func read_config_file($file)
@@ -2736,7 +2751,6 @@ EndFunc
 func dekurz_init()
 	; excel
 	$excel = _Excel_Open(False, False, False, False, True)
-;	$excel = _Excel_Open()
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
@@ -2765,6 +2779,7 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
+;	logger("dekurz start: " & @MIN & ":" & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
@@ -2825,9 +2840,11 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:P' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
+;	logger("dekurz stop: " & @MIN & ":" & @SEC)
 EndFunc
 
 func print(); 2100 x 2970
+;	logger("print start: " & @MIN & ":" & @SEC)
 	local $printer, $printer_error
 	; GDI+ init
 	_GDIPlus_Startup()
@@ -2907,12 +2924,12 @@ func print(); 2100 x 2970
 			; update offset
 			if $line_index <> 1 then $top_offset += $text_height + $line_offset
 			; note
-			_PrintSetFont($printer, 'Arial',10, Default, Default)
+			_PrintSetFont($printer, 'Arial', 10, Default, Default)
 			$text_height = _PrintGetTextHeight($printer, 'Arial')
 			$line_len = 395
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')))> 1 then
 				for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ', 2); no count
-					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 395 Then
+					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
 						$line_len=395
 						$top_offset+=$text_height + $line_offset
 					EndIf
@@ -2937,7 +2954,7 @@ func print(); 2100 x 2970
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$line_len = 50
 	for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ', 2); no count
-		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 100 Then
+		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
 			$line_len=50
 			$top_offset+=$text_height + $line_offset
 		EndIf
@@ -2962,4 +2979,5 @@ func print(); 2100 x 2970
 	_GDIPlus_ImageDispose($logo)
 	_GDIPlus_ImageDispose($qr)
 	_GDIPlus_Shutdown()
+;	logger("print stop: " & @MIN & ":" & @SEC)
 EndFunc
