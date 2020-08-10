@@ -75,7 +75,7 @@ global $json_template='{' _
 		& '"ao":{"label":"Aorta", "note":null, "id":null},' _
 		& '"ach":{"label":"Aortální chlopeň", "note":null, "id":null},' _
 		& '"mch":{"label":"Mitrální chlopeň", "note":null, "id":null},' _
-		& '"pch":{"label":"Pulmonární chlopeň", "note":null, "id":null},' _
+		& '"pch":{"label":"Pulmonální chlopeň", "note":null, "id":null},' _
 		& '"tch":{"label":"Trikuspidální chlopeň", "note":null, "id":null},' _
 		& '"p":{"label":"Perikard", "note":null, "id":null},' _
 		& '"other":{"label":"Ostatní", "note":null, "id":null}' _
@@ -93,7 +93,7 @@ global $json_template='{' _
 			& '"LVmass":{"label":"LVmass", "unit":"g", "value":null, "id":null},' _
 			& '"LVmass-i^2,7":{"label":"LVmass-i^2.7", "unit":"g/m2.7", "value":null, "id":null},' _
 			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":"g/m²", "value":null, "id":null},' _
-			& '"RTW":{"label":"RTW", "unit":"?", "value":null, "id":null},' _
+			& '"RWT":{"label":"RWT", "unit":"?", "value":null, "id":null},' _
 			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
 			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
 			& '"SV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
@@ -161,7 +161,7 @@ global $json_template='{' _
 			& '"MV A Vel":{"label":"A", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV PHT":{"label":"MR-PHT", "unit":"ms", "value":null, "id":null},' _
+			& '"MV PHT":{"label":"MV-PHT", "unit":"ms", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
@@ -196,7 +196,7 @@ global $json_template='{' _
 		& '},' _
 		& '"other":{' _
 			& '"IVC Diam Exp":{"label":"DDŽexp", "unit":"mm", "value":null, "id":null},' _
-			& '"IVC diam Ins":{"label":"DDŽins", "unit":"mm", "value":null, "id":null}' _
+			& '"IVC diam Ins":{"label":"DDŽinsp", "unit":"mm", "value":null, "id":null}' _
 		& '}' _
 	& '}' _
 & '}'
