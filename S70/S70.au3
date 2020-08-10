@@ -22,7 +22,6 @@
 ; func: recount "round" bug
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
-; var "" to ''?
 ; main: archiving
 ;
 
@@ -2279,7 +2278,7 @@ if FileExists($config_file) then
 	read_config_file($config_file)
 	if @error then logger('Načtení konfiguračního souboru selhalo.')
 Else
-	$c = FileOpen($config_file, 2+256); UTF8 / NOBOM overwrite
+	$c = FileOpen($config_file, 2 + 256); UTF8 / NOBOM overwrite
 	FileWrite($c, 'export=' & @CRLF & 'archiv=' & @CRLF & 'result=' & @CRLF & 'history=')
 	FileClose($c)
 endif
@@ -2297,12 +2296,12 @@ if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cm
 ; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file)
-;	if @error then
-;		FileMove($export_file, $export_file & '.err', 1); overwrite
-;		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
-;	else
-;		FileMove($export_file, $export_file & '.old', 1); overwrite
-;	endif
+	if @error then
+		FileMove($export_file, $export_file & '.err', 1); overwrite
+		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
+	else
+		FileMove($export_file, $export_file & '.old', 1); overwrite
+	endif
 endif
 
 ; update history buffer from archive
@@ -2346,8 +2345,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate("S70 Echo " & $VERSION & ' - ' & $cmdline[1] & ' : ' & $cmdline[2]& ' ' & $cmdline[3], 930, 1010, @DesktopWidth-930-5, 0)
-$gui = GUICreate("S70 Echo " & $VERSION & ' [' & $cmdline[2] & ' '  & $cmdline[3] & ' : ' & $cmdline[1]& ']', 930, 1010, 120, 0)
+ $gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 930, 1010, @DesktopWidth-935, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 930, 1010, 120, 0)
 
 ; header
 
@@ -2394,8 +2393,8 @@ for $group in Json_Get($history, '.group')
 	$gui_top_offset+=18; group spacing
 
 	; group
-	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 920, 21 + 21 * (gui_get_group_index($gui_index,5)+ 1))
-	GUICtrlSetFont(-1, 8, 800, 0, "MS Sans Serif")
+	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 920, 21 + 21 * (gui_get_group_index($gui_index, 5)+ 1))
+	GUICtrlSetFont(-1, 8, 800, 0, 'MS Sans Serif')
 	$gui_group_top_offset += 21 + 21 * (gui_get_group_index($gui_index, 5) + 1)
 
 	; update index / offset
@@ -2506,7 +2505,7 @@ While 1
 				msgbox(48, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
 			endif
 		else
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Historie není dostupná.')
+			MsgBox(48, 'S70 Echo ' & $VERSION, 'Historie není dostupná.')
 		endif
 	endif
 	; write & exit
