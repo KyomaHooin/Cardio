@@ -2323,7 +2323,7 @@ endif
 
 ; update result from history or template
 Json_Put($buffer, '.result', Json_Get($history, '.result'), True)
-if not Json_Get($buffer, '.result') then
+if Json_Get($buffer, '.result') = Null then
 	$result_text = FileRead($result_file)
 	if @error then
 		logger('Načtení výchozího závěru selhalo.')
@@ -2932,7 +2932,7 @@ func print(); 2100 x 2970
 			_PrintSetFont($printer, 'Arial', 10, Default, Default)
 			$text_height = _PrintGetTextHeight($printer, 'Arial')
 			$line_len = 395
-			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')))> 1 then
+			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))) > 0 then
 				for $word in StringSplit(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), ' ', 2); no count
 					if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
 						$line_len=395
