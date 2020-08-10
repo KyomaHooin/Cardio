@@ -2316,7 +2316,7 @@ for $group in Json_Get($history, '.group')
 next
 
 ; update height & weight if not export
-if UBound($cmdline) == 6  Then
+if UBound($cmdline) = 6  Then
 		if not Json_Get($buffer, '.height') then Json_Put($buffer, '.height', Number($cmdline[4]), True)
 		if not Json_Get($buffer, '.weight') then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
 endif
@@ -2608,9 +2608,9 @@ func export_parse($export)
 			for $j = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
 					StringReplace($raw[$j], @TAB, ''); test tabs
-					if @extended == 2 Then
+					if @extended = 2 Then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True)
-					elseif @extended == 1 then
+					elseif @extended = 1 then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), 1), True)
 					endif
 				endif
@@ -2745,7 +2745,7 @@ EndFunc
 
 ; gui get group index
 func gui_get_group_index($i, $mod)
-	if mod($i, $mod) == 0 then
+	if mod($i, $mod) = 0 then
 		return int($i/5)
 	Else
 		return int($i/5 + 1)
@@ -2802,7 +2802,7 @@ func dekurz()
 			for $member in Json_Get($history, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
 					; update index
-					if $column_index == 80 Then; reset
+					if $column_index = 80 Then; reset
 						$column_index = 65
 						$row_index+=1
 					endif
