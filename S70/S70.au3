@@ -2388,7 +2388,7 @@ for $group in Json_Get($history, '.group')
 	next
 	; note
 	GUICtrlCreateLabel('Poznámka:', 0, 21 + $gui_top_offset + 3, 85, 21, 0x0002)
-	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 825, 21))
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 825, 21), True)
 
 	$gui_top_offset+=18; group spacing
 
@@ -2465,9 +2465,9 @@ While 1
 		for $group in Json_Get($history, '.group')
 			for $member in Json_Get($history, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null)
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))))
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))), True)
 				endif
 			next
 		next
@@ -2521,13 +2521,13 @@ While 1
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			; update note
-			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')))
+			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')), True)
 			; update data
 			for $member in Json_Get($history, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null)
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))))
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))), True)
 				endif
 			next
 		next
@@ -2609,7 +2609,7 @@ func export_parse($export)
 				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
 					StringReplace($raw[$j], @TAB, ''); test tabs
 					if @extended == 2 Then
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True); check exists
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True)
 					elseif @extended == 1 then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), 1), True)
 					endif
