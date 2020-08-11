@@ -26,9 +26,13 @@
 ; main: archiving
 ;
 
+#AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
+#AutoIt3Wrapper_Res_ProductName=S70
+#AutoIt3Wrapper_Res_ProductVersion=1.7
+#AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
+#AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
+#AutoIt3Wrapper_Res_Language=1029
 #AutoIt3Wrapper_Icon=S70.ico
-;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
-;#AutoIt3Wrapper_UseX64=y
 #NoTrayIcon
 
 ; -------------------------------------------------------------------------------------------
