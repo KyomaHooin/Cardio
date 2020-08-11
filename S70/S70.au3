@@ -26,7 +26,6 @@
 ; main: archiving
 ;
 
-
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
 ;#AutoIt3Wrapper_UseX64=y
@@ -2361,7 +2360,7 @@ $input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 90, 2, 34
 $input_weight_unit = GUICtrlCreateLabel('kg', 185 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 92, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 90, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
@@ -2421,7 +2420,7 @@ $button_konec = GUICtrlCreateButton('Konec', 850, $gui_group_top_offset + 104, 7
 ; GUI tune
 GUICtrlSetBkColor($input_height, 0xC0DCC0)
 GUICtrlSetBkColor($input_weight, 0xC0DCC0)
-GUICtrlSetBkColor($input_bsa, 0xC0DCC0)
+;GUICtrlSetBkColor($input_bsa, 0xC0DCC0)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
