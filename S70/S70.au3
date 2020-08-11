@@ -19,11 +19,13 @@
 ;
 ; TODO:
 ;
+; prog: update units
 ; func: recount "round" bug
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
 ; main: archiving
 ;
+
 
 #AutoIt3Wrapper_Icon=S70.ico
 ;#AutoIt3Wrapper_Outfile_x64=S70_64.exe
@@ -2249,20 +2251,20 @@ global $qr_file_two = '000000000000000000000000000000000000000000000000000000000
 
 ; check one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'S70 Echo v' & $VERSION, 'Program byl již spuštěn.')
+	MsgBox(48, 'S70 Echo ' & $VERSION, 'Program byl již spuštěn.')
 	exit
 endif
 
 ; logging
 $log = FileOpen($log_file, 1)
 if @error then
-	MsgBox(48, 'S70 Echo v' & $VERSION, 'System je připojen pouze pro čtení.')
+	MsgBox(48, 'S70 Echo ' & $VERSION, 'System je připojen pouze pro čtení.')
 	exit
 endif
 
 ; cmdline
 if UBound($cmdline) < 3 then; minimum RC + NAME
-	MsgBox(48, 'S70 Echo v' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
+	MsgBox(48, 'S70 Echo ' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
 	exit
 endif
 
@@ -2317,8 +2319,8 @@ next
 
 ; update height & weight if not export
 if UBound($cmdline) = 6  Then
-		if not Json_Get($buffer, '.height') then Json_Put($buffer, '.height', Number($cmdline[4]), True)
-		if not Json_Get($buffer, '.weight') then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
+		if Json_Get($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[4]), True)
+		if Json_Get($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
 endif
 
 ; update result from history or template
@@ -2442,7 +2444,7 @@ While 1
 		$dekurz = dekurz()
 		if @error then
 			logger($dekurz)
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Generování dekurzu selhalo.')
+			MsgBox(48, 'S70 Echo ' & $VERSION, 'Generování dekurzu selhalo.')
 		endif
 		gui_enable(True)
 	endif
@@ -2452,7 +2454,7 @@ While 1
 		$print = print()
 		if @error then
 			logger($print)
-			MsgBox(48, 'S70 Echo v' & $VERSION, 'Tisk selhal.')
+			MsgBox(48, 'S70 Echo ' & $VERSION, 'Tisk selhal.')
 		endif
 		gui_enable(True)
 	endif
@@ -2486,7 +2488,7 @@ While 1
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
 			if _DateDiff('h', Json_Get($history,'.date'), $runtime) < $AGE then
-				if msgbox(4, 'S70 Echo ' & $VERSION & ' - Historie', 'Načíst poslední naměřené hodnoty?') = 6 then
+				if msgbox(4, 'S70 Echo ' & $VERSION, 'Načíst poslední naměřené hodnoty?') = 6 then
 					; update GUI from history
 					for $group in Json_Get($buffer, '.group')
 						; update basic
@@ -2502,7 +2504,7 @@ While 1
 					next
 				endif
 			else
-				msgbox(48, 'S70 Echo ' & $VERSION & ' - Historie', 'Nelze načís historii. Příliš stará data.')
+				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načís historii. Příliš stará data.')
 			endif
 		else
 			MsgBox(48, 'S70 Echo ' & $VERSION, 'Historie není dostupná.')
