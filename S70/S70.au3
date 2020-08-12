@@ -2327,9 +2327,9 @@ func print(); 2100 x 2970
 	$top_offset = 0
 
 	;logo
-	_PrintImageFromDC($printer, $logo_handle, 0, 0, 128, 128, 50, 50, 300, 300)
+	_PrintImageFromDC($printer, $logo_handle, 0, 0, 128, 128, 50, 50, 338, 338)
 	; QR code
-	_PrintImageFromDC($printer, $qr_handle, 0, 0, 123, 123, $max_width - 300 - 50, 50, 300, 300)
+	_PrintImageFromDC($printer, $qr_handle, 0, 0, 123, 123, $max_width - 325 - 50, 50, 325, 325)
 	; address
 	_PrintSetFont($printer,'Arial',12, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
