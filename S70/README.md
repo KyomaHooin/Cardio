@@ -25,8 +25,8 @@ FILE
          S70.ini - Program configuration file.    
          LICENSE - License & disclaimer.
 
-logo_128x128.bmp - Printing logo bitmap.
-       vcard.bmp - vCard v3 QR code bitmap.
+logo_128x128.bmp - Printing logo bitmap. [128 x 128 96DPI]
+       vcard.bmp - vCard v3 QR code bitmap. [ 123 x 123 96DPI]
      Medicus.png - Medicus 3 external app configuration screen.
          S70.png - Program GUI screen.
          S70.ico - Program icon.
