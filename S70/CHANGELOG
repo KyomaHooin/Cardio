@@ -1,0 +1,47 @@
+
+
+Question:
+
+a] Which are allway not rounded.. 4.33 ?
+b] Group member order.
+
+General:
+
+- E/m podle vzorce z export hodnot bez export vypoctu
+- FAS% = EDA / 100 * ESA
+- RWT, LWd index(/BSA), LVs index(/BSA), LAVi-1D, DDZins nefunguje vypocet
+- BSA na 2 desetiny vzdy(+gui)
+- Excel instance broke Excel ?
+- Store RAW value, display Round value
+- Archivace json hodnot
+
+GUI:
+- SV/SVi resize/input overflow/inner spacing (?)
+- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
+- (Bolt result)
+- ESA/EDA = cm2
+- (Auto calc.)
+- LVD index -> LVd index
+- Ao VTI, LVOT-VTI = cm
+- ',.' catch + fix
+- DDZinsp/DZexp -> DDZ insp / DDZ expt
+- Zuzit
+- MVA-DHT = cm2/m2
+
+Tisk:
+- Oboustrany pri prekroceni delky.
+- Group sediva car atesne na label / sedivyramecek
+- Poznamka nizky font / tucne
+- Datum do userinfo
+
+DEkurz:
+
+- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
+- Srazit hodnoty jako tisk -> | Label_value_unit |
+- Group label @CRLF zalomit v bunce
+- Note bold
+- Group Label '9' font
+
+[1.7]
+
+Initial version.
