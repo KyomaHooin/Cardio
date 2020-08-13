@@ -16,31 +16,33 @@ General:
 - Archivace json hodnot
 
 GUI:
+
 - SV/SVi resize/input overflow/inner spacing (?)
 - PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
-- (Bolt result)
-- ESA/EDA = cm2
-- (Auto calc.)
-- LVD index -> LVd index
-- Ao VTI, LVOT-VTI = cm
-- ',.' catch + fix
-- DDZinsp/DZexp -> DDZ insp / DDZ expt
+[DONE]- ESA/EDA = cm2
+[DONE]- LVD index -> LVd index
+[DONE]- Ao VTI, LVOT-VTI = cm
+[DONE]- ',.' catch + fix
+[DONE]- DDZinsp/DZexp -> DDZ insp / DDZ expt
 - Zuzit
-- MVA-DHT = cm2/m2
+[DONE]- MVAi-DHT = cm2/m2
+- (Auto calc.)
+- (Bolt result)
 
 Tisk:
+
 - Oboustrany pri prekroceni delky.
 - Group sediva car atesne na label / sedivyramecek
-- Poznamka nizky font / tucne
+[DONE]- Poznamka nizky font / tucne
 - Datum do userinfo
 
-DEkurz:
+Dekurz:
 
-- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
+[DONE center align?]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 - Srazit hodnoty jako tisk -> | Label_value_unit |
 - Group label @CRLF zalomit v bunce
-- Note bold
-- Group Label '9' font
+[DONE]- Note bold
+[DONE]- Group Label '9' font
 
 [1.7]
 

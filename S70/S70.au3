@@ -28,7 +28,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=1.7
+#AutoIt3Wrapper_Res_ProductVersion=1.8
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -53,7 +53,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-$VERSION = '1.7'
+$VERSION = '1.8'
 $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -89,7 +89,7 @@ global $json_template='{' _
 		& '"lk":{' _
 			& '"IVSd":{"label":"IVS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDd":{"label":"LVd", "unit":"mm", "value":null, "id":null},' _
-			& '"LVd index":{"label":"LVD index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVd index":{"label":"LVd index", "unit":"mm/m²", "value":null, "id":null},' _
 			& '"LVPWd":{"label":"ZS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDs"::{"label":"LVs", "unit":"mm", "value":null, "id":null},' _
 			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
@@ -126,8 +126,8 @@ global $json_template='{' _
 			& '"RV Major":{"label":"RVplax", "unit":"mm", "value":null, "id":null},' _
 			& '"RVIDd":{"label":"RVD1", "unit":"mm", "value":null, "id":null},' _
 			& '"S-RV":{"label":"S-RV", "unit":"cm/s", "value":null, "id":null},' _
-			& '"EDA":{"label":"EDA", "unit":"?", "value":null, "id":null},' _
-			& '"ESA":{"label":"ESA", "unit":"?", "value":null, "id":null},' _
+			& '"EDA":{"label":"EDA", "unit":"cm²", "value":null, "id":null},' _
+			& '"ESA":{"label":"ESA", "unit":"cm²", "value":null, "id":null},' _
 			& '"FAC%":{"label":"FAC%", "unit":"%", "value":null, "id":null},' _
 			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
@@ -148,8 +148,8 @@ global $json_template='{' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
-			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
-			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm/torr?", "value":null, "id":null},' _
+			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm", "value":null, "id":null},' _
 			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
 			& '"SVi":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
 			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
@@ -171,7 +171,7 @@ global $json_template='{' _
 			& '"MV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
-			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/2", "value":null, "id":null},' _
+			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/m²", "value":null, "id":null},' _
 			& '"EmSept":{"label":"EmSept", "unit":"cm/s", "value":null, "id":null},' _
 			& '"EmLat":{"label":"EmLat", "unit":"cm/s", "value":null, "id":null},' _
 			& '"E/Em":{"label":"E/Em", "unit":"ratio", "value":null, "id":null},' _
@@ -200,8 +200,8 @@ global $json_template='{' _
 		& '"p":{' _
 		& '},' _
 		& '"other":{' _
-			& '"IVC Diam Exp":{"label":"DDŽexp", "unit":"mm", "value":null, "id":null},' _
-			& '"IVC diam Ins":{"label":"DDŽinsp", "unit":"mm", "value":null, "id":null}' _
+			& '"IVC Diam Exp":{"label":"DDŽ exp", "unit":"mm", "value":null, "id":null},' _
+			& '"IVC diam Ins":{"label":"DDŽ insp", "unit":"mm", "value":null, "id":null}' _
 		& '}' _
 	& '}' _
 & '}'
@@ -1917,15 +1917,15 @@ While 1
 	; re-calculate
 	if $msg = $button_recount Then
 		; update height / weight
-		Json_Put($buffer, '.height', Number(GuiCtrlRead($input_height)), True)
-		Json_Put($buffer, '.weight', Number(GuiCtrlRead($input_weight)), True)
+		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
+		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			for $member in Json_Get($history, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))), True)
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.')), True)
 				endif
 			next
 		next
@@ -1974,8 +1974,8 @@ While 1
 		; update result
 		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz), True)
 		; update height / weight
-		Json_Put($buffer, '.height', Number(GuiCtrlRead($input_height)), True)
-		Json_Put($buffer, '.weight', Number(GuiCtrlRead($input_weight)), True)
+		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
+		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
 		; update data buffer
 		for $group in Json_Get($history, '.group')
 			; update note
@@ -1985,7 +1985,7 @@ While 1
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id'))), True)
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.')), True)
 				endif
 			next
 		next
@@ -2213,6 +2213,7 @@ EndFunc
 ; initialize XLS template
 func dekurz_init()
 	; excel
+;	$excel = _Excel_Open()
 	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
@@ -2220,7 +2221,7 @@ func dekurz_init()
 	; default font
 	$book.Activesheet.Range('A1:P32').Font.Size = 8
 	; columns height
-	$book.Activesheet.Range('A1:P32').RowHeight = 13
+	$book.Activesheet.Range('A1:P32').RowHeight = 10
 	; number format
 	$book.Activesheet.Range('A1:P32').NumberFormat = "@"; string
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
@@ -2255,8 +2256,9 @@ func dekurz()
 	for $group in Json_Get($history, '.group')
 		if not_empty_group($group) then
 			; group label
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
 			$book.Activesheet.Range('A' & $row_index).Font.Bold = True
+			$book.Activesheet.Range('A' & $row_index).Font.Size = 9
+			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
 			for $member in Json_Get($history, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
 					; update index
@@ -2265,12 +2267,12 @@ func dekurz()
 						$row_index+=1
 					endif
 					; label
+					$book.Activesheet.Range(Chr($column_index + 1) & $row_index).HorizontalAlignment = $xlRight
 					_Excel_RangeWrite($book, $book.Activesheet, String(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')), Chr($column_index + 1) & $row_index)
-					$book.Activesheet.Range(Chr($column_index + 1) & $row_index).HorizontalAlignment = $xlRight;
 					; value
-					_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) , Chr($column_index + 2) & $row_index)
+					_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')), ',', '.') , Chr($column_index + 2) & $row_index)
 					; unit
-					$book.Activesheet.Range(Chr($column_index + 2) & $row_index).HorizontalAlignment = $xlCenter;
+					$book.Activesheet.Range(Chr($column_index + 2) & $row_index).HorizontalAlignment = $xlCenter
 					_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit') , Chr($column_index + 3) & $row_index)
 					; update index
 					$column_index+=3
@@ -2280,6 +2282,9 @@ func dekurz()
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))) > 0 then
 				if $column_index <> 65 then $row_index+=1; not only note
 				$book.Activesheet.Range('B' & $row_index & ':P' & $row_index).MergeCells = True
+				$book.Activesheet.Range('B' & $row_index).Font.Bold = True
+				$book.Activesheet.Range('B' & $row_index).VerticalAlignment = $xlCenter
+				$book.Activesheet.Range('A' & $row_index).RowHeight = 13
 				_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), 'B' & $row_index)
 			endif
 			; group line
@@ -2351,11 +2356,12 @@ func print(); 2100 x 2970
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset += 50
 	_PrintText($printer, 'Jméno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
-	_PrintText($printer, 'Výška: ' & GUICtrlRead($input_height) & ' cm', 550, $top_offset)
-	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
+	_PrintText($printer, 'Výška: ' & StringReplace(GUICtrlRead($input_height), ',', '.') & ' cm', 550, $top_offset)
+	_PrintText($printer, 'BSA: ' & StringReplace(GUICtrlRead($input_bsa), ',', '.') & ' m²', 1050, $top_offset)
+	_PrintText($printer, 'Datum: ' & $runtime, 1550, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'Rodné číslo: ' & $cmdline[1], 50, $top_offset)
-	_PrintText($printer, 'Váha: ' & GUICtrlRead($input_weight) & ' kg', 550, $top_offset)
+	_PrintText($printer, 'Váha: ' & StringReplace(GUICtrlRead($input_weight), ',', '.') & ' kg', 550, $top_offset)
 	; separator
 	_PrintSetLineWid($printer, 2)
 	_PrintLine($printer, 50, $top_offset + 90, $max_width - 50, $top_offset + 90)
@@ -2380,14 +2386,14 @@ func print(); 2100 x 2970
 						$line_index = 1
 						$top_offset += $text_height + $line_offset
 					endif
-					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ': ' & String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))) & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
+					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ': ' & StringReplace(String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))), ',', '.') & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
 					$line_index+=1
 				endif
 			next
 			; update offset
 			if $line_index <> 1 then $top_offset += $text_height + $line_offset
 			; note
-			_PrintSetFont($printer, 'Arial', 10, Default, Default)
+			_PrintSetFont($printer, 'Arial', 8, Default, 'bold')
 			$text_height = _PrintGetTextHeight($printer, 'Arial')
 			$line_len = 395
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))) > 0 then
