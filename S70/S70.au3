@@ -2229,23 +2229,21 @@ EndFunc
 ; initialize XLS template
 func dekurz_init()
 	; excel
-;	$excel = _Excel_Open()
-	$excel = _Excel_Open(False, False, False, False, True)
+	$excel = _Excel_Open()
+;	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
 	; default font
-	$book.Activesheet.Range('A1:P32').Font.Size = 8
+	$book.Activesheet.Range('A1:F32').Font.Size = 8
 	; columns height
-	$book.Activesheet.Range('A1:P32').RowHeight = 10
+	$book.Activesheet.Range('A1:F32').RowHeight = 10
 	; number format
-	$book.Activesheet.Range('A1:P32').NumberFormat = "@"; string
+	$book.Activesheet.Range('A1:F32').NumberFormat = "@"; string
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
-	$book.Activesheet.Range('A1').ColumnWidth = 15; group A-P
+	$book.Activesheet.Range('A1').ColumnWidth = 14.5; group A-P
 	for $i = 0 to 4; five columns starts B[66]
-		$book.Activesheet.Range(Chr(66 + 3*$i) & '1').ColumnWidth = 9
-		$book.Activesheet.Range(Chr(66 + 3*$i + 1) & '1').ColumnWidth = 3.5
-		$book.Activesheet.Range(Chr(66 + 3*$i + 2) & '1').ColumnWidth = 4.5
+		$book.Activesheet.Range(Chr(66 + $i) & '1').ColumnWidth = 17.5
 	Next
 endFunc
 
@@ -2266,7 +2264,7 @@ func dekurz()
 	_ClipBoard_Close()
 
 	$row_index = 1
-	$column_index = 65; A ... 66-68 BCD, 69-71 EFG, 72-74 HIJ, 75-77 KLM, 78-80 NOP
+	$column_index = 65; A ... 66 B, 67 C, 68 D, 69 E, 70 F
 
 	; generate data
 	for $group in Json_Get($history, '.group')
@@ -2278,33 +2276,26 @@ func dekurz()
 			for $member in Json_Get($history, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
 					; update index
-					if $column_index = 80 Then; reset
+					if $column_index = 70 Then; reset
 						$column_index = 65
 						$row_index+=1
 					endif
-					; label
-					$book.Activesheet.Range(Chr($column_index + 1) & $row_index).HorizontalAlignment = $xlRight
-					_Excel_RangeWrite($book, $book.Activesheet, String(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')), Chr($column_index + 1) & $row_index)
-					; value
-					_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')), ',', '.') , Chr($column_index + 2) & $row_index)
-					; unit
-					$book.Activesheet.Range(Chr($column_index + 2) & $row_index).HorizontalAlignment = $xlCenter
-					_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit') , Chr($column_index + 3) & $row_index)
+					; data
+					_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".label') & ': ' & StringReplace(GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')), ',', '.') & ' ' & Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), Chr($column_index + 1) & $row_index)
 					; update index
-					$column_index+=3
+					$column_index+=1
 				endif
 			next
 			; note
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))) > 0 then
 				if $column_index <> 65 then $row_index+=1; not only note
-				$book.Activesheet.Range('B' & $row_index & ':P' & $row_index).MergeCells = True
+				$book.Activesheet.Range('B' & $row_index & ':F' & $row_index).MergeCells = True
 				$book.Activesheet.Range('B' & $row_index).Font.Bold = True
-				$book.Activesheet.Range('B' & $row_index).VerticalAlignment = $xlCenter
 				$book.Activesheet.Range('A' & $row_index).RowHeight = 13
 				_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), 'B' & $row_index)
 			endif
 			; group line
-			With $book.Activesheet.Range('A' & $row_index & ':P' & $row_index).Borders(9)
+			With $book.Activesheet.Range('A' & $row_index & ':F' & $row_index).Borders(9)
 				.LineStyle = 1
 				.Weight = 2
 			EndWith
@@ -2314,15 +2305,15 @@ func dekurz()
 		endif
 	next
 	; result
-	$book.Activesheet.Range('A' & $row_index & ':P' & $row_index).MergeCells = True
+	$book.Activesheet.Range('A' & $row_index & ':F' & $row_index).MergeCells = True
 	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'A' & $row_index)
 	; result line
-	With $book.Activesheet.Range('A' & $row_index & ':P' & $row_index).Borders(9)
+	With $book.Activesheet.Range('A' & $row_index & ':F' & $row_index).Borders(9)
 		.LineStyle = 1
 		.Weight = 2
 	EndWith
 	; clip
-	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:P' & $row_index)
+	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:F' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 ;	logger("dekurz stop: " & @MIN & ":" & @SEC)
 EndFunc
@@ -2373,7 +2364,7 @@ func print(); 2100 x 2970
 	$top_offset += 50
 	_PrintText($printer, 'Jméno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
 	_PrintText($printer, 'Výška: ' & StringReplace(GUICtrlRead($input_height), ',', '.') & ' cm', 550, $top_offset)
-	_PrintText($printer, 'BSA: ' & StringReplace(GUICtrlRead($input_bsa), ',', '.') & ' m²', 1050, $top_offset)
+	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
 	_PrintText($printer, 'Datum: ' & $runtime, 1550, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'Rodné číslo: ' & $cmdline[1], 50, $top_offset)

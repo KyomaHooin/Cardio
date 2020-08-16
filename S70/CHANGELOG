@@ -38,8 +38,8 @@ Tisk:
 
 Dekurz:
 
-- Srazit hodnoty jako tisk -> | Label_value_unit |
-- Group label @CRLF zalomit v bunce
+[DONE]- Srazit hodnoty jako tisk -> | Label_value_unit |
+(- Group label @CRLF zalomit v bunce)
 - Excel instance broke Excel ?
 [DONE center align?]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 [DONE]- Note bold
