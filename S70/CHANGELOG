@@ -7,40 +7,41 @@ b] Group member order.
 
 General:
 
-- E/m podle vzorce z export hodnot bez export vypoctu
-- FAS% = EDA / 100 * ESA
-- RWT, LWd index(/BSA), LVs index(/BSA), LAVi-1D, DDZins nefunguje vypocet
-- BSA na 2 desetiny vzdy(+gui)
+[DONE]- E/m podle vzorce z export hodnot bez export vypoctu
+[DONE]- FAS% = EDA / 100 * ESA
+[DONE]- RWT, LWd index(/BSA), LVs index(/BSA)
+- LAVi-1D, DDZins nefunguje vypocet
+[DONE]- BSA na 2 desetiny vzdy(+gui)
 - Store RAW value, display Round value
 - Archivace json hodnot
+- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
 
 GUI:
 
 - SV/SVi resize/input overflow/inner spacing (?)
-- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
+- Zuzit
 [DONE]- ESA/EDA = cm2
 [DONE]- LVD index -> LVd index
 [DONE]- Ao VTI, LVOT-VTI = cm
 [DONE]- ',.' catch + fix
 [DONE]- DDZinsp/DZexp -> DDZ insp / DDZ expt
-- Zuzit
 [DONE]- MVAi-DHT = cm2/m2
 - (Auto calc.)
 - (Bolt result)
 
 Tisk:
 
-- Oboustrany pri prekroceni delky.
+- Oboustrany pri prekroceni delky PrinterNewPage().
 - Group sediva car tesne nad label / sedivy ramecek
 [DONE]- Poznamka nizky font / tucne
 [DONE]- Datum do userinfo
 
 Dekurz:
 
-- Excel instance broke Excel ?
-[DONE center align?]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 - Srazit hodnoty jako tisk -> | Label_value_unit |
 - Group label @CRLF zalomit v bunce
+- Excel instance broke Excel ?
+[DONE center align?]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 [DONE]- Note bold
 [DONE]- Group Label '9' font
 
