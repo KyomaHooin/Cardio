@@ -1951,12 +1951,11 @@ While 1
 		if FileExists($archive_file) then
 			if _DateDiff('h', Json_Get($history,'.date'), $runtime) < $AGE then
 				if msgbox(4, 'S70 Echo ' & $VERSION, 'Načíst poslední naměřené hodnoty?') = 6 then
-					; update GUI from history
+					; update basic
+					GUICtrlSetData($input_height, Json_Get($history, '.height'))
+					GUICtrlSetData($input_weight, Json_Get($history, '.weight'))
+					GUICtrlSetData($input_bsa, Json_Get($history, '.bsa'))
 					for $group in Json_Get($buffer, '.group')
-						; update basic
-						GUICtrlSetData($input_height, Json_Get($history, '.height'))
-						GUICtrlSetData($input_weight, Json_Get($history, '.weight'))
-						GUICtrlSetData($input_bsa, Json_Get($history, '.bsa'))
 						; update note
 						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
 						; update data
