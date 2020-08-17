@@ -19,7 +19,7 @@
 ;
 ; TODO:
 ;
-; prog: update units
+; tisk: zalomeni enteru, chybejici mezera..
 ; func: recount "round" bug
 ; parse: dup bug (Ao Diam, PV Vmax..)
 ; print: superscript m2
@@ -2229,8 +2229,8 @@ EndFunc
 ; initialize XLS template
 func dekurz_init()
 	; excel
-;	$excel = _Excel_Open()
-	$excel = _Excel_Open(False, False, False, False, True)
+	$excel = _Excel_Open()
+;	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
@@ -2257,7 +2257,6 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
-;	logger("dekurz start: " & @MIN & ":" & @SEC)
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
@@ -2315,11 +2314,9 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:F' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
-;	logger("dekurz stop: " & @MIN & ":" & @SEC)
 EndFunc
 
 func print(); 2100 x 2970
-;	logger("print start: " & @MIN & ":" & @SEC)
 	local $printer, $printer_error
 	; GDI+ init
 	_GDIPlus_Startup()
@@ -2339,9 +2336,9 @@ func print(); 2100 x 2970
 	$top_offset = 0
 
 	;logo
-	_PrintImageFromDC($printer, $logo_handle, 0, 0, 128, 128, 50, 50, 338, 338)
+	_PrintImageFromDC($printer, $logo_handle, 0, 0, 128, 128, 50, 45, 338, 338); 128 x 128 inch 96 DPI => 338 mm
 	; QR code
-	_PrintImageFromDC($printer, $qr_handle, 0, 0, 123, 123, $max_width - 325 - 50, 50, 325, 325)
+	_PrintImageFromDC($printer, $qr_handle, 0, 0, 123, 123, $max_width - 325 - 50, 50, 325, 325); 123 x 123 inch 96 DPI => 325 mm
 	; address
 	_PrintSetFont($printer,'Arial',12, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
@@ -2380,6 +2377,11 @@ func print(); 2100 x 2970
 	$group_index = $top_offset
 	for $group in Json_Get($history, '.group')
 		if not_empty_group($group) then
+			; check new page
+			if $top_offset + 50 >= $max_height Then
+				_PrintNewPage($printer)
+				$top_offset = 50
+			endif
 			; line index
 			$line_index = 1
 			; group line
@@ -2427,8 +2429,8 @@ func print(); 2100 x 2970
 	; separator
 	_PrintSetLineCol($printer, 0x000000)
 	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, 50, $top_offset + 25, $max_width - 50, $top_offset + 25)
-	$top_offset += 55
+	_PrintLine($printer, 50, $top_offset + 15, $max_width - 50, $top_offset + 15)
+	$top_offset += 35
 	; result label
 	_PrintSetFont($printer, 'Arial', 9, Default, 'bold')
 	_PrintText($printer, 'Závěr', 50, $top_offset)
@@ -2463,5 +2465,4 @@ func print(); 2100 x 2970
 	_GDIPlus_ImageDispose($logo)
 	_GDIPlus_ImageDispose($qr)
 	_GDIPlus_Shutdown()
-;	logger("print stop: " & @MIN & ":" & @SEC)
 EndFunc
