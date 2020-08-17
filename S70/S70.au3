@@ -17,15 +17,6 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;
-; TODO:
-;
-; dekurz: regen. overwrite formating bug
-; tisk: zalomeni enteru, chybejici mezera..
-; func: recount "round" bug
-; parse: dup bug (Ao Diam, PV Vmax..)
-; print: superscript m2
-; main: archiving
-;
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
