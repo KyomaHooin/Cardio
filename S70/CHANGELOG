@@ -7,14 +7,14 @@ b] Group member order.
 
 General:
 
+- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
+- LAVi-1D, DDZins nefunguje vypocet
 [DONE]- E/m podle vzorce z export hodnot bez export vypoctu
 [DONE]- FAS% = EDA / 100 * ESA
 [DONE]- RWT, LWd index(/BSA), LVs index(/BSA)
-- LAVi-1D, DDZins nefunguje vypocet
 [DONE]- BSA na 2 desetiny vzdy(+gui)
-- Store RAW value, display Round value
-- Archivace json hodnot
-- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
+[DONE]- Archivace json hodnot
+(- Store RAW value, display Round value)
 
 GUI:
 
@@ -39,11 +39,11 @@ Tisk:
 Dekurz:
 
 [DONE]- Srazit hodnoty jako tisk -> | Label_value_unit |
-(- Group label @CRLF zalomit v bunce)
-- Excel instance broke Excel ?
-[DONE center align?]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
+[DONE]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 [DONE]- Note bold
 [DONE]- Group Label '9' font
+(- Group label @CRLF zalomit v bunce)
+- Excel instance broke Excel ?
 
 [1.7]
 
