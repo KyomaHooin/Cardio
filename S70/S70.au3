@@ -19,6 +19,7 @@
 ;
 ; TODO:
 ;
+; dekurz: regen. overwrite formating bug
 ; tisk: zalomeni enteru, chybejici mezera..
 ; func: recount "round" bug
 ; parse: dup bug (Ao Diam, PV Vmax..)
@@ -62,6 +63,7 @@ global $result_file = @ScriptDir & '\' & 'zaver.txt'
 
 global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archiv'
+global $history_path = $archive_path & '\' & 'history'
 
 global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
@@ -1741,22 +1743,26 @@ Else
 	FileClose($c)
 endif
 
-; create archive directory
+; update history path
+$history_path = $archive_path & '\' & 'history'
+
+; create archive / history directory
 DirCreate($archive_path)
+DirCreate($history_path & '\' & $cmdline[1])
 
 ; archive file full path
 global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
 
 ; export  file full path
 global $export_file = get_export_file($export_path, $cmdline[1])
-if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1] & '.txt')
+if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1])
 
 ; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file)
 	if @error then
 		FileMove($export_file, $export_file & '.err', 1); overwrite
-		logger('Nepodařilo se načíst export: ' & $cmdline[1] & '.dat')
+		logger('Nepodařilo se načíst export: ' & $cmdline[1])
 	else
 		FileMove($export_file, $export_file & '.old', 1); overwrite
 	endif
@@ -1996,6 +2002,9 @@ While 1
 		FileWrite($out, Json_Encode($buffer))
 		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
 		FileClose($out)
+		; update history
+		FileCopy($archive_file, $history_path & '\' & $cmdline[1] & '\' & $cmdline[1] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
+		if @error then logger('Zápis historie selhal: ' & $cmdline[1])
 		; exit
 		exitloop
 	endif
