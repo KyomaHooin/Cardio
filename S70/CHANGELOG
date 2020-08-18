@@ -3,12 +3,12 @@
 Question:
 
 a] Which are allway not rounded.. 4.33
-b] Export dup Ao Diam) 
+b] Export dup Ao Diam 
 
 General:
 
-- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
-- LAVi-1D, DDZins nefunguje vypocet
+[DONE]- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
+[DONE]- LAVi-1D, DDZins nefunguje vypocet
 [DONE]- E/m podle vzorce z export hodnot bez export vypoctu
 [DONE]- FAS% = EDA / 100 * ESA
 [DONE]- RWT, LWd index(/BSA), LVs index(/BSA)
@@ -19,7 +19,7 @@ General:
 
 GUI:
 
-- SV/SVi resize/input overflow/inner spacing (?)
+[DONE]- SV/SVi resize/input overflow/inner spacing (?)
 [DONE]- pk/S-RV + ach/AVAi step down [hole]
 [DONE]- Zuzit
 [DONE]- ESA/EDA = cm2

@@ -193,7 +193,7 @@ global $json_template='{' _
 		& '"p":{' _
 		& '},' _
 		& '"other":{' _
-			& '"IVC diam Ins":{"label":"DDŽ insp", "unit":"mm", "value":null, "id":null}' _
+			& '"IVC Diam Ins":{"label":"DDŽ insp", "unit":"mm", "value":null, "id":null}' _
 			& '"IVC Diam Exp":{"label":"DDŽ exp", "unit":"mm", "value":null, "id":null},' _
 		& '}' _
 	& '}' _
@@ -1807,15 +1807,15 @@ $gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3]
 ; header
 
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
-$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 90, 2, 34, 19, 1)
+$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 89, 2, 36, 19, 1)
 $input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
 
 $label_wegiht = GUICtrlCreateLabel('Váha', 175, 5, 85, 17, 0x0002); right
-$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 175 + 90, 2, 34, 19, 1)
+$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 175 + 89, 2, 36, 19, 1)
 $input_weight_unit = GUICtrlCreateLabel('kg', 175 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 175 + 175 + 90, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
@@ -1835,7 +1835,7 @@ for $group in Json_Get($order, '.group')
 			; label
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
 			; input
-			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 90 + $gui_left_offset, $gui_top_offset, 34, 19, 1), True)
+			Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 36, 19, 0x0001), True); centered
 			; unit
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset, $gui_top_offset + 3, 45, 21)
 			; update index
@@ -1846,7 +1846,7 @@ for $group in Json_Get($order, '.group')
 	next
 	; note
 	GUICtrlCreateLabel('Poznámka:', 0, 21 + $gui_top_offset + 3, 85, 21, 0x0002)
-	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 785, 21), True)
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 89, 21 + $gui_top_offset, 786, 21), True)
 
 	$gui_top_offset+=18; group spacing
 
@@ -1863,7 +1863,7 @@ next
 
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 85, 21,0x0002); align right
-$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 90, $gui_group_top_offset + 8, 792, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 89, $gui_group_top_offset + 8, 793, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
 $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 150, 17)
@@ -2127,9 +2127,13 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 		Json_Put($buffer, '.data.lk.ESVi.value', Round(Json_Get($buffer, '.data.lk."LVESV MOD BP".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
-	; LAV-A4C
+	; LAV-A4C (LAV-1D)
 	if IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
 		Json_Put($buffer, '.data.ls.LAV-A4C.value', Round((Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, 1), True)
+	endif
+	; LAVi (LAVi-1D) or machine
+	if IsNumber(Json_Get($buffer, '.data.ls."LAV-A4C".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ls.LAVi.value', Round(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	; LAV-2D
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
@@ -2158,15 +2162,15 @@ func calculate($is_export = True)
 		endif
 	endif
 	; PV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then
 		Json_Put($buffer, '.data.pch."PV max/meanPG".value', Json_Get($buffer, '.data.pch."PV maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PV meanPG".value'), True)
 	endif
 	; PR max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PR maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
 		Json_Put($buffer, '.data.pch."PR max/meanPG".value', Json_Get($buffer, '.data.pch."PR maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PR meanPG".value'), True)
 	endif
 	; MV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
 		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 1), True)
 	endif
 	; MVA-PHT
@@ -2177,16 +2181,16 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
 		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
-	;E/Em
+	;E/Em or machine
 	if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
 		Json_Put($buffer, '.data.mch."E/Em".value', Round(2 * Json_Get($buffer, '.data.mch."MV E Vel".value')/(Json_Get($buffer, '.data.mch.EmSept.value') + Json_Get($buffer, '.data.mch.EmLat.value')), 1), True)
 	endif
 	; TV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV meanPG".value')) then
 		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 1), True)
 	endif
 	; AV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV maxPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV meanPG".value')) then
 		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 2) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 1), True)
 	endif
 	; SV
