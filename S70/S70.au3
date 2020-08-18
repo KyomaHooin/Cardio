@@ -1801,8 +1801,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 930, 1010, @DesktopWidth - 935, 0)
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 930, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
 
 ; header
 
@@ -1818,7 +1818,7 @@ $label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
 $input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 90, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 
-$button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
+$button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
 
 ; groups
 for $group in Json_Get($order, '.group')
@@ -1830,7 +1830,7 @@ for $group in Json_Get($order, '.group')
 				$gui_top_offset+=21; member spacing
 				$gui_left_offset=0; reset
 			Else
-				$gui_left_offset+=185; column offset
+				$gui_left_offset+=175; column offset
 			endif
 			; label
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
@@ -1844,12 +1844,12 @@ for $group in Json_Get($order, '.group')
 	next
 	; note
 	GUICtrlCreateLabel('Poznámka:', 0, 21 + $gui_top_offset + 3, 85, 21, 0x0002)
-	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 825, 21), True)
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 90, 21 + $gui_top_offset, 785, 21), True)
 
 	$gui_top_offset+=18; group spacing
 
 	; group
-	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 920, 21 + 21 * (gui_get_group_index($gui_index, 5)+ 1))
+	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 880, 21 + 21 * (gui_get_group_index($gui_index, 5)+ 1))
 	GUICtrlSetFont(-1, 8, 800, 0, 'MS Sans Serif')
 	$gui_group_top_offset += 21 + 21 * (gui_get_group_index($gui_index, 5) + 1)
 
@@ -1861,21 +1861,20 @@ next
 
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 85, 21,0x0002); align right
-$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 90, $gui_group_top_offset + 8, 832, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 90, $gui_group_top_offset + 8, 792, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
 $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 150, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 616, $gui_group_top_offset + 104, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 694, $gui_group_top_offset + 104, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 772, $gui_group_top_offset + 104, 75, 21)
-$button_konec = GUICtrlCreateButton('Konec', 850, $gui_group_top_offset + 104, 75, 21)
+$button_history = GUICtrlCreateButton('Historie', 574, $gui_group_top_offset + 104, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 652, $gui_group_top_offset + 104, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 730, $gui_group_top_offset + 104, 75, 21)
+$button_konec = GUICtrlCreateButton('Konec', 808, $gui_group_top_offset + 104, 75, 21)
 
 ; GUI tune
 GUICtrlSetBkColor($input_height, 0xC0DCC0)
 GUICtrlSetBkColor($input_weight, 0xC0DCC0)
-;GUICtrlSetBkColor($input_bsa, 0xC0DCC0)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
