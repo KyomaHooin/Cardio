@@ -1,14 +1,54 @@
 
 [open]
 
+@ SSD Win 10 + Hibernace. + SATA Kabel + Default notes.
+
 - Export dup. Ao Diam. 
 - Store RAW value, display rounded value.
 - Re-count round flaw.
 - Auto calc.
 - Bolt text in result.
-- Duplex print.
 - Print superscript.
 - Excel broken instance Win10.
+
+[1.9]
+
+General:
+
+-@email round + int(zbytek)
+-Default notes.
+
+GUI:
+
+-Ao.PG: [100/80] + px, zbytel int().
+-AVA cm2 /AVAi cm2/m2.
+
+Tisk:
+
+- User/footer date HMD only.
+- "Sticky" footer:
+
+......................................
+ Datum: $date             $MEDICUS_USER 
+
+Dekurz:
+
+-Excel logging crash(1061 no object). "cannot open Excel .log"
+- Header (Bold/10):
+
+Echokardiografie(TTE) $date:'
+
+-----------------------------
+data
+
+- Zaver = Header(bold) + zaver + footer:
+
+Zaver: ............................................
+...................................................
+Dne: $date                      MUDr. $MEDUCUS_USER <- or map()
+
+-Result font 9 size.
+-Remove footer separator.
 
 [1.8]
 
