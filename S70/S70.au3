@@ -1789,7 +1789,7 @@ if Json_Get($buffer, '.result') = Null then
 endif
 
 ; calculate values
-calculate(True)
+calculate()
 
 ; -------------------------------------------------------------------------------------------
 ; GUI
@@ -2079,7 +2079,7 @@ func export_parse($export)
 endfunc
 
 ; calculate aditional variables
-func calculate($is_export)
+func calculate($is_export = True)
 	if not $is_export then
 		; BSA
 		if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
@@ -2235,12 +2235,6 @@ func dekurz_init()
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
 	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
-	; default font
-	$book.Activesheet.Range('A1:E46').Font.Size = 8
-	; columns height
-	$book.Activesheet.Range('A1:E46').RowHeight = 10
-	; number format
-	$book.Activesheet.Range('A1:E46').NumberFormat = "@"; string
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
 	$book.Activesheet.Range('A1').ColumnWidth = 14.5; group A-E
 	for $i = 0 to 3; four columns starts B[66]
@@ -2262,6 +2256,15 @@ func dekurz()
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
+
+	; clean-up
+	_Excel_RangeDelete($book.Activesheet, 'A1:E46')
+	; default font
+	$book.Activesheet.Range('A1:E46').Font.Size = 8
+	; columns height
+	$book.Activesheet.Range('A1:E46').RowHeight = 10
+	; number format
+	$book.Activesheet.Range('A1:E46').NumberFormat = "@"; string
 
 	$row_index = 1
 	$column_index = 65; 65 A, 66 B, 67 C, 68 D, 69 E
