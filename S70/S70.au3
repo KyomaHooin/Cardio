@@ -2132,8 +2132,8 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.ls.LAV-A4C.value', Round((Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, 1), True)
 	endif
 	; LAVi (LAVi-1D) or machine
-	if IsNumber(Json_Get($buffer, '.data.ls."LAV-A4C".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ls.LAVi.value', Round(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')/Json_Get($buffer, '.bsa'), 1), True)
+	if IsNumber(Json_Get($buffer, '.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ls.LAVi.value', Round(Json_Get($buffer, '.data.ls.LAV-A4C.value')/Json_Get($buffer, '.bsa'), 1), True)
 	endif
 	; LAV-2D
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
