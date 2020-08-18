@@ -80,49 +80,49 @@ global $json_template='{' _
 	& '},' _
 	& '"data":{' _
 		& '"lk":{' _
-			& '"IVSd":{"label":"IVS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDd":{"label":"LVd", "unit":"mm", "value":null, "id":null},' _
-			& '"LVd index":{"label":"LVd index", "unit":"mm/m²", "value":null, "id":null},' _
-			& '"LVPWd":{"label":"ZS", "unit":"mm", "value":null, "id":null},' _
 			& '"LVIDs"::{"label":"LVs", "unit":"mm", "value":null, "id":null},' _
-			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
-			& '"LVEF % Teich":{"label":"LVEF % Teich.", "unit":"%", "value":null, "id":null},' _
-			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":"%", "value":null, "id":null},' _
-			& '"LVmass":{"label":"LVmass", "unit":"g", "value":null, "id":null},' _
-			& '"LVmass-i^2,7":{"label":"LVmass-i^2.7", "unit":"g/m2.7", "value":null, "id":null},' _
-			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":"g/m²", "value":null, "id":null},' _
-			& '"RWT":{"label":"RWT", "unit":"ratio", "value":null, "id":null},' _
+			& '"IVSd":{"label":"IVS", "unit":"mm", "value":null, "id":null},' _
+			& '"LVPWd":{"label":"ZS", "unit":"mm", "value":null, "id":null},' _
 			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
+			& '"LVd index":{"label":"LVd index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
+			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":"%", "value":null, "id":null},' _
+			& '"LVEF % Teich":{"label":"LVEF % Teich.", "unit":"%", "value":null, "id":null},' _
 			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
-			& '"SV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"SV MOD A2C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"LVmass":{"label":"LVmass", "unit":"g", "value":null, "id":null},' _
+			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":"g/m²", "value":null, "id":null},' _
+			& '"LVmass-i^2,7":{"label":"LVmass-i^2.7", "unit":"g/m2.7", "value":null, "id":null},' _
+			& '"RWT":{"label":"RWT", "unit":"ratio", "value":null, "id":null},' _
 			& '"SV-biplane":{"label":"SV-biplane", "unit":"ml", "value":null, "id":null},' _
 			& '"LVEDV MOD BP":{"label":"EDV", "unit":"ml", "value":null, "id":null},' _
-			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":null, "id":null},' _
 			& '"EDVi":{"label":"EDVi", "unit":"ml/m²", "value":null, "id":null},' _
-			& '"ESVi":{"label":"ESVi", "unit":"ml/m²", "value":null, "id":null}' _
+			& '"LVESV MOD BP":{"label":"ESV", "unit":"ml", "value":null, "id":null},' _
+			& '"ESVi":{"label":"ESVi", "unit":"ml/m²", "value":null, "id":null},' _
+			& '"SV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"SV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"ls":{' _
 			& '"LA Diam":{"label":"Plax", "unit":"mm", "value":null, "id":null},' _
+			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
+			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAV-A4C":{"label":"LAV-1D", "unit":"ml", "value":null, "id":null},' _
+			& '"LAVi":{"label":"LAVi-1D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAV-2D":{"label":"LAV-2D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
-			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
-			& '"LAVi":{"label":"LAVi-1D", "unit":"ml/m²", "value":null, "id":null}' _
+			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"pk":{' _
 			& '"RV Major":{"label":"RVplax", "unit":"mm", "value":null, "id":null},' _
 			& '"RVIDd":{"label":"RVD1", "unit":"mm", "value":null, "id":null},' _
+			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null},' _
 			& '"S-RV":{"label":"S-RV", "unit":"cm/s", "value":null, "id":null},' _
-			& '"EDA":{"label":"EDA", "unit":"cm²", "value":null, "id":null},' _
-			& '"ESA":{"label":"ESA", "unit":"cm²", "value":null, "id":null},' _
 			& '"FAC%":{"label":"FAC%", "unit":"%", "value":null, "id":null},' _
-			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null}' _
+			& '"EDA":{"label":"EDA", "unit":"cm²", "value":null, "id":null},' _
+			& '"ESA":{"label":"ESA", "unit":"cm²", "value":null, "id":null}' _
 		& '},' _
 		& '"ps":{' _
 			& '"RA Minor":{"label":"RA šířka", "unit":"mm", "value":null, "id":null},' _
@@ -135,66 +135,66 @@ global $json_template='{' _
 			& '"Ao Diam":{"label":"Asc-Ao", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
-			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
-			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
-			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
 			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm", "value":null, "id":null},' _
-			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
-			& '"SVi":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
-			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"AVA":{"label":"AVA", "unit":"cm", "value":null, "id":null},' _
 			& '"AVAi":{"label":"AVAi", "unit":"cm²", "value":null, "id":null},' _
+			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":"ratio", "value":null, "id":null},' _
-			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"AR RV":{"label":"AR-RV", "unit":"ml", "value":null, "id":null},' _
 			& '"AR ERO":{"label":"AR-ERO", "unit":"cm²", "value":null, "id":null},' _
-			& '"AR RV":{"label":"AR-RV", "unit":"ml", "value":null, "id":null}' _
+			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
+			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
+			& '"SVi":{"label":null, "unit":"ml/m²", "value":null}' _; calculation
 		& '},' _
 		& '"mch":{' _
-			& '"MR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
 			& '"MV E Vel":{"label":"E", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV A Vel":{"label":"A", "unit":"cm/s", "value":null, "id":null},' _
 			& '"MV E/A Ratio":{"label":"E/A", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV DecT":{"label":"DecT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV PHT":{"label":"MV-PHT", "unit":"ms", "value":null, "id":null},' _
-			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"MV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
-			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
-			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/m²", "value":null, "id":null},' _
 			& '"EmSept":{"label":"EmSept", "unit":"cm/s", "value":null, "id":null},' _
 			& '"EmLat":{"label":"EmLat", "unit":"cm/s", "value":null, "id":null},' _
 			& '"E/Em":{"label":"E/Em", "unit":"ratio", "value":null, "id":null},' _
-			& '"MR VTI":{"label":"MR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"MV PHT":{"label":"MV-PHT", "unit":"ms", "value":null, "id":null},' _
+			& '"MVA-PHT":{"label":"MVA-PHT", "unit":"cm²", "value":null, "id":null},' _
+			& '"MR RV":{"label":"MR-RV", "unit":"ml", "value":null, "id":null},' _
 			& '"MR ERO":{"label":"MR-ERO", "unit":"cm²", "value":null, "id":null},' _
-			& '"MR RV":{"label":"MR-RV", "unit":"ml", "value":null, "id":null}' _
+			& '"MR VTI":{"label":"MR-VTI", "unit":"cm", "value":null, "id":null},' _
+			& '"MR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
+			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/m²", "value":null, "id":null},' _
+			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"MV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"pch":{' _
 			& '"PV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
 			& '"PVAcc T":{"label":"ACT", "unit":"ms", "value":null, "id":null},' _
-			& '"PV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"PV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"PV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"PRend PG":{"label":"PGed-reg", "unit":"torr", "value":null, "id":null},' _
+			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null},' _
+			& '"PV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
+			& '"PV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"PR maxPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"PR meanPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"PR max/meanPG":{"label":"PR max/meanPG", "unit":"torr", "value":null, "id":null}' _
+			& '"PR meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"tch":{' _
 			& '"TR maxPG":{"label":"PGmax-reg", "unit":"torr", "value":null, "id":null},' _
 			& '"TR meanPG":{"label":"PGmean-reg", "unit":"torr", "value":null, "id":null},' _
+			& '"TV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"TV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"TV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"TV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null}' _
+			& '"TV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"p":{' _
 		& '},' _
 		& '"other":{' _
-			& '"IVC Diam Exp":{"label":"DDŽ exp", "unit":"mm", "value":null, "id":null},' _
 			& '"IVC diam Ins":{"label":"DDŽ insp", "unit":"mm", "value":null, "id":null}' _
+			& '"IVC Diam Exp":{"label":"DDŽ exp", "unit":"mm", "value":null, "id":null},' _
 		& '}' _
 	& '}' _
 & '}'
@@ -202,6 +202,7 @@ global $json_template='{' _
 ;data
 global $history = Json_Decode($json_template)
 global $buffer = Json_Decode($json_template)
+global $order = Json_Decode($json_template)
 
 ;XLS variable
 global $excel, $book
@@ -1820,8 +1821,8 @@ $input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
 $button_recount = GUICtrlCreateButton('Přepočítat', 850, 2, 75, 21)
 
 ; groups
-for $group in Json_Get($history, '.group')
-	for $member in Json_Get($history, '.data.' & $group)
+for $group in Json_Get($order, '.group')
+	for $member in Json_Get($order, '.data.' & $group)
 		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
 			; update index / offset
@@ -2269,14 +2270,13 @@ func dekurz()
 		.Weight = 2
 	EndWith
 	; generate data
-	for $group in Json_Get($history, '.group')
+	for $group in Json_Get($order, '.group')
 		if not_empty_group($group) then
 			; group label
 			$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 			$book.Activesheet.Range('A' & $row_index).Font.Size = 9
 			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
-			$row_index+=1; step down
-			for $member in Json_Get($history, '.data.' & $group)
+			for $member in Json_Get($order, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
 					; update index
 					if $column_index = 69 Then; reset
@@ -2298,10 +2298,10 @@ func dekurz()
 				_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id')), 'B' & $row_index)
 			endif
 			; group line
-			;With $book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Borders(9); $xlEdgeBottom
-			;	.LineStyle = 1
-			;	.Weight = 2
-			;EndWith
+			With $book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Borders(9); $xlEdgeBottom
+				.LineStyle = 1
+				.Weight = 2
+			EndWith
 			; update index
 			$row_index+=1
 			$column_index = 65
@@ -2379,7 +2379,7 @@ func print(); 2100 x 2970
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset+=15
 	$group_index = $top_offset
-	for $group in Json_Get($history, '.group')
+	for $group in Json_Get($order, '.group')
 		if not_empty_group($group) then
 			; check new page
 			if $top_offset + 50 >= $max_height Then
@@ -2400,7 +2400,7 @@ func print(); 2100 x 2970
 			$top_offset += $text_height + $line_offset; step down
 			; group data
 			_PrintSetFont($printer, 'Arial', 8, Default, Default)
-			for $member in Json_Get($history, '.data.' & $group)
+			for $member in Json_Get($order, '.data.' & $group)
 				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
 					if $line_index = 5 Then
 						$line_index = 1

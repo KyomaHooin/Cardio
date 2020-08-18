@@ -20,6 +20,8 @@ General:
 
 GUI:
 
+- pk/S-RV stepd down [hole]
+- ach/AVAi step down [hole]
 - SV/SVi resize/input overflow/inner spacing (?)
 - Zuzit
 [DONE]- ESA/EDA = cm2
