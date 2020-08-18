@@ -2314,7 +2314,7 @@ func dekurz()
 	next
 	; result
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).MergeCells = True
-	_Excel_RangeWrite($book, $book.Activesheet, GUICtrlRead($edit_dekurz), 'A' & $row_index)
+	_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead($edit_dekurz), @CRLF, @LF), 'A' & $row_index)
 	; bottom line
 	With $book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Borders(9); $xlEdgeBottom
 		.LineStyle = 1
@@ -2438,7 +2438,7 @@ func print(); 2100 x 2970
 		endif
 	next
 	; separator
-	_PrintSetLineCol($printer, 0x000000)
+	_PrintSetLineCol($printer, 0x000000); black
 	_PrintSetLineWid($printer, 2)
 	_PrintLine($printer, 50, $top_offset + 15, $max_width - 50, $top_offset + 15)
 	$top_offset += 35
