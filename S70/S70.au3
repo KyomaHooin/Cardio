@@ -2450,23 +2450,26 @@ func print(); 2100 x 2970
 	_PrintSetFont($printer, 'Arial', 9, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$line_len = 50
-	for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ', 2); no count
-		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
-			; check new page
-			if $top_offset + 200 >= $max_height Then
-				_PrintNewPage($printer)
-				$top_offset = 50
-			endif
-			; step down
-			$line_len=50
-			$top_offset+=$text_height + $line_offset
-		EndIf
-		_PrintText($printer, ' ' & $word, $line_len, $top_offset)
-		$line_len+=_PrintGetTextWidth($printer, ' ' & $word)
+	for $phrase in StringSplit(GUICtrlRead($edit_dekurz), @LF, 2); no count
+		for $word in StringSplit($phrase, ' ', 2); no count
+			if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
+				; check new page
+				if $top_offset + 200 >= $max_height Then
+					_PrintNewPage($printer)
+					$top_offset = 50
+				endif
+				; line break
+				$line_len=50
+				$top_offset+=$text_height + $line_offset
+			EndIf
+			_PrintText($printer, ' ' & $word, $line_len, $top_offset)
+			$line_len+=_PrintGetTextWidth($printer, ' ' & $word)
+		next
+		; phrase break
+		$top_offset+=$text_height + $line_offset
+		$line_len=50
 	next
-	$top_offset += $text_height + $line_offset
 	; date
-	$top_offset += 10
 	_PrintText($printer, 'Datum: ' & $runtime, 50, $max_height - 100)
 	; singnature
 	_PrintText($printer, 'Podpis:', 1500, $max_height - 100)

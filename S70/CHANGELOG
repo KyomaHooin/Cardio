@@ -2,8 +2,8 @@
 
 Question:
 
-a] Which are allway not rounded.. 4.33
-b] Export dup Ao Diam 
+[DONE]- Rounded value, calc only(!)
+?] Export dup Ao Diam. 
 
 General:
 
@@ -33,7 +33,7 @@ GUI:
 
 Tisk:
 
-- linebreak [enter], missing space.. 
+[DONE]- linebreak [enter], missing space.. 
 [DONE]- Prekroceni delky PrinterNewPage().
 [DONE]- Group sediva car tesne nad label / sedivy ramecek
 [DONE]- Poznamka nizky font / tucne
