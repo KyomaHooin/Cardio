@@ -1801,8 +1801,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
 
 ; header
 
@@ -2175,11 +2175,11 @@ func calculate($is_export = True)
 	endif
 	; MVA-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
-		Json_Put($buffer, '.data.mch."MVA-PHT".value', Round(220/Json_Get($buffer, '.data.mch."MV PHT".value'), 1), True)
+		Json_Put($buffer, '.data.mch."MVA-PHT".value', Round(220/Json_Get($buffer, '.data.mch."MV PHT".value'), 2), True)
 	endif
 	; MVAi-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
-		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 1), True)
+		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Round(Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), 2), True)
 	endif
 	;E/Em or machine
 	if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
@@ -2207,11 +2207,11 @@ func calculate($is_export = True)
 	endif
 	; AVA
 	if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-		Json_Put($buffer, '.data.ach.AVA.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, 1), True)
+		Json_Put($buffer, '.data.ach.AVA.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.4159265/4/Json_Get($buffer,'.data.ach."LVOT Diam".value')/100, 2), True)
 	endif
 	; AVAi
 	if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-		Json_Put($buffer, '.data.ach.AVAi.value', Round(Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), 1), True)
+		Json_Put($buffer, '.data.ach.AVAi.value', Round(Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa'), 2), True)
 	endif
 	; VTI LVOT/Ao
 	if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
