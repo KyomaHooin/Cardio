@@ -1890,7 +1890,6 @@ if @error then logger($dekurz_init)
 ; MAIN
 ; -------------------------------------------------------------------------------------------
 
-; main loop
 While 1
 	$msg = GUIGetMsg()
 	; generate dekurz clipboard
@@ -1939,7 +1938,7 @@ While 1
 			next
 		next
 	endif
-	; load history
+	; load history data
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
 			if _DateDiff('h', Json_Get($history,'.date'), $runtime) < $AGE then
@@ -1949,8 +1948,6 @@ While 1
 					GUICtrlSetData($input_weight, Json_Get($history, '.weight'))
 					GUICtrlSetData($input_bsa, Json_Get($history, '.bsa'))
 					for $group in Json_Get($buffer, '.group')
-						; update note
-						GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), Json_Get($history, '.group.' & $group & '.note'))
 						; update data
 						for $member in Json_Get($buffer, '.data.' & $group)
 							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'), Json_Get($history,'.data.' & $group & '."' & $member & '".value'))
@@ -2385,10 +2382,11 @@ func print(); 2100 x 2970
 	$group_index = $top_offset
 	for $group in Json_Get($order, '.group')
 		if not_empty_group($group) then
-			; check new page
-			if $top_offset + 50 >= $max_height Then
+			;check new page
+			if $top_offset + 200 >= $max_height Then
 				_PrintNewPage($printer)
 				$top_offset = 50
+				$group_index = $top_offset
 			endif
 			; line index
 			$line_index = 1
@@ -2450,6 +2448,12 @@ func print(); 2100 x 2970
 	$line_len = 50
 	for $word in StringSplit(GUICtrlRead($edit_dekurz), ' ', 2); no count
 		if _PrintGetTextWidth($printer, ' ' & $word) + $line_len > $max_width - 80 Then
+			; check new page
+			if $top_offset + 200 >= $max_height Then
+				_PrintNewPage($printer)
+				$top_offset = 50
+			endif
+			; step down
 			$line_len=50
 			$top_offset+=$text_height + $line_offset
 		EndIf

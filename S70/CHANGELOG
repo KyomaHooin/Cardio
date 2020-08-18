@@ -15,7 +15,7 @@ General:
 [DONE]- BSA na 2 desetiny vzdy(+gui)
 [DONE]- Archivace json hodnot
 (- Store RAW value, display Round value)
-(-Recount round flaw.)
+(-Recount round flaw)
 
 GUI:
 
@@ -33,12 +33,13 @@ GUI:
 
 Tisk:
 
-- m2 superscript
-- [enter] linebreak, missing space.. 
-- Oboustrany pri prekroceni delky PrinterNewPage().
+- linebreak [enter], missing space.. 
+[DONE]- Prekroceni delky PrinterNewPage().
 [DONE]- Group sediva car tesne nad label / sedivy ramecek
 [DONE]- Poznamka nizky font / tucne
 [DONE]- Datum do userinfo
+(- Double side print)
+(- m2 superscript)
 
 Dekurz:
 
@@ -47,7 +48,7 @@ Dekurz:
 [DONE]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
 [DONE]- Note bold
 [DONE]- Group Label '9' font
-(- Group label @CRLF zalomit v bunce)
+(- Group label @CRLF zalomit v bunce or "Trikusp.")
 (- Excel instance broke Excel. Win10 ?)
 
 [1.7]
