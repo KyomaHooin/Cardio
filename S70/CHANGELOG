@@ -3,8 +3,7 @@
 Question:
 
 a] Which are allway not rounded.. 4.33 ?
-b] Group member order.
-c] EXport dup preference. (Ao Diam + PV Vmax) 
+c] Export dup preference. (Ao Diam + PV Vmax) 
 
 General:
 
@@ -20,9 +19,8 @@ General:
 
 GUI:
 
-- pk/S-RV stepd down [hole]
-- ach/AVAi step down [hole]
 - SV/SVi resize/input overflow/inner spacing (?)
+[DONE]- pk/S-RV + ach/AVAi step down [hole]
 [DONE]- Zuzit
 [DONE]- ESA/EDA = cm2
 [DONE]- LVD index -> LVd index

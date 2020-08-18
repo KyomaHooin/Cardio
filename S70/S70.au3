@@ -1810,13 +1810,13 @@ $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
 $input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 90, 2, 34, 19, 1)
 $input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
 
-$label_wegiht = GUICtrlCreateLabel('Váha', 185, 5, 85, 17, 0x0002); right
-$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 185 + 90, 2, 34, 19, 1)
-$input_weight_unit = GUICtrlCreateLabel('kg', 185 + 130, 4, 45, 21)
+$label_wegiht = GUICtrlCreateLabel('Váha', 175, 5, 85, 17, 0x0002); right
+$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 175 + 90, 2, 34, 19, 1)
+$input_weight_unit = GUICtrlCreateLabel('kg', 175 + 130, 4, 45, 21)
 
-$label_bsa = GUICtrlCreateLabel('BSA', 185 + 185, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 185 + 185 + 90, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
-$input_bsa_unit = GUICtrlCreateLabel('m²', 185 + 185 + 130, 4, 45, 21)
+$label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
+$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 175 + 175 + 90, 2, 34, 19, BitOr(0x0001, 0x0800)); read-only
+$input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
 
@@ -1840,6 +1840,8 @@ for $group in Json_Get($order, '.group')
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset, $gui_top_offset + 3, 45, 21)
 			; update index
 			$gui_index+=1
+			; extra step down hole
+			if $member == 'S-RV' or $member == 'AVAi' then $gui_index+=1
 		endif
 	next
 	; note
@@ -2406,6 +2408,7 @@ func print(); 2100 x 2970
 						$top_offset += $text_height + $line_offset
 					endif
 					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ': ' & StringReplace(String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))), ',', '.') & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
+					; update index
 					$line_index+=1
 				endif
 			next
