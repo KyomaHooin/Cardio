@@ -1,55 +1,55 @@
 
+[open]
 
-Question:
+- Export dup. Ao Diam. 
+- Store RAW value, display rounded value.
+- Re-count round flaw.
+- Auto calc.
+- Bolt text in result.
+- Duplex print.
+- Print superscript.
+- Excel broken instance Win10.
 
-[DONE]- Rounded value, calc only(!)
-?] Export dup Ao Diam. 
+[1.8]
 
 General:
 
-[DONE]- PV max/mean ..PM max/mean .. (23/9) -> 23 (?)
-[DONE]- LAVi-1D, DDZins nefunguje vypocet
-[DONE]- E/m podle vzorce z export hodnot bez export vypoctu
-[DONE]- FAS% = EDA / 100 * ESA
-[DONE]- RWT, LWd index(/BSA), LVs index(/BSA)
-[DONE]- BSA na 2 desetiny vzdy(+gui)
-[DONE]- Archivace json hodnot
-(- Store RAW value, display Round value)
-(-Recount round flaw)
+- Decimal digits round update(calc only).
+- Max/mean calc() fix.
+- LAVi-1D,  DDZins calc fix.
+- E/Em formula. 
+- FAS% = EDA / 100 * ESA formula.
+- RWT, LWd index(/BSA), LVs index(/BSA) formula.
+- BSA two decimal digit round.
+- JSON archiving.
 
 GUI:
 
-[DONE]- SV/SVi resize/input overflow/inner spacing (?)
-[DONE]- pk/S-RV + ach/AVAi step down [hole]
-[DONE]- Zuzit
-[DONE]- ESA/EDA = cm2
-[DONE]- LVD index -> LVd index
-[DONE]- Ao VTI, LVOT-VTI = cm
-[DONE]- ',.' catch + fix
-[DONE]- DDZinsp/DZexp -> DDZ insp / DDZ expt
-[DONE]- MVAi-DHT = cm2/m2
-- (Auto calc.)
-- (Bolt result)
+- Data input size +2px.
+- S-RV & AVAi step down "hole".
+- Shorter GUI.
+- ESA/EDA units.
+- LVD index -> LVd index typo.
+- Ao VTI, LVOT-VTI units.
+- Catch decimal comma separator. 
+- DDZinsp/DZexp -> DDZ insp / DDZ expt typo.
+- MVAi-DHT units.
 
-Tisk:
+Print:
 
-[DONE]- linebreak [enter], missing space.. 
-[DONE]- Prekroceni delky PrinterNewPage().
-[DONE]- Group sediva car tesne nad label / sedivy ramecek
-[DONE]- Poznamka nizky font / tucne
-[DONE]- Datum do userinfo
-(- Double side print)
-(- m2 superscript)
+- Preserve linebreak.
+- Detect page overflow.
+- Group grey line separator.
+- Lower / bold note font.
+- Date to user info box.
 
 Dekurz:
 
-[DONE]-regen. overwrite fix
-[DONE]- Srazit hodnoty jako tisk -> | Label_value_unit |
-[DONE]- Nizsi slopec + hodnot, note vyzsi, ale mensi nez ted
-[DONE]- Note bold
-[DONE]- Group Label '9' font
-(- Group label @CRLF zalomit v bunce or "Trikusp.")
-(- Excel instance broke Excel. Win10 ?)
+- Cleanup on re-run.
+- Join label/value/unit to single column.
+- Lower data row, higher note row.
+- Bold note.
+- Group label font 9 size.
 
 [1.7]
 
