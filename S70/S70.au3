@@ -1,6 +1,6 @@
 ;
 ; GE Vivid S70 - Medicus 3 integration
-; CMD: S70.exe %RODCISN% %CELEJMENO% %VYSKA% %VAHA%
+; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %VYSKA% %VAHA%
 ;
 ; Copyright (c) 2020 Kyoma Hooin
 ;
@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=1.8
+#AutoIt3Wrapper_Res_ProductVersion=1.9
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -45,7 +45,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-$VERSION = '1.8'
+$VERSION = '1.9'
 $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -140,8 +140,8 @@ global $json_template='{' _
 			& '"AV VTI":{"label":"Ao-VTI", "unit":"cm", "value":null, "id":null},' _
 			& '"LVOT Diam":{"label":"LVOT", "unit":"mm", "value":null, "id":null},' _
 			& '"LVOT VTI":{"label":"LVOT-VTI", "unit":"cm", "value":null, "id":null},' _
-			& '"AVA":{"label":"AVA", "unit":"cm", "value":null, "id":null},' _
-			& '"AVAi":{"label":"AVAi", "unit":"cm²", "value":null, "id":null},' _
+			& '"AVA":{"label":"AVA", "unit":"cm²", "value":null, "id":null},' _
+			& '"AVAi":{"label":"AVAi", "unit":"cm²/m²", "value":null, "id":null},' _
 			& '"SV/SVi":{"label":"SV/SVi", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"VTI LVOT/Ao":{"label":"VTI LVOT/Ao", "unit":"ratio", "value":null, "id":null},' _
 			& '"AR RV":{"label":"AR-RV", "unit":"ml", "value":null, "id":null},' _
@@ -1713,7 +1713,7 @@ if @error then
 endif
 
 ; cmdline
-if UBound($cmdline) < 3 then; minimum RC + NAME
+if UBound($cmdline) < 4 then; minimum  RAND(1) + RC(1) + NAME(2)
 	MsgBox(48, 'S70 Echo ' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
 	exit
 endif
@@ -2314,12 +2314,8 @@ func dekurz()
 	next
 	; result
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).MergeCells = True
+	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
 	_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead($edit_dekurz), @CRLF, @LF), 'A' & $row_index)
-	; bottom line
-	With $book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Borders(9); $xlEdgeBottom
-		.LineStyle = 1
-		.Weight = 2
-	EndWith
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
@@ -2371,7 +2367,7 @@ func print(); 2100 x 2970
 	_PrintText($printer, 'Jméno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
 	_PrintText($printer, 'Výška: ' & StringReplace(GUICtrlRead($input_height), ',', '.') & ' cm', 550, $top_offset)
 	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
-	_PrintText($printer, 'Datum: ' & $runtime, 1550, $top_offset)
+	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 1550, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'Rodné číslo: ' & $cmdline[1], 50, $top_offset)
 	_PrintText($printer, 'Váha: ' & StringReplace(GUICtrlRead($input_weight), ',', '.') & ' kg', 550, $top_offset)
@@ -2470,7 +2466,7 @@ func print(); 2100 x 2970
 		$line_len=50
 	next
 	; date
-	_PrintText($printer, 'Datum: ' & $runtime, 50, $max_height - 100)
+	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 50, $max_height - 100)
 	; singnature
 	_PrintText($printer, 'Podpis:', 1500, $max_height - 100)
 	_PrintSetLineWid($printer, 2)

@@ -22,11 +22,12 @@ General:
 GUI:
 
 -Ao.PG: [100/80] + px, zbytel int().
--AVA cm2 /AVAi cm2/m2.
+[DONE]-AVA cm2 /AVAi cm2/m2.
 
 Tisk:
 
-- User/footer date HMD only.
+-UID with slash.
+[DONE]- User/footer date HMD only.
 - "Sticky" footer:
 
 ......................................
@@ -48,8 +49,8 @@ Zaver: ............................................
 ...................................................
 Dne: $date                      MUDr. $MEDUCUS_USER <- or map()
 
--Result font 9 size.
--Remove footer separator.
+[DONE]-Result font 9 size.
+[DONE]-Remove footer separator.
 
 [1.8]
 
