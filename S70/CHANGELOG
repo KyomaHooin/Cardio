@@ -15,7 +15,7 @@
 
 General:
 
--Export / Excel  crash logic(.old, archive..).
+-Export / Excel  crash logic(.old, archive..). Crash(1061 no object). "cannot open Excel .log"
 -@email round + int(zbytek)
 -Default notes.
 
@@ -26,9 +26,9 @@ GUI:
 
 Tisk:
 
--UID with slash.
+[DONE]-UID with slash.
 [DONE]- User/footer date HMD only.
-- "Sticky" footer:
+[DONE]- "Sticky" footer:
 
 ......................................
  Datum: $date             $MEDICUS_USER 

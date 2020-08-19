@@ -1801,8 +1801,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
 
 ; header
 
@@ -2440,7 +2440,7 @@ func print(); 2100 x 2970
 	$top_offset += 35
 	; result label
 	_PrintSetFont($printer, 'Arial', 9, Default, 'bold')
-	_PrintText($printer, 'Závěr', 50, $top_offset)
+	_PrintText($printer, 'Závěr:', 50, $top_offset)
 	$top_offset += $text_height + $line_offset + 5
 	; result
 	_PrintSetFont($printer, 'Arial', 9, Default, Default)
@@ -2465,12 +2465,12 @@ func print(); 2100 x 2970
 		$top_offset+=$text_height + $line_offset
 		$line_len=50
 	next
+	; footer
+	$top_offset+=$text_height + $line_offset
 	; date
-	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 50, $max_height - 100)
+	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 50, $top_offset)
 	; singnature
-	_PrintText($printer, 'Podpis:', 1500, $max_height - 100)
-	_PrintSetLineWid($printer, 2)
-	_PrintLine($printer, 1650, $max_height - 70, $max_width - 50, $max_height - 70)
+	_PrintText($printer, 'Vyhotovil: ' , 1250, $top_offset); & $map[$cmdline[1]]
 	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)
