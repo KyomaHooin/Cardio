@@ -16,13 +16,13 @@
 General:
 
 -UID with slash.
--@email round + int(zbytek)
+[DONE]-@email round + int(zbytek)
 [DONE]-Dekurz crash fix.
 [DONE]-Default notes.
 
 GUI:
 
--Ao.PG: [100/80] + px, zbytel int().
+[DONE]-Ao.PG: [100/80] + px, zbytel int().
 [DONE]-AVA cm2 /AVAi cm2/m2.
 
 Tisk:
