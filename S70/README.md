@@ -11,7 +11,7 @@ MEDICUS SETUP
 <pre>
 Configuration > External Program > [+] > Command line:
 
-../S70.exe %RODCIS% %JMENO% %PRIJMENI% %VYSKA% %VAHA%
+../S70.exe %IDUZI% %RODCISN% %JMENO% %PRIJMENI% %VYSKA% %VAHA%
 </pre>
 
 FILE

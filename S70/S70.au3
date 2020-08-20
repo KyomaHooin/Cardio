@@ -1,6 +1,6 @@
 ;
 ; GE Vivid S70 - Medicus 3 integration
-; CMD: S70.exe %RODCISN% %JMENO% %PRIJMENI% %VYSKA% %VAHA%
+; CMD: S70.exe %IDUZI% %RODCISN% %JMENO% %PRIJMENI% %VYSKA% %VAHA%
 ;
 ; Copyright (c) 2020 Kyoma Hooin
 ;
@@ -58,8 +58,17 @@ global $history_path = $archive_path & '\' & 'history'
 
 global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
+; user map
+
+; Medicus user ID to name
+global $user_template='{' _
+	& '"4":"Jan Škoda",' _
+	& '"2":"Tomáš Slezák",' _
+	& '"3":"Vlastimil Vodárek"' _
+& '}'
+
 ;data template
-global $json_template='{' _
+global $data_template='{' _
 	& '"bsa":null,' _
 	& '"weight":null,' _
 	& '"height":null,' _
@@ -200,9 +209,10 @@ global $json_template='{' _
 & '}'
 
 ;data
-global $history = Json_Decode($json_template)
-global $buffer = Json_Decode($json_template)
-global $order = Json_Decode($json_template)
+global $history = Json_Decode($data_template)
+global $buffer = Json_Decode($data_template)
+global $order = Json_Decode($data_template)
+global $user = Json_Decode($user_template)
 
 ;XLS variable
 global $excel, $book
@@ -1713,8 +1723,8 @@ if @error then
 endif
 
 ; cmdline
-if UBound($cmdline) < 4 then; minimum  RAND(1) + RC(1) + NAME(2)
-	MsgBox(48, 'S70 Echo ' & $VERSION, 'Načtení údajů pacienta z Medicus selhalo.')
+if UBound($cmdline) < 5 then; minimum  CNT(1) + IDUZI(1) + RC(1) + NAME(2) + H(1) + W(1)
+	MsgBox(48, 'S70 Echo ' & $VERSION, 'Načtení základních údajů pacienta z Medicus selhalo.')
 	exit
 endif
 
@@ -1740,21 +1750,21 @@ $history_path = $archive_path & '\' & 'history'
 
 ; create archive / history directory
 DirCreate($archive_path)
-DirCreate($history_path & '\' & $cmdline[1])
+DirCreate($history_path & '\' & $cmdline[2])
 
 ; archive file full path
-global $archive_file = $archive_path & '\' & $cmdline[1] & '.dat'
+global $archive_file = $archive_path & '\' & $cmdline[2] & '.dat'
 
 ; export  file full path
-global $export_file = get_export_file($export_path, $cmdline[1])
-if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[1])
+global $export_file = get_export_file($export_path, $cmdline[2])
+if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[2])
 
 ; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file)
 	if @error then
 		FileMove($export_file, $export_file & '.err', 1); overwrite
-		logger('Nepodařilo se načíst export: ' & $cmdline[1])
+		logger('Nepodařilo se načíst export: ' & $cmdline[2])
 	else
 		FileMove($export_file, $export_file & '.old', 1); overwrite
 	endif
@@ -1763,7 +1773,7 @@ endif
 ; update history buffer from archive
 if FileExists($archive_file) then
 	$history = Json_Decode(FileRead($archive_file))
-	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[1] & '.dat')
+	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[2] & '.dat')
 endif
 
 ; update note from history
@@ -1772,9 +1782,9 @@ for $group in Json_Get($history, '.group')
 next
 
 ; update height & weight if not export
-if UBound($cmdline) = 6  Then
-		if Json_Get($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[4]), True)
-		if Json_Get($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[5]), True)
+if UBound($cmdline) = 7  Then
+		if Json_Get($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[5]), True)
+		if Json_Get($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[6]), True)
 endif
 
 ; update result from history or template
@@ -1801,8 +1811,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, @DesktopWidth - 895, 0)
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[2] & ' ' & $cmdline[3] & ' : ' & $cmdline[1] & ']', 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [ ' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & $cmdline[2] & ' ]', 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & $cmdline[2] & ']', 890, 1010, 120, 0)
 
 ; header
 
@@ -1899,6 +1909,9 @@ While 1
 		if @error then
 			logger($dekurz)
 			MsgBox(48, 'S70 Echo ' & $VERSION, 'Generování dekurzu selhalo.')
+			; trying re-initialize
+			$dekurz_init = dekurz_init()
+			if @error then logger($dekurz_init)
 		endif
 		gui_enable(True)
 	endif
@@ -1989,11 +2002,11 @@ While 1
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / NOBOM overwrite
 		FileWrite($out, Json_Encode($buffer))
-		if @error then logger('Zápis archivu selhal: ' & $cmdline[1] & '.dat')
+		if @error then logger('Zápis archivu selhal: ' & $cmdline[2] & '.dat')
 		FileClose($out)
 		; update history
-		FileCopy($archive_file, $history_path & '\' & $cmdline[1] & '\' & $cmdline[1] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
-		if @error then logger('Zápis historie selhal: ' & $cmdline[1])
+		FileCopy($archive_file, $history_path & '\' & $cmdline[2] & '\' & $cmdline[2] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
+		if @error then logger('Zápis historie selhal: ' & $cmdline[2])
 		; exit
 		exitloop
 	endif
@@ -2235,12 +2248,15 @@ func dekurz_init()
 	$excel = _Excel_Open(False, False, False, False, True)
 	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
-	if @error then return SetError(1, 0, 'Nelze vytvořit book.')
+	if @error then return SetError(1, 0, 'Nelze vytvořit Excel book.')
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
 	$book.Activesheet.Range('A1').ColumnWidth = 14.5; group A-E
 	for $i = 0 to 3; four columns starts B[66]
 		$book.Activesheet.Range(Chr(66 + $i) & '1').ColumnWidth = 17.5
 	Next
+	; header
+	$book.Activesheet.Range('A1').RowHeight = 20
+	$book.Activesheet.Range('A1').Font.Size = 10
 endFunc
 
 func not_empty_group($group)
@@ -2253,21 +2269,26 @@ endFunc
 
 ; update XLS data & write clipboard
 func dekurz()
+	; check init
+	if $dekurz_init <> 0 then return SetError(1, 0, 'Inicializace aplikace Excel selhala.')
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	_ClipBoard_Close()
 
 	; clean-up
-	_Excel_RangeDelete($book.Activesheet, 'A1:E46')
+	_Excel_RangeDelete($book.Activesheet, 'A1:E49')
 	; default font
-	$book.Activesheet.Range('A1:E46').Font.Size = 8
+	$book.Activesheet.Range('A2:E49').Font.Size = 8
 	; columns height
-	$book.Activesheet.Range('A1:E46').RowHeight = 10
+	$book.Activesheet.Range('A2:E49').RowHeight = 10
 	; number format
-	$book.Activesheet.Range('A1:E46').NumberFormat = "@"; string
-
-	$row_index = 1
+	$book.Activesheet.Range('A1:E49').NumberFormat = "@"; string
+	; header
+	$book.Activesheet.Range('A1').Font.Bold = True
+	_Excel_RangeWrite($book, $book.Activesheet, 'Echokardiografie(TTE) ' &  @MDAY & '.' & @MON & '.' & @YEAR & ':', 'A1')
+	; data init
+	$row_index = 2
 	$column_index = 65; 65 A, 66 B, 67 C, 68 D, 69 E
 	; top line
 	With $book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Borders(8); $xlEdgeTop
@@ -2313,9 +2334,18 @@ func dekurz()
 		endif
 	next
 	; result
+	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
+	$book.Activesheet.Range('A' & $row_index).Font.Bold = True
+	_Excel_RangeWrite($book, $book.Activesheet, 'Závěr:', 'A' & $row_index)
+	$row_index+=1
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).MergeCells = True
 	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
 	_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead($edit_dekurz), @CRLF, @LF), 'A' & $row_index)
+	$row_index+=1
+	; footer
+	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Font.Size = 9
+	_Excel_RangeWrite($book, $book.Activesheet, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 'A' & $row_index)
+	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_Get($user, '.' & $cmdline[1]), 'D' & $row_index)
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
@@ -2354,7 +2384,7 @@ func print(); 2100 x 2970
 	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'Praha 17 16300', ($max_width - _PrintGetTextWidth($printer, 'Praha 17 16300'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Tel: +420/235 318 915', ($max_width - _PrintGetTextWidth($printer, 'Tel: +420/235 318 915'))/2, $top_offset)
+	_PrintText($printer, 'Tel: +420/235318915', ($max_width - _PrintGetTextWidth($printer, 'Tel: +420/235318915'))/2, $top_offset)
 	$top_offset+=$text_height + $line_offset
 	; separator
 	_PrintSetLineWid($printer, 2)
@@ -2364,12 +2394,12 @@ func print(); 2100 x 2970
 	_PrintSetFont($printer, 'Arial',10, Default, Default)
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset += 25
-	_PrintText($printer, 'Jméno: ' & $cmdline[2]& ' ' & $cmdline[3], 50, $top_offset)
+	_PrintText($printer, 'Jméno: ' & $cmdline[3]& ' ' & $cmdline[4], 50, $top_offset)
 	_PrintText($printer, 'Výška: ' & StringReplace(GUICtrlRead($input_height), ',', '.') & ' cm', 550, $top_offset)
 	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
-	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 1550, $top_offset)
+	_PrintText($printer, 'Datum: ' & @MDAY & '.' & @MON & '.' & @YEAR, 1550, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Rodné číslo: ' & $cmdline[1], 50, $top_offset)
+	_PrintText($printer, 'Rodné číslo: ' & $cmdline[2], 50, $top_offset)
 	_PrintText($printer, 'Váha: ' & StringReplace(GUICtrlRead($input_weight), ',', '.') & ' kg', 550, $top_offset)
 	; separator
 	_PrintSetLineWid($printer, 2)
@@ -2468,9 +2498,11 @@ func print(); 2100 x 2970
 	; footer
 	$top_offset+=$text_height + $line_offset
 	; date
-	_PrintText($printer, 'Datum: ' & @YEAR & '/' & @MON & '/' & @MDAY, 50, $top_offset)
+	_PrintText($printer, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 50, $top_offset)
 	; singnature
-	_PrintText($printer, 'Vyhotovil: ' , 1250, $top_offset); & $map[$cmdline[1]]
+	_PrintText($printer, 'Ošetřující lékař', 1250, $top_offset)
+	$top_offset+=$text_height + $line_offset
+	_PrintText($printer, 'MUDr. ' & Json_Get($user, '.' & $cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
 	_PrintNewPage($printer)

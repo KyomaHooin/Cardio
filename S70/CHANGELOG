@@ -15,18 +15,19 @@
 
 General:
 
--Export / Excel  crash logic(.old, archive..). Crash(1061 no object). "cannot open Excel .log"
+[DONE]-Export / Excel  crash logic(.old, archive..). Crash(1061 no object). "cannot open Excel .log"
 -@email round + int(zbytek)
 -Default notes.
 
 GUI:
 
+-UID with slash.
 -Ao.PG: [100/80] + px, zbytel int().
 [DONE]-AVA cm2 /AVAi cm2/m2.
 
 Tisk:
 
-[DONE]-UID with slash.
+-UID with slash.
 [DONE]- User/footer date HMD only.
 [DONE]- "Sticky" footer:
 
@@ -35,15 +36,14 @@ Tisk:
 
 Dekurz:
 
--Excel logging crash(1061 no object). "cannot open Excel .log"
-- Header (Bold/10):
+[DONE]- Header (Bold/10):
 
 Echokardiografie(TTE) $date:'
 
 -----------------------------
 data
 
-- Zaver = Header(bold) + zaver + footer:
+[DONE]- Zaver = Header(bold) + zaver + footer:
 
 Zaver: ............................................
 ...................................................
