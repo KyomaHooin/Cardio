@@ -45,8 +45,8 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-$VERSION = '1.9'
-$AGE = 24; default stored data age in hours
+global const $VERSION = '1.9'
+global $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
@@ -56,19 +56,34 @@ global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archiv'
 global $history_path = $archive_path & '\' & 'history'
 
-global $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
+global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
 ; user map
 
 ; Medicus user ID to name
-global $user_template='{' _
+global const $user_template='{' _
 	& '"4":"Jan Škoda",' _
 	& '"2":"Tomáš Slezák",' _
 	& '"3":"Vlastimil Vodárek"' _
 & '}'
 
+; Default note template
+global const $note_template='{' _
+	& '"lk":"Levá komora poznámka.",' _
+	& '"ls":"Levá síň poznámka.",' _
+	& '"pk":"Pravá komora poznámka.",' _
+	& '"ps":"Pravá síň poznámka.",' _
+	& '"ao":"Aorta poznámka.",' _
+	& '"ach":"Aortální chlopeň poznámka.",' _
+	& '"mch":"Mitrální chlopeň poznámka.",' _
+	& '"pch":"Pulmonální chlopeň poznámka.",' _
+	& '"tch":"Trikuspidální chlopeň poznámka.",' _
+	& '"p":"Perikard poznámka.",' _
+	& '"other":"Ostatní poznámka."' _
+& '}'
+
 ;data template
-global $data_template='{' _
+global const $data_template='{' _
 	& '"bsa":null,' _
 	& '"weight":null,' _
 	& '"height":null,' _
@@ -213,6 +228,7 @@ global $history = Json_Decode($data_template)
 global $buffer = Json_Decode($data_template)
 global $order = Json_Decode($data_template)
 global $user = Json_Decode($user_template)
+global $note = Json_Decode($note_template)
 
 ;XLS variable
 global $excel, $book
@@ -1797,6 +1813,13 @@ if Json_Get($buffer, '.result') = Null then
 		Json_Put($buffer, '.result', $result_text, True)
 	endif
 endif
+
+; update note on default
+for $group in Json_Get($history, '.group')
+	if Json_Get($buffer, '.group.' & $group & '.note') = Null then
+		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group), True)
+	endif
+next
 
 ; calculate values
 calculate()
