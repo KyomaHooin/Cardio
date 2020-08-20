@@ -1834,11 +1834,10 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [ ' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & $cmdline[2] & ' ]', 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & $cmdline[2] & ']', 890, 1010, 120, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
 
 ; header
-
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
 $input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 89, 2, 36, 19, 1)
 $input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
@@ -2447,7 +2446,7 @@ func print(); 2100 x 2970
 	_PrintText($printer, 'BSA: ' & GUICtrlRead($input_bsa) & ' m²', 1050, $top_offset)
 	_PrintText($printer, 'Datum: ' & @MDAY & '.' & @MON & '.' & @YEAR, 1550, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'Rodné číslo: ' & $cmdline[2], 50, $top_offset)
+	_PrintText($printer, 'Rodné číslo: ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 50, $top_offset)
 	_PrintText($printer, 'Váha: ' & StringReplace(GUICtrlRead($input_weight), ',', '.') & ' kg', 550, $top_offset)
 	; separator
 	_PrintSetLineWid($printer, 2)

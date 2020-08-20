@@ -15,27 +15,29 @@
 
 General:
 
--UID with slash.
-[DONE]-@email round + int(zbytek)
-[DONE]-Dekurz crash fix.
-[DONE]-Default notes.
+-Calc() decimal round loop.
+-Dekurz crash fix.
+-Default notes.
 
 GUI:
 
-[DONE]-Ao.PG: [100/80] + px, zbytel int().
-[DONE]-AVA cm2 /AVAi cm2/m2.
+-UID slash.
+-Expand input box for "ao.PG".
+-AVA cm2 /AVAi cm2/m2 units fix.
 
 Tisk:
 
-[DONE]-User/footer date HMD only.
-[DONE]-"Sticky" footer.
+-UID slash.
+-User,footer date H.M.D only.
+-"Sticky" footer.
 
 Dekurz:
 
-[DONE]-Header.
-[DONE]-Footer.
-[DONE]-Result font 9 size.
-[DONE]-Remove footer separator.
+-Dekurz header.
+-Result font 9 size.
+-Result header, footer.
+-Result font 9 size.
+-Remove footer separator.
 
 [1.8]
 
