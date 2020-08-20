@@ -1,7 +1,7 @@
 
 [open]
 
-@ SSD Win 10 + Hibernace. + SATA Kabel + Default notes.
+@ SSD Win 10 + Hibernace. + SATA Kabel + Default notes. + RAID1 vs Storage Spaces.
 
 - Export dup. Ao Diam. 
 - Store RAW value, display rounded value.
@@ -15,40 +15,25 @@
 
 General:
 
-[DONE]-Export / Excel  crash logic(.old, archive..). Crash(1061 no object). "cannot open Excel .log"
+-UID with slash.
 -@email round + int(zbytek)
+[DONE]-Dekurz crash fix.
 [DONE]-Default notes.
 
 GUI:
 
--UID with slash.
 -Ao.PG: [100/80] + px, zbytel int().
 [DONE]-AVA cm2 /AVAi cm2/m2.
 
 Tisk:
 
--UID with slash.
-[DONE]- User/footer date HMD only.
-[DONE]- "Sticky" footer:
-
-......................................
- Datum: $date             $MEDICUS_USER 
+[DONE]-User/footer date HMD only.
+[DONE]-"Sticky" footer.
 
 Dekurz:
 
-[DONE]- Header (Bold/10):
-
-Echokardiografie(TTE) $date:'
-
------------------------------
-data
-
-[DONE]- Zaver = Header(bold) + zaver + footer:
-
-Zaver: ............................................
-...................................................
-Dne: $date                      MUDr. $MEDUCUS_USER <- or map()
-
+[DONE]-Header.
+[DONE]-Footer.
 [DONE]-Result font 9 size.
 [DONE]-Remove footer separator.
 
