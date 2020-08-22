@@ -233,7 +233,7 @@ global $note = Json_Decode($note_template)
 ;XLS variable
 global $excel, $book
 
-global static $logo_file_one = '0x424d36c000000000000036000000280000008000000080000000010018000000000000c00000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
+global const $logo_file_one = '0x424d36c000000000000036000000280000008000000080000000010018000000000000c00000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'fffffffffffffffffffffffffffffffffffffffffffffffffdfdfdfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc' _
@@ -982,7 +982,7 @@ global static $logo_file_one = '0x424d36c000000000000036000000280000008000000080
 & '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' _
 & '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 
-global static $logo_file_two = '0000131313818181fffffffffffffefefefffffffffffffffffffffffffdfdfdffffffb7b7b72b2b2b0000000000000000000000000000000000000000000000' _
+global const $logo_file_two = '0000131313818181fffffffffffffefefefffffffffffffffffffffffffdfdfdffffffb7b7b72b2b2b0000000000000000000000000000000000000000000000' _
 & '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' _
 & '000000000000000000000000000000000000000000000000000000000000000000050505515151e3e3e3fffffffdfdfdfffffffffffffffffffffffffffffffd' _
 & 'fdfdffffffffffffd8d8d8acacaca6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6' _
@@ -1004,7 +1004,7 @@ global static $logo_file_two = '0000131313818181fffffffffffffefefeffffffffffffff
 & 'fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc' _
 & 'fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfefefeffffffffffffffffffffffffffffffffffff'
 
-global static $qr_file = '0x424df2b200000000000036000000280000007b0000007b0000000100180000000000bcb20000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
+global const $qr_file = '0x424df2b200000000000036000000280000007b0000007b0000000100180000000000bcb20000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
@@ -1956,6 +1956,7 @@ While 1
 	endif
 	; re-calculate
 	if $msg = $button_recount Then
+		gui_enable(False)
 		; update height / weight
 		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
 		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
@@ -1979,6 +1980,7 @@ While 1
 				GUICtrlSetData(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id'), Json_Get($buffer,'.data.' & $group & '."' & $member & '".value'))
 			next
 		next
+		gui_enable(True)
 	endif
 	; load history data
 	if $msg = $button_history Then
@@ -2060,6 +2062,7 @@ endfunc
 func gui_enable($visible)
 	if $visible = True then $state = $GUI_ENABLE
 	If $visible = False then $state = $GUI_DISABLE
+	GUICtrlSetState($button_recount, $state)
 	GUICtrlSetState($button_history, $state)
 	GUICtrlSetState($button_tisk, $state)
 	GUICtrlSetState($button_dekurz, $state)
@@ -2260,8 +2263,8 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), True)
 	endif
 	; round it!
-	for $group in Json_ObjGet($history, '.group')
-		for $member in Json_ObjGet($history, '.data.' & $group)
+	for $group in Json_Get($history, '.group')
+		for $member in Json_Get($history, '.data.' & $group)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal
