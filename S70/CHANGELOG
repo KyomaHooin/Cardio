@@ -11,6 +11,38 @@
 - Print superscript.
 - Excel broken instance Win10.
 
+GUI:
+
+-Aorta: Asc-Ao(MM) + Asc-Ao(2D)?
+-Aoch: SV/SVi 2x, AR-PHT + AR-SLOPE?
+
+General:
+
+-Static constants.
+
+5 to 4 pseudo code:
+
+$line_offset = 0
+$hole = False
+
+for $group
+  for $array_index
+    if value:
+      write_line()
+      hole=True
+    else:
+      line_offset+=1
+    endif
+    if $line_offset = 4:
+      if $hole:
+        $row+=1
+        $hole=False
+      endif
+      $line_offset=0
+    endif  
+  next
+next 
+
 [1.9]
 
 General:
