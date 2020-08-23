@@ -3,7 +3,6 @@
 
 - Export dup. Ao Diam. 
 - json_get() -> json_objget()
--_printnew()
 - RWT round
 
 General:

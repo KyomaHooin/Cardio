@@ -2558,7 +2558,6 @@ func print(); 2100 x 2970
 	_PrintText($printer, 'MUDr. ' & Json_Get($user, '.' & $cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
-	_PrintNewPage($printer)
 	_printDllClose($printer)
 	; GDI+ de-init
 	 _WinAPI_DeleteObject($logo_handle)
