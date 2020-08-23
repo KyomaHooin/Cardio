@@ -156,7 +156,8 @@ global const $data_template='{' _
 		& '},' _
 		& '"ao":{' _
 			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
-			& '"Ao Diam":{"label":"Asc-Ao", "unit":"mm", "value":null, "id":null}' _
+			& '"Ao Diam":{"label":"Asc-Ao(MM)", "unit":"mm", "value":null, "id":null}' _
+			& '"Asc-Ao 2D":{"label":"Asc-Ao(2D)", "unit":"?", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
@@ -172,6 +173,8 @@ global const $data_template='{' _
 			& '"AR ERO":{"label":"AR-ERO", "unit":"cm²", "value":null, "id":null},' _
 			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
 			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
+			& '"AR-PHT":{"label":"AR-PHT", "unit":"?", "value":null, "id":null},' _
+			& '"AR-SLOPE":{"label":"AR-SLOPE", "unit":"?", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
@@ -1880,7 +1883,7 @@ for $group in Json_Get($order, '.group')
 			; update index
 			$gui_index+=1
 			; extra step down hole
-			if $member == 'S-RV' or $member == 'AVAi' then $gui_index+=1
+			if $member == 'S-RV' then $gui_index+=1
 		endif
 	next
 	; note

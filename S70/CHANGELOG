@@ -1,24 +1,12 @@
 
 [open]
 
-@ SSD Win 10 + Hibernace. + SATA Kabel + Default notes. + RAID1 vs Storage Spaces.
-
 - Export dup. Ao Diam. 
-- Store RAW value, display rounded value.
-- Re-count round flaw.
-- Auto calc.
-- Bolt text in result.
-- Print superscript.
-- Excel broken instance Win10.
-
-GUI:
-
--Aorta: Asc-Ao(MM) + Asc-Ao(2D)?
--Aoch: SV/SVi 2x, AR-PHT + AR-SLOPE?
+- json_get() -> json_objget()
+-_printnew()
+- RWT round
 
 General:
-
--Static constants.
 
 5 to 4 pseudo code:
 
@@ -26,7 +14,7 @@ $line_offset = 0
 $hole = False
 
 for $group
-  for $array_index
+  for $map_index
     if value:
       write_line()
       hole=True
@@ -47,6 +35,8 @@ next
 
 General:
 
+-QR, logo costantiate.
+-Asc-Ao(MM),Asc-Ao(2D), AR-PHT, AR-SLOPE.
 -Calc() decimal round loop.
 -Dekurz crash fix.
 -Default notes.
