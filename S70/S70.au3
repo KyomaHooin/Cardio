@@ -1909,7 +1909,7 @@ for $group in Json_ObjGet($order, '.group')
 	$gui_top_offset+=18; group spacing
 
 	; group
-	GUICtrlCreateGroup(Json_Get($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 880, 21 + 21 * (gui_get_group_index($gui_index, 5)+ 1))
+	GUICtrlCreateGroup(Json_ObjGet($buffer, '.group.' & $group & '.label'), 5, $gui_group_top_offset, 880, 21 + 21 * (gui_get_group_index($gui_index, 5)+ 1))
 	GUICtrlSetFont(-1, 8, 800, 0, 'MS Sans Serif')
 	$gui_group_top_offset += 21 + 21 * (gui_get_group_index($gui_index, 5) + 1)
 
@@ -1980,8 +1980,8 @@ While 1
 		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
 		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
 		; update data buffer
-		for $group in Json_Get($history, '.group')
-			for $member in Json_Get($history, '.data.' & $group)
+		for $group in Json_ObjGet($history, '.group')
+			for $member in Json_ObjGet($history, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
@@ -1992,10 +1992,10 @@ While 1
 		; re-calculate
 		calculate(False)
 		; re-fill BSA
-		GUICtrlSetData($input_bsa, Json_Get($buffer, '.bsa'))
+		GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
 		; re-fill data
-		for $group in Json_Get($history, '.group')
-			for $member in Json_Get($history, '.data.' & $group)
+		for $group in Json_ObjGet($history, '.group')
+			for $member in Json_ObjGet($history, '.data.' & $group)
 				GUICtrlSetData(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id'), Json_Get($buffer,'.data.' & $group & '."' & $member & '".value'))
 			next
 		next
@@ -2007,12 +2007,12 @@ While 1
 			if _DateDiff('h', Json_Get($history,'.date'), $runtime) < $AGE then
 				if msgbox(4, 'S70 Echo ' & $VERSION, 'Načíst poslední naměřené hodnoty?') = 6 then
 					; update basic
-					GUICtrlSetData($input_height, Json_Get($history, '.height'))
-					GUICtrlSetData($input_weight, Json_Get($history, '.weight'))
-					GUICtrlSetData($input_bsa, Json_Get($history, '.bsa'))
-					for $group in Json_Get($buffer, '.group')
+					GUICtrlSetData($input_height, Json_ObjGet($history, '.height'))
+					GUICtrlSetData($input_weight, Json_ObjGet($history, '.weight'))
+					GUICtrlSetData($input_bsa, Json_ObjGet($history, '.bsa'))
+					for $group in Json_ObjGet($buffer, '.group')
 						; update data
-						for $member in Json_Get($buffer, '.data.' & $group)
+						for $member in Json_ObjGet($buffer, '.data.' & $group)
 							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'), Json_Get($history,'.data.' & $group & '."' & $member & '".value'))
 						next
 					next
@@ -2035,11 +2035,11 @@ While 1
 		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
 		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
 		; update data buffer
-		for $group in Json_Get($history, '.group')
+		for $group in Json_ObjGet($history, '.group')
 			; update note
 			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')), True)
 			; update data
-			for $member in Json_Get($history, '.data.' & $group)
+			for $member in Json_ObjGet($history, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
@@ -2282,8 +2282,8 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), True)
 	endif
 	; round it!
-	for $group in Json_Get($history, '.group')
-		for $member in Json_Get($history, '.data.' & $group)
+	for $group in Json_ObjGet($history, '.group')
+		for $member in Json_ObjGet($history, '.data.' & $group)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal
@@ -2292,9 +2292,9 @@ func calculate($is_export = True)
 					; round 1 decimal
 					case 'AV Vmax', 'VTI LVOT/Ao', 'MV E/A Ratio', 'PV Vmax'
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 1), True)
-					; round int default
+					; round 0 default
 					case else
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Int(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value')), True)
+						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 0), True)
 				EndSwitch
 			endif
 		next
@@ -2330,7 +2330,7 @@ endFunc
 
 func not_empty_group($group)
 	if StringLen(GUICtrlRead(Json_Get($buffer, '.group.' & $group & '.id'))) > 0 then return True
-	for $member in Json_Get($history, '.data.' & $group)
+	for $member in Json_ObjGet($history, '.data.' & $group)
 		if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then return True
 	next
 	return False
@@ -2365,12 +2365,12 @@ func dekurz()
 		.Weight = 2
 	EndWith
 	; generate data
-	for $group in Json_Get($order, '.group')
+	for $group in Json_ObjGet($order, '.group')
 		if not_empty_group($group) then
 			; group label
 			$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 			$book.Activesheet.Range('A' & $row_index).Font.Size = 9
-			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
+			_Excel_RangeWrite($book, $book.Activesheet, Json_ObjGet($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
 			$step=False
 			$members = Json_ObjGet($order, '.data.' & $group).Keys()
 			for $i in Json_ObjGet($map, '.' & $group)
@@ -2504,7 +2504,7 @@ func print(); 2100 x 2970
 			endif
 			; group label
 			_PrintSetFont($printer, 'Arial', 9, Default, 'bold')
-			_PrintText($printer, Json_Get($buffer,'.group.' & $group & '.label'), 50, $top_offset)
+			_PrintText($printer, Json_ObjGet($buffer,'.group.' & $group & '.label'), 50, $top_offset)
 			$top_offset += $text_height + $line_offset; step down
 			; group data
 			_PrintSetFont($printer, 'Arial', 8, Default, Default)
