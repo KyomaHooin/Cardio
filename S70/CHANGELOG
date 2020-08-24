@@ -4,7 +4,6 @@
 - Units update.
 - User map update.
 - Default note update.
-- RWT round(?)
 - Export dup. Ao Diam. 
 
 [1.9]
@@ -13,6 +12,7 @@ General:
 
 -QR, logo costantiate.
 -Asc-Ao(MM),Asc-Ao(2D), AR-PHT, AR-SLOPE.
+-RWT round.
 -Calc() decimal round loop.
 -Dekurz crash fix.
 -Default notes.
