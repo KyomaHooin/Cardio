@@ -6,9 +6,7 @@
 - Default note update.
 - RWT round(?)
 - Export dup. Ao Diam. 
-
-- Dekurz 5 to 4 mapping.
-- json_get() -> json_objget() tune
+- Json_Get/Put() -> Json_ObjGet/Put() tune
 
 [1.9]
 
@@ -35,6 +33,7 @@ Tisk:
 
 Dekurz:
 
+-5 to 4 mapping.
 -Dekurz header.
 -Result header, footer.
 -Result font 9 size.

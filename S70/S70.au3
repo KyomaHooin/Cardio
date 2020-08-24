@@ -1813,7 +1813,7 @@ endif
 
 ; update note from history
 for $group in Json_ObjGet($history, '.group')
-	Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, '.group.' & $group & '.note'), True)
+	Json_Put($buffer, '.group.' & $group & '.note', Json_ObjGet($history, '.group.' & $group & '.note'), True)
 next
 
 ; update height & weight if not export
@@ -1853,8 +1853,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
@@ -1872,8 +1872,8 @@ $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 $button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
 
 ; groups
-for $group in Json_Get($order, '.group')
-	for $member in Json_Get($order, '.data.' & $group)
+for $group in Json_ObjGet($order, '.group')
+	for $member in Json_ObjGet($order, '.data.' & $group)
 		; data
 		if IsString(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label')) then
 			; update index / offset
@@ -2371,22 +2371,29 @@ func dekurz()
 			$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 			$book.Activesheet.Range('A' & $row_index).Font.Size = 9
 			_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.group.' & $group & '.label'), 'A' & $row_index)
-			for $member in Json_Get($order, '.data.' & $group)
-				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
-					; update index
-					if $column_index = 69 Then; reset
-						$column_index = 65
-						$row_index+=1
-					endif
-					; data
-					_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $member & '".label') & ': ' & StringReplace(GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')), ',', '.') & ' ' & Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), Chr($column_index + 1) & $row_index)
-					; update index
-					$column_index+=1
+			$step=False
+			$members = Json_ObjGet($order, '.data.' & $group).Keys()
+			for $i in Json_ObjGet($map, '.' & $group)
+				; line break
+				if $column_index = 69 Then
+					if $step then $row_index+=1
+					$step=False
+					$column_index = 65
 				endif
+				; write value
+				if $i <> Null then; not hole
+					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')) then; has value
+						_Excel_RangeWrite($book, $book.Activesheet, Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".label') & ': ' & StringReplace(GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')), ',', '.') & ' ' & Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".unit'), Chr($column_index + 1) & $row_index)
+						$step=True
+					endif
+				endif
+				; update index
+				$column_index+=1
 			next
+			; update offset
+			if $step then $row_index+=1
 			; note
 			if StringLen(GUICtrlRead(Json_Get($buffer,'.group.' & $group & '.id'))) > 0 then
-				if $column_index <> 65 then $row_index+=1; not only note
 				$book.Activesheet.Range('B' & $row_index & ':E' & $row_index).MergeCells = True
 				$book.Activesheet.Range('B' & $row_index).Font.Bold = True
 				$book.Activesheet.Range('A' & $row_index).RowHeight = 13
