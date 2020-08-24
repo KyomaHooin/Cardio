@@ -74,7 +74,7 @@ global const $map_template='{' _
 	& '"pk":[0,1,2,3,4,5,6],' _
 	& '"ps":[0,1,2,3],' _
 	& '"ao":[0,1,2],' _
-	& '"ach":[0,1,2,7,3,4,13,14,5,6,7,8,9,10,11,12],' _
+	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
 	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
 	& '"pch":[0,1,2,3,4],' _
 	& '"tch":[0,1,2],' _
@@ -142,7 +142,7 @@ global const $data_template='{' _
 			& '"SV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"ls":{' _
-			& '"LA Diam":{"label":"Plax", "unit":"mm", "value":null, "id":null},' _
+			& '"LA Diam":{"label":"LA-Plax", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAV-A4C":{"label":"LAV-1D", "unit":"ml", "value":null, "id":null},' _
@@ -188,8 +188,8 @@ global const $data_template='{' _
 			& '"AR ERO":{"label":"AR-ERO", "unit":"cm²", "value":null, "id":null},' _
 			& '"AR VTI":{"label":"AR-VTI", "unit":"cm", "value":null, "id":null},' _
 			& '"AR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
-			& '"AR-PHT":{"label":"AR-PHT", "unit":"?", "value":null, "id":null},' _
-			& '"AR-SLOPE":{"label":"AR-SLOPE", "unit":"?", "value":null, "id":null},' _
+			& '"AR-PHT":{"label":"AR-PHT", "unit":"ms", "value":null, "id":null},' _
+			& '"AR-SLOPE":{"label":"AR-SLOPE", "unit":"cm/s²", "value":null, "id":null},' _
 			& '"AV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"AV meanPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"SV":{"label":null, "unit":"ml/m²", "value":null},' _; calculation
