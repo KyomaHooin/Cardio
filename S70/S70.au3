@@ -67,6 +67,21 @@ global const $user_template='{' _
 	& '"3":"Vlastimil Vodárek"' _
 & '}'
 
+; 5 to 4 column map template
+global const $map_template='{' _
+	& '"lk":[0,1,2,3,5,6,4,13,7,8,9,14,10,11,12,Null,15,16,17,18],' _
+	& '"ls":[0,1,2,Null,3,4,5,6],' _
+	& '"pk":[0,1,2,3,4,5,6],' _
+	& '"ps":[0,1,2,3],' _
+	& '"ao":[0,1,2],' _
+	& '"ach":[0,1,2,7,3,4,13,14,5,6,7,8,9,10,11,12],' _
+	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
+	& '"pch":[0,1,2,3,4],' _
+	& '"tch":[0,1,2],' _
+	& '"p":[],' _
+	& '"other":[0,1]' _
+& '}'
+
 ; Default note template
 global const $note_template='{' _
 	& '"lk":"Levá komora poznámka.",' _
@@ -232,6 +247,7 @@ global $buffer = Json_Decode($data_template)
 global $order = Json_Decode($data_template)
 global $user = Json_Decode($user_template)
 global $note = Json_Decode($note_template)
+global $map = Json_Decode($map_template)
 
 ;XLS variable
 global $excel, $book
@@ -1796,19 +1812,19 @@ if FileExists($archive_file) then
 endif
 
 ; update note from history
-for $group in Json_Get($history, '.group')
+for $group in Json_ObjGet($history, '.group')
 	Json_Put($buffer, '.group.' & $group & '.note', Json_Get($history, '.group.' & $group & '.note'), True)
 next
 
 ; update height & weight if not export
 if UBound($cmdline) = 7  Then
-		if Json_Get($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[5]), True)
-		if Json_Get($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[6]), True)
+		if Json_ObjGet($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[5]), True)
+		if Json_ObjGet($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[6]), True)
 endif
 
 ; update result from history or template
-Json_Put($buffer, '.result', Json_Get($history, '.result'), True)
-if Json_Get($buffer, '.result') = Null then
+Json_Put($buffer, '.result', Json_ObjGet($history, '.result'), True)
+if Json_ObjGet($buffer, '.result') = Null then
 	$result_text = FileRead($result_file)
 	if @error then
 		logger('Načtení výchozího závěru selhalo.')
@@ -1818,9 +1834,9 @@ if Json_Get($buffer, '.result') = Null then
 endif
 
 ; update note on default
-for $group in Json_Get($history, '.group')
-	if Json_Get($buffer, '.group.' & $group & '.note') = Null then
-		Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group), True)
+for $group in Json_ObjGet($history, '.group')
+	if Json_ObjGet($buffer, '.group.' & $group & '.note') = Null then
+		Json_Put($buffer, '.group.' & $group & '.note', Json_ObjGet($note, '.' & $group), True)
 	endif
 next
 
@@ -1837,20 +1853,20 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
-$input_height = GUICtrlCreateInput(Json_Get($buffer, '.height'), 89, 2, 36, 19, 1)
+$input_height = GUICtrlCreateInput(Json_ObjGet($buffer, '.height'), 89, 2, 36, 19, 1)
 $input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
 
 $label_wegiht = GUICtrlCreateLabel('Váha', 175, 5, 85, 17, 0x0002); right
-$input_weight = GUICtrlCreateInput(Json_Get($buffer, '.weight'), 175 + 89, 2, 36, 19, 1)
+$input_weight = GUICtrlCreateInput(Json_ObjGet($buffer, '.weight'), 175 + 89, 2, 36, 19, 1)
 $input_weight_unit = GUICtrlCreateLabel('kg', 175 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_Get($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
+$input_bsa = GUICtrlCreateInput(Json_ObjGet($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
 $button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
@@ -1905,7 +1921,7 @@ next
 
 ; dekurz
 $label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 85, 21,0x0002); align right
-$edit_dekurz = GUICtrlCreateEdit(Json_Get($buffer, '.result'), 89, $gui_group_top_offset + 8, 793, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$edit_dekurz = GUICtrlCreateEdit(Json_ObjGet($buffer, '.result'), 89, $gui_group_top_offset + 8, 793, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
 $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 150, 17)
@@ -2398,7 +2414,7 @@ func dekurz()
 	; footer
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Font.Size = 9
 	_Excel_RangeWrite($book, $book.Activesheet, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 'A' & $row_index)
-	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_Get($user, '.' & $cmdline[1]), 'D' & $row_index)
+	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]), 'D' & $row_index)
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index)
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
@@ -2463,7 +2479,7 @@ func print(); 2100 x 2970
 	$text_height = _PrintGetTextHeight($printer, 'Arial')
 	$top_offset+=15
 	$group_index = $top_offset
-	for $group in Json_Get($order, '.group')
+	for $group in Json_ObjGet($order, '.group')
 		if not_empty_group($group) then
 			;check new page
 			if $top_offset + 200 >= $max_height Then
@@ -2485,19 +2501,27 @@ func print(); 2100 x 2970
 			$top_offset += $text_height + $line_offset; step down
 			; group data
 			_PrintSetFont($printer, 'Arial', 8, Default, Default)
-			for $member in Json_Get($order, '.data.' & $group)
-				if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then; has value
-					if $line_index = 5 Then
-						$line_index = 1
-						$top_offset += $text_height + $line_offset
-					endif
-					_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $member & '".label') & ': ' & StringReplace(String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'))), ',', '.') & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $member & '".unit'), 400*$line_index, $top_offset)
-					; update index
-					$line_index+=1
+			$step=False
+			$members = Json_ObjGet($order, '.data.' & $group).Keys()
+			for $i in Json_ObjGet($map, '.' & $group)
+				; line break
+				if $line_index = 5 Then
+					if $step then $top_offset += $text_height + $line_offset
+					$step=False
+					$line_index = 1
 				endif
+				; write value
+				if $i <> Null then; not hole
+					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')) then; has value
+						_PrintText($printer, Json_Get($buffer,'.data.' & $group & '."' & $members[$i] & '".label') & ': ' & StringReplace(String(GuiCtrlRead(Json_Get($buffer,'.data.' & $group & '."' & $members[$i] & '".id'))), ',', '.') & ' ' & Json_Get($buffer,'.data.' & $group & '."' & $members[$i] & '".unit'), 400*$line_index, $top_offset)
+						$step=True
+					endif
+				endif
+				; update index
+				$line_index+=1
 			next
 			; update offset
-			if $line_index <> 1 then $top_offset += $text_height + $line_offset
+			if $step then $top_offset += $text_height + $line_offset
 			; note
 			_PrintSetFont($printer, 'Arial', 8, Default, 'bold')
 			$text_height = _PrintGetTextHeight($printer, 'Arial')
@@ -2555,7 +2579,7 @@ func print(); 2100 x 2970
 	; singnature
 	_PrintText($printer, 'Ošetřující lékař', 1250, $top_offset)
 	$top_offset+=$text_height + $line_offset
-	_PrintText($printer, 'MUDr. ' & Json_Get($user, '.' & $cmdline[1]) , 1250, $top_offset)
+	_PrintText($printer, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
 	_printDllClose($printer)

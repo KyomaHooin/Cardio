@@ -1,34 +1,14 @@
 
-[open]
+[TODO]
 
+- Units update.
+- User map update.
+- Default note update.
+- RWT round(?)
 - Export dup. Ao Diam. 
-- json_get() -> json_objget()
-- RWT round
 
-General:
-
-5 to 4 pseudo code:
-
-$line_offset = 0
-$hole = False
-
-for $group
-  for $map_index
-    if value:
-      write_line()
-      hole=True
-    else:
-      line_offset+=1
-    endif
-    if $line_offset = 4:
-      if $hole:
-        $row+=1
-        $hole=False
-      endif
-      $line_offset=0
-    endif  
-  next
-next 
+- Dekurz 5 to 4 mapping.
+- json_get() -> json_objget() tune
 
 [1.9]
 
@@ -48,6 +28,7 @@ GUI:
 
 Tisk:
 
+-5 to 4 mapping.
 -UID slash.
 -User,footer date H.M.D only.
 -"Sticky" footer.
