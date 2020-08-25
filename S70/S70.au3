@@ -50,15 +50,20 @@ global $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
-global $result_file = @ScriptDir & '\' & 'zaver.txt'
 
 global $export_path = @ScriptDir & '\' & 'input'
-global $archive_path = @ScriptDir & '\' & 'archiv'
+global $archive_path = @ScriptDir & '\' & 'archive'
 global $history_path = $archive_path & '\' & 'history'
 
 global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
 ; user map
+
+
+global const $result_template[2]=[ _
+	"Dobrá systolická i diastolická funkce nedilat. levé komory, dobrá funkce nedilat.. pravé komory, chlopně bez valvulopatie, ostatní srd. oddíly nedilatovány, bez známek zvýšené tenze v plicnici.", _
+	"Dobrá systolická funkce nedilat. levé komory, dobrá funkce nedilat. pravé komory," _
+]
 
 ; Medicus user ID to name
 global const $user_template='{' _
@@ -84,17 +89,17 @@ global const $map_template='{' _
 
 ; Default note template
 global const $note_template='{' _
-	& '"lk":"Levá komora poznámka.",' _
-	& '"ls":"Levá síň poznámka.",' _
-	& '"pk":"Pravá komora poznámka.",' _
-	& '"ps":"Pravá síň poznámka.",' _
-	& '"ao":"Aorta poznámka.",' _
-	& '"ach":"Aortální chlopeň poznámka.",' _
-	& '"mch":"Mitrální chlopeň poznámka.",' _
-	& '"pch":"Pulmonální chlopeň poznámka.",' _
-	& '"tch":"Trikuspidální chlopeň poznámka.",' _
-	& '"p":"Perikard poznámka.",' _
-	& '"other":"Ostatní poznámka."' _
+	& '"lk":["nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez  hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická porucha relaxace  v normě"],' _
+	& '"ls":["nedilatovaná", "nedilatovaná"],' _
+	& '"pk":["nedilatovaná, normální systolická funkce", "nedilatovaná, normální systolická funkce"],' _
+	& '"ps":["nedilatovaná", "nedilatovaná"],' _
+	& '"ao":["Ascendentní aorta nedilatovaná", "Ascendentní aorta nedilatovaná"],' _
+	& '"ach":["trojcípá, cípy jemné, bez vady,", "trojcípá, fibrózní, bez vady,"],' _
+	& '"mch":["jemná, anulus nedilat, bez vady", "fibrózní, anulus nedilat, stopová regurgitace  1/4"],' _
+	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
+	& '"tch":["jemná, anulus nedilat, bez vady, odhad PASP  torr", "jemná, anulus nedilat, stopová regurgitace 1/4, odhad PASP  torr"],' _
+	& '"p":[Null, Null],' _
+	& '"other":[Null, Null]' _
 & '}'
 
 ;data template
@@ -1776,7 +1781,7 @@ if FileExists($config_file) then
 	if @error then logger('Načtení konfiguračního souboru selhalo.')
 Else
 	$c = FileOpen($config_file, 2 + 256); UTF8 / NOBOM overwrite
-	FileWrite($c, 'export=' & @CRLF & 'archiv=' & @CRLF & 'result=' & @CRLF & 'history=')
+	FileWrite($c, 'export=' & @CRLF & 'archive=' & @CRLF & 'history=')
 	FileClose($c)
 endif
 
@@ -1825,18 +1830,21 @@ endif
 ; update result from history or template
 Json_Put($buffer, '.result', Json_ObjGet($history, '.result'), True)
 if Json_ObjGet($buffer, '.result') = Null then
-	$result_text = FileRead($result_file)
-	if @error then
-		logger('Načtení výchozího závěru selhalo.')
+	if fifty($cmdline[2]) then
+		Json_Put($buffer, '.result', $result_template[0], True)
 	else
-		Json_Put($buffer, '.result', $result_text, True)
+		Json_Put($buffer, '.result', $result_template[1], True)
 	endif
 endif
 
 ; update note on default
 for $group in Json_ObjGet($history, '.group')
 	if Json_ObjGet($buffer, '.group.' & $group & '.note') = Null then
-		Json_Put($buffer, '.group.' & $group & '.note', Json_ObjGet($note, '.' & $group), True)
+		if fifty($cmdline[2]) then
+			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[0]'), True)
+		else
+			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[1]'), True)
+		endif
 	endif
 next
 
@@ -2078,6 +2086,10 @@ func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
 
+func fifty($rc)
+	Return True
+endfunc
+
 func gui_enable($visible)
 	if $visible = True then $state = $GUI_ENABLE
 	If $visible = False then $state = $GUI_DISABLE
@@ -2095,8 +2107,7 @@ func read_config_file($file)
 	if @error then return SetError(1)
 	for $i = 0 to UBound($cfg) - 1
 		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'archiv' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'result' then $result_file = $cfg[$i][1]
+		if $cfg[$i][0] == 'archive' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
 		if $cfg[$i][0] == 'history' then $AGE = $cfg[$i][1]
 	next
 endfunc

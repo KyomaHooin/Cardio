@@ -3,8 +3,8 @@
 
 - Asc-Ao(2D) units, calculation(?).
 - User map update.
-- Default note update.
-- Export dup. Ao Diam. 
+- Export dup. Ao Diam.
+- Fifty($rc)
 
 [1.9]
 
@@ -15,7 +15,8 @@ General:
 -RWT round.
 -Calc() decimal round loop.
 -Dekurz crash fix.
--Default notes.
+-Default note.
+-Default result.
 
 GUI:
 
