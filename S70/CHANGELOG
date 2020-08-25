@@ -4,12 +4,12 @@
 - Asc-Ao(2D) units, calculation(?).
 - User map update.
 - Export dup. Ao Diam.
-- Fifty($rc)
 
 [1.9]
 
 General:
 
+-Fifty().
 -QR, logo costantiate.
 -Asc-Ao(MM),Asc-Ao(2D), AR-PHT, AR-SLOPE.
 -RWT round.

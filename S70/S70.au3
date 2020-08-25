@@ -57,9 +57,7 @@ global $history_path = $archive_path & '\' & 'history'
 
 global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 
-; user map
-
-
+; default result template
 global const $result_template[2]=[ _
 	"Dobrá systolická i diastolická funkce nedilat. levé komory, dobrá funkce nedilat.. pravé komory, chlopně bez valvulopatie, ostatní srd. oddíly nedilatovány, bez známek zvýšené tenze v plicnici.", _
 	"Dobrá systolická funkce nedilat. levé komory, dobrá funkce nedilat. pravé komory," _
@@ -1831,9 +1829,9 @@ endif
 Json_Put($buffer, '.result', Json_ObjGet($history, '.result'), True)
 if Json_ObjGet($buffer, '.result') = Null then
 	if fifty($cmdline[2]) then
-		Json_Put($buffer, '.result', $result_template[0], True)
-	else
 		Json_Put($buffer, '.result', $result_template[1], True)
+	else
+		Json_Put($buffer, '.result', $result_template[0], True)
 	endif
 endif
 
@@ -1841,9 +1839,9 @@ endif
 for $group in Json_ObjGet($history, '.group')
 	if Json_ObjGet($buffer, '.group.' & $group & '.note') = Null then
 		if fifty($cmdline[2]) then
-			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[0]'), True)
-		else
 			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[1]'), True)
+		else
+			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[0]'), True)
 		endif
 	endif
 next
@@ -2087,6 +2085,15 @@ func logger($text)
 endfunc
 
 func fifty($rc)
+	local $rc_year = Int(StringLeft($rc, 2))
+	local $year = Int(StringRight(@YEAR, 2))
+	local $fifty = Int(StringRight(Int(@YEAR) - 50, 2))
+	if $year >= 50 Then
+		if $rc_year > $fifty or $rc_year > $year then Return False
+	endif
+	if $year < 50 Then
+		if $rc_year > $fifty or $rc_year < $year then Return False
+	endif
 	Return True
 endfunc
 
