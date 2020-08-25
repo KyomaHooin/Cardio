@@ -2088,12 +2088,7 @@ func fifty($rc)
 	local $rc_year = Int(StringLeft($rc, 2))
 	local $year = Int(StringRight(@YEAR, 2))
 	local $fifty = Int(StringRight(Int(@YEAR) - 50, 2))
-	if $year >= 50 Then
-		if $rc_year > $fifty or $rc_year > $year then Return False
-	endif
-	if $year < 50 Then
-		if $rc_year > $fifty or $rc_year < $year then Return False
-	endif
+	if $rc_year > $fifty or $rc_year <= $year then Return False
 	Return True
 endfunc
 
