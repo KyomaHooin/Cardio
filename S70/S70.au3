@@ -175,7 +175,7 @@ global const $data_template='{' _
 		& '"ao":{' _
 			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
 			& '"Ao Diam":{"label":"Asc-Ao(MM)", "unit":"mm", "value":null, "id":null}' _
-			& '"Asc-Ao 2D":{"label":"Asc-Ao(2D)", "unit":"?", "value":null, "id":null}' _
+			& '"Asc-Ao 2D":{"label":"Asc-Ao(2D)", "unit":"mm", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
