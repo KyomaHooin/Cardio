@@ -85,9 +85,9 @@ global const $map_template='{' _
 	& '"other":[0,1]' _
 & '}'
 
-; Default note template
+; default note template
 global const $note_template='{' _
-	& '"lk":["nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez  hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická porucha relaxace  v normě"],' _
+	& '"lk":["nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická porucha relaxace v normě"],' _
 	& '"ls":["nedilatovaná", "nedilatovaná"],' _
 	& '"pk":["nedilatovaná, normální systolická funkce", "nedilatovaná, normální systolická funkce"],' _
 	& '"ps":["nedilatovaná", "nedilatovaná"],' _
@@ -95,12 +95,12 @@ global const $note_template='{' _
 	& '"ach":["trojcípá, cípy jemné, bez vady,", "trojcípá, fibrózní, bez vady,"],' _
 	& '"mch":["jemná, anulus nedilat, bez vady", "fibrózní, anulus nedilat, stopová regurgitace  1/4"],' _
 	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
-	& '"tch":["jemná, anulus nedilat, bez vady, odhad PASP  torr", "jemná, anulus nedilat, stopová regurgitace 1/4, odhad PASP  torr"],' _
+	& '"tch":["jemná, anulus nedilat, bez vady, odhad PASP torr", "jemná, anulus nedilat, stopová regurgitace 1/4, odhad PASP torr"],' _
 	& '"p":[Null, Null],' _
 	& '"other":[Null, Null]' _
 & '}'
 
-;data template
+; data template
 global const $data_template='{' _
 	& '"bsa":null,' _
 	& '"weight":null,' _
@@ -244,7 +244,7 @@ global const $data_template='{' _
 	& '}' _
 & '}'
 
-;data
+; data dicts
 global $history = Json_Decode($data_template)
 global $buffer = Json_Decode($data_template)
 global $order = Json_Decode($data_template)
@@ -252,9 +252,10 @@ global $user = Json_Decode($user_template)
 global $note = Json_Decode($note_template)
 global $map = Json_Decode($map_template)
 
-;XLS variable
+; XLS variable
 global $excel, $book
 
+; cardio bitmap logo
 global const $logo_file_one = '0x424d36c000000000000036000000280000008000000080000000010018000000000000c00000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
@@ -1026,6 +1027,7 @@ global const $logo_file_two = '0000131313818181fffffffffffffefefefffffffffffffff
 & 'fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc' _
 & 'fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfefefeffffffffffffffffffffffffffffffffffff'
 
+; QR code bitmap
 global const $qr_file = '0x424df2b200000000000036000000280000007b0000007b0000000100180000000000bcb20000c40e0000c40e00000000000000000000ffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
 & 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' _
@@ -1859,8 +1861,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' [' & $cmdline[3] & ' ' & $cmdline[4] & ' : ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6) & ']', 890, 1010, 120, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
@@ -1939,8 +1941,6 @@ $button_dekurz = GUICtrlCreateButton('Dekurz', 730, $gui_group_top_offset + 104,
 $button_konec = GUICtrlCreateButton('Konec', 808, $gui_group_top_offset + 104, 75, 21)
 
 ; GUI tune
-GUICtrlSetBkColor($input_height, 0xC0DCC0)
-GUICtrlSetBkColor($input_weight, 0xC0DCC0)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; GUI display
