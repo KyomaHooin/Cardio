@@ -8,6 +8,7 @@
 
 General:
 
+-Fix double value detection.
 -Fifty().
 -QR, logo costantiate.
 -Asc-Ao(MM),Asc-Ao(2D), AR-PHT, AR-SLOPE.

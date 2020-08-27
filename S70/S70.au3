@@ -1991,7 +1991,13 @@ While 1
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.')), True)
+					; detect double value
+					$double = StringSplit(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.'), '/', 2); no count
+					if @error then
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]), True)
+					Else
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]) & '/' & Number($double[1]), True)
+					endif
 				endif
 			next
 		next
@@ -2049,7 +2055,12 @@ While 1
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
-					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.')), True)
+					$double = StringSplit(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.'), '/', 2); no count
+					if @error then
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]), True)
+					else
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]) & '/' & Number($double[1]), True)
+					endif
 				endif
 			next
 		next
@@ -2084,6 +2095,7 @@ func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
 
+; determine age over fifty from UIN
 func fifty($rc)
 	local $rc_year = Int(StringLeft($rc, 2))
 	local $year = Int(StringRight(@YEAR, 2))
@@ -2097,6 +2109,7 @@ func fifty($rc)
 	Return True
 endfunc
 
+; GUI buttons visibility
 func gui_enable($visible)
 	if $visible = True then $state = $GUI_ENABLE
 	If $visible = False then $state = $GUI_DISABLE
@@ -2312,7 +2325,13 @@ func calculate($is_export = True)
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 1), True)
 					; round 0 default
 					case else
-						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 0), True)
+						; test double value
+						$double = StringSplit(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), '/', 2); no count
+						if @error then
+							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round($double[0], 0), True)
+						else
+							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round($double[0], 0) & '/' & Round($double[1], 0), True)
+						endif
 				EndSwitch
 			endif
 		next
