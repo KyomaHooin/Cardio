@@ -3,6 +3,28 @@
 
 - User map update.
 - Export dup. Ao Diam.
+- AVA round 2 trailing zero ? 1.60 -> 1.6
+- QR code, logo update
+- 4 x 4 GUI
+
+[2.0]
+
+General:
+
+-VTI LVOT/Ao, MR ERO two decimal round.
+
+GUI:
+
+-LA-Plax => LA-plax, RVplax => RV-plax typo.
+-"Delete note", "Delete result" button.
+
+Print:
+
+-Remove "osetrujici lekar".
+
+Dekurz:
+
+-Header font 11.
 
 [1.9]
 
@@ -24,7 +46,7 @@ GUI:
 -Expand input box for "ao.PG".
 -AVA cm2 /AVAi cm2/m2 units fix.
 
-Tisk:
+Print:
 
 -5 to 4 mapping.
 -UID slash.

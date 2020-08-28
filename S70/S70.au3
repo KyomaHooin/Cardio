@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=1.9
+#AutoIt3Wrapper_Res_ProductVersion=2.0
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -45,7 +45,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-global const $VERSION = '1.9'
+global const $VERSION = '2.0'
 global $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -65,9 +65,9 @@ global const $result_template[2]=[ _
 
 ; Medicus user ID to name
 global const $user_template='{' _
-	& '"4":"Jan Škoda",' _
-	& '"2":"Tomáš Slezák",' _
-	& '"3":"Vlastimil Vodárek"' _
+	& '"5":"Jan Škoda",' _
+	& '"6":"Jiří Procházka",' _
+	& '"8":"Tomáš Březák"' _
 & '}'
 
 ; 5 to 4 column map template
@@ -145,7 +145,7 @@ global const $data_template='{' _
 			& '"SV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"ls":{' _
-			& '"LA Diam":{"label":"LA-Plax", "unit":"mm", "value":null, "id":null},' _
+			& '"LA Diam":{"label":"LA-plax", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Minor":{"label":"LA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAV-A4C":{"label":"LAV-1D", "unit":"ml", "value":null, "id":null},' _
@@ -158,7 +158,7 @@ global const $data_template='{' _
 			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"pk":{' _
-			& '"RV Major":{"label":"RVplax", "unit":"mm", "value":null, "id":null},' _
+			& '"RV Major":{"label":"RV-plax", "unit":"mm", "value":null, "id":null},' _
 			& '"RVIDd":{"label":"RVD1", "unit":"mm", "value":null, "id":null},' _
 			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null},' _
 			& '"S-RV":{"label":"S-RV", "unit":"cm/s", "value":null, "id":null},' _
@@ -1861,8 +1861,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
@@ -1877,6 +1877,8 @@ $label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
 $input_bsa = GUICtrlCreateInput(Json_ObjGet($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
+$button_del_note = GUICtrlCreateButton('Vymazat poznámky', 602, 2, 110, 21)
+$button_del_result = GUICtrlCreateButton('Vymazat závěr', 715, 2, 90, 21)
 $button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
 
 ; groups
@@ -1978,6 +1980,14 @@ While 1
 			MsgBox(48, 'S70 Echo ' & $VERSION, 'Tisk selhal.')
 		endif
 		gui_enable(True)
+	endif
+	if $msg = $button_del_note Then
+		for $group in Json_ObjGet($history, '.group')
+			GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), '')
+		next
+	endif
+	if $msg = $button_del_result Then
+		GUICtrlSetData($edit_dekurz, '')
 	endif
 	; re-calculate
 	if $msg = $button_recount Then
@@ -2318,10 +2328,10 @@ func calculate($is_export = True)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal
-					case 'RWT', 'AVA', 'AVAi', 'AR ERO', 'MVA-PHT', 'MVAi-PHT', 'AR ERO'
+					case 'RWT', 'AVA', 'AVAi', 'VTI LVOT/Ao', 'AR ERO', 'MVA-PHT', 'MR ERO', 'MVAi-PHT', 'AR ERO'
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 2), True)
 					; round 1 decimal
-					case 'AV Vmax', 'VTI LVOT/Ao', 'MV E/A Ratio', 'PV Vmax'
+					case 'AV Vmax', 'MV E/A Ratio', 'PV Vmax'
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 1), True)
 					; round 0 default
 					case else
@@ -2391,6 +2401,7 @@ func dekurz()
 	; number format
 	$book.Activesheet.Range('A1:E49').NumberFormat = "@"; string
 	; header
+	$book.Activesheet.Range('A1').Font.Size = 11
 	$book.Activesheet.Range('A1').Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'Echokardiografie(TTE) ' &  @MDAY & '.' & @MON & '.' & @YEAR & ':', 'A1')
 	; data init
@@ -2621,8 +2632,6 @@ func print(); 2100 x 2970
 	; date
 	_PrintText($printer, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 50, $top_offset)
 	; singnature
-	_PrintText($printer, 'Ošetřující lékař', 1250, $top_offset)
-	$top_offset+=$text_height + $line_offset
 	_PrintText($printer, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
