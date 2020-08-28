@@ -16,21 +16,21 @@ Configuration > External Program > [+] > Command line:
 
 FILE
 <pre>
-         S70.au3 - Program source code.
-       Print.au3 - Printing library by "martin".
-        Json.au3 - JSON library by "Ward".
-  BinaryCall.au3 - JSON binary wrapper.
+          S70.au3 - Program source code.
+        Print.au3 - Printing library by "martin".
+         Json.au3 - JSON library by "Ward".
+   BinaryCall.au3 - JSON binary wrapper.
 
-       print.dll - Printing DLL.
-         S70.ini - Program configuration file.    
-         LICENSE - License & disclaimer.
-       CHANGELOG - Changelog.
+        print.dll - Printing DLL.
+          S70.ini - Program configuration file.    
+          LICENSE - License & disclaimer.
+        CHANGELOG - Changelog.
 
-logo_128x128.bmp - Printing logo bitmap. [128 x 128 96DPI]
-       vcard.bmp - vCard v3 QR code bitmap. [ 123 x 123 96DPI]
-     Medicus.png - Medicus 3 external app configuration screen.
-         S70.png - Program GUI screen.
-         S70.ico - Program icon.
+ logo_128x128.bmp - Printing logo bitmap. [96DPI]
+vcard_123x123.bmp - vCard v3 QR code bitmap. [96DPI]
+      Medicus.png - Medicus 3 external app configuration screen.
+          S70.png - Program GUI screen.
+          S70.ico - Program icon.
 </pre>
 SOURCE
 
