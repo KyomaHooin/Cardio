@@ -9,7 +9,6 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
-- User map update.
 - Export dup. Ao Diam.
 - 4 x 4 GUI
 
@@ -17,11 +16,12 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 General:
 
+-User map update.
 -VTI LVOT/Ao, MR ERO two decimal round.
 
 GUI:
 
-- Round trailing zero(not history) fix.
+-Round trailing zero(not history) fix.
 -LA-Plax => LA-plax, RVplax => RV-plax typo.
 -"Delete note", "Delete result" button.
 
