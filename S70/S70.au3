@@ -60,7 +60,7 @@ global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @
 ; default result template
 global const $result_template[2]=[ _
 	"Dobrá systolická i diastolická funkce nedilat. levé komory, dobrá funkce nedilat.. pravé komory, chlopně bez valvulopatie, ostatní srd. oddíly nedilatovány, bez známek zvýšené tenze v plicnici.", _
-	"Dobrá systolická funkce nedilat. levé komory, dobrá funkce nedilat. pravé komory," _
+	"Dobrá systolická funkce obou nedilat. komor, chlopenní aparát bez významnější valvulopatie, nejsou známky zvýšené tenze v plicnici." _
 ]
 
 ; Medicus user ID to name
