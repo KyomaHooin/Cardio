@@ -93,7 +93,7 @@ global const $note_template='{' _
 	& '"ps":["nedilatovaná", "nedilatovaná"],' _
 	& '"ao":["Ascendentní aorta nedilatovaná", "Ascendentní aorta nedilatovaná"],' _
 	& '"ach":["trojcípá, cípy jemné, bez vady,", "trojcípá, fibrózní, bez vady,"],' _
-	& '"mch":["jemná, anulus nedilat, bez vady", "fibrózní, anulus nedilat, stopová regurgitace  1/4"],' _
+	& '"mch":["jemná, anulus nedilat, bez vady", "fibrózní, anulus nedilat, stopová regurgitace 1/4"],' _
 	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
 	& '"tch":["jemná, anulus nedilat, bez vady, odhad PASP torr", "jemná, anulus nedilat, stopová regurgitace 1/4, odhad PASP torr"],' _
 	& '"p":[Null, Null],' _
@@ -2274,6 +2274,10 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
 		Json_Put($buffer, '.data.pch."PR max/meanPG".value', Json_Get($buffer, '.data.pch."PR maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PR meanPG".value'), True)
 	endif
+	;MV E/A Ratio
+	if IsNumber(Json_Get($buffer,'.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV A Vel".value')) then
+		Json_Put($buffer, '.data.mch."MV E/A Ratio".value', Json_Get($buffer, '.data.mch."MV E Vel".value')/Json_Get($buffer, '.data.mch."MV A Vel".value'), True)
+	endif
 	; MV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
 		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Json_Get($buffer, '.data.mch."MV maxPG".value') & '/' & Json_Get($buffer, '.data.mch."MV meanPG".value'), True)
@@ -2374,7 +2378,6 @@ func dekurz_init()
 	Next
 	; header
 	$book.Activesheet.Range('A1').RowHeight = 20
-	$book.Activesheet.Range('A1').Font.Size = 10
 endFunc
 
 func not_empty_group($group)
