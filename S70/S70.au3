@@ -2284,7 +2284,7 @@ func calculate($is_export = True)
 	endif
 	; MVAi-PHT
 	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
-		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Json_Get($buffer, '.data.mch."MV PHT".value')/Json_Get($buffer, '.bsa'), True)
+		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Json_Get($buffer, '.data.mch."MVA-PHT".value')/Json_Get($buffer, '.bsa'), True)
 	endif
 	;E/Em or machine
 	if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
