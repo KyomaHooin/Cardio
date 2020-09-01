@@ -11,11 +11,13 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 - Export dup. Ao Diam.
 - 4 x 4 GUI
+- _WM_COMMAND dynamic check/dynamic calc().
 
 [2.0]
 
 General:
 
+-Single value in "double value" fix.
 -TV max/meanPG -> TV max/meanPG.
 -FAC%, MVAi-PHT calc() fix.
 -Update default result.

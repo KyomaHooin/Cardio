@@ -229,8 +229,8 @@ global const $data_template='{' _
 			& '"PR meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"tch":{' _
-			& '"TR maxPG":{"label":"PGmax-reg", "unit":"torr", "value":null, "id":null},' _
-			& '"TR meanPG":{"label":"PGmean-reg", "unit":"torr", "value":null, "id":null},' _
+			& '"TR maxPG":{"label":"TR maxPG", "unit":"torr", "value":null, "id":null},' _
+			& '"TR meanPG":{"label":"TR meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"TV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
 			& '"TV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"TV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
@@ -2005,8 +2005,8 @@ While 1
 					$double = StringSplit(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.'), '/', 2); no count
 					if @error then
 						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]), True)
-					Else
-						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]) & '/' & Number($double[1]), True)
+					else
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', $double[0] & '/' & $double[1], True)
 					endif
 				endif
 			next
@@ -2069,7 +2069,7 @@ While 1
 					if @error then
 						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]), True)
 					else
-						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]) & '/' & Number($double[1]), True)
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', $double[0] & '/' & $double[1], True)
 					endif
 				endif
 			next
@@ -2250,7 +2250,7 @@ func calculate($is_export = True)
 	endif
 	; FAC%
 	if IsNumber(Json_Get($buffer,'.data.pk.EDA.value')) and IsNumber(Json_Get($buffer, '.data.pk.ESA.value')) then
-		Json_Put($buffer, '.data.ls."FAC%".value', Json_Get($buffer, '.data.pk.EDA.value')/ 100 * Json_Get($buffer, '.data.pk.ESA.value'), True)
+		Json_Put($buffer, '.data.pk."FAC%".value', Json_Get($buffer, '.data.pk.EDA.value')/ 100 * Json_Get($buffer, '.data.pk.ESA.value'), True)
 	endif
 	if $is_export then
 		;MR Rad
@@ -2267,15 +2267,15 @@ func calculate($is_export = True)
 		endif
 	endif
 	; PV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then
 		Json_Put($buffer, '.data.pch."PV max/meanPG".value', Json_Get($buffer, '.data.pch."PV maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PV meanPG".value'), True)
 	endif
 	; PR max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) and IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
 		Json_Put($buffer, '.data.pch."PR max/meanPG".value', Json_Get($buffer, '.data.pch."PR maxPG".value') & '/' & Json_Get($buffer, '.data.pch."PR meanPG".value'), True)
 	endif
 	; MV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
 		Json_Put($buffer, '.data.mch."MV max/meanPG".value', Json_Get($buffer, '.data.mch."MV maxPG".value') & '/' & Json_Get($buffer, '.data.mch."MV meanPG".value'), True)
 	endif
 	; MVA-PHT
@@ -2291,11 +2291,11 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.mch."E/Em".value', 2 * Json_Get($buffer, '.data.mch."MV E Vel".value')/(Json_Get($buffer, '.data.mch.EmSept.value') + Json_Get($buffer, '.data.mch.EmLat.value')), True)
 	endif
 	; TV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.tch."TV meanPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.tch."TV meanPG".value')) then
 		Json_Put($buffer, '.data.tch."TV max/meanPG".value', Json_Get($buffer, '.data.tch."TV maxPG".value') & '/' & Json_Get($buffer, '.data.tch."TV meanPG".value'), True)
 	endif
 	; AV max/meanPG
-	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV meanPG".value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.ach."AV meanPG".value')) then
 		Json_Put($buffer, '.data.ach."AV max/meanPG".value', Json_Get($buffer, '.data.ach."AV maxPG".value') & '/' & Json_Get($buffer, '.data.ach."AV meanPG".value'), True)
 	endif
 	; SV
@@ -2340,7 +2340,9 @@ func calculate($is_export = True)
 						if @error then
 							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round($double[0], 0), True)
 						else
-							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round($double[0], 0) & '/' & Round($double[1], 0), True)
+							if $double[0] then $double[0] = Round($double[0], 0)
+							if $double[1] then $double[1] = Round($double[1], 0)
+							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', $double[0] & '/' & $double[1], True)
 						endif
 				EndSwitch
 			endif
