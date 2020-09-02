@@ -19,7 +19,7 @@ General:
 
 -Single value in "double value" fix.
 -TV max/meanPG -> TV max/meanPG.
--E/A Ratio, FAC%, MVAi-PHT calc() fix.
+-RAVi, E/A Ratio, FAC%, MVAi-PHT calc() fix.
 -Update default result.
 -User map update.
 -VTI LVOT/Ao, MR ERO two decimal round.
@@ -38,6 +38,9 @@ Print:
 
 Dekurz:
 
+-Init default update.
+-Footer empty line.
+-Result bold.
 -Header font 11.
 
 [1.9]

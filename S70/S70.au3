@@ -2236,7 +2236,7 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value')) then
 		Json_Put($buffer, '.data.ls.LAV-A4C.value', (Json_Get($buffer, '.data.ls."LAEDV A-L A4C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A4C".value'))/2, True)
 	endif
-	; LAVi (LAVi-1D) or machine
+	; LAVi (LAVi-1D)
 	if IsNumber(Json_Get($buffer, '.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 		Json_Put($buffer, '.data.ls.LAVi.value', Json_Get($buffer, '.data.ls.LAV-A4C.value')/Json_Get($buffer, '.bsa'), True)
 	endif
@@ -2251,6 +2251,10 @@ func calculate($is_export = True)
 	; FAC%
 	if IsNumber(Json_Get($buffer,'.data.pk.EDA.value')) and IsNumber(Json_Get($buffer, '.data.pk.ESA.value')) then
 		Json_Put($buffer, '.data.pk."FAC%".value', Json_Get($buffer, '.data.pk.EDA.value')/ 100 * Json_Get($buffer, '.data.pk.ESA.value'), True)
+	endif
+	; RAVi
+	if IsNumber(Json_Get($buffer,'.data.ps.RAV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
+		Json_Put($buffer, '.data.ps.RAVi.value', Json_Get($buffer, '.data.ps.RAV.value')/Json_Get($buffer, '.bsa'), True)
 	endif
 	if $is_export then
 		;MR Rad
@@ -2290,7 +2294,7 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
 		Json_Put($buffer, '.data.mch."MVAi-PHT".value', Json_Get($buffer, '.data.mch."MVA-PHT".value')/Json_Get($buffer, '.bsa'), True)
 	endif
-	;E/Em or machine
+	;E/Em
 	if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
 		Json_Put($buffer, '.data.mch."E/Em".value', 2 * Json_Get($buffer, '.data.mch."MV E Vel".value')/(Json_Get($buffer, '.data.mch.EmSept.value') + Json_Get($buffer, '.data.mch.EmLat.value')), True)
 	endif
@@ -2400,11 +2404,11 @@ func dekurz()
 	; clean-up
 	_Excel_RangeDelete($book.Activesheet, 'A1:E49')
 	; default font
-	$book.Activesheet.Range('A2:E49').Font.Size = 8
+	$book.Activesheet.Range('A2:E40').Font.Size = 8
 	; columns height
-	$book.Activesheet.Range('A2:E49').RowHeight = 10
+	$book.Activesheet.Range('A2:E40').RowHeight = 10
 	; number format
-	$book.Activesheet.Range('A1:E49').NumberFormat = "@"; string
+	$book.Activesheet.Range('A1:E40').NumberFormat = "@"; string
 	; header
 	$book.Activesheet.Range('A1').Font.Size = 11
 	$book.Activesheet.Range('A1').Font.Bold = True
@@ -2469,6 +2473,7 @@ func dekurz()
 	$row_index+=1
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).MergeCells = True
 	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
+	$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead($edit_dekurz), @CRLF, @LF), 'A' & $row_index)
 	$row_index+=1
 	; footer
@@ -2476,7 +2481,7 @@ func dekurz()
 	_Excel_RangeWrite($book, $book.Activesheet, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 'A' & $row_index)
 	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]), 'D' & $row_index)
 	; clip
-	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index)
+	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index + 1); data + one empty line..
 	if @error then return SetError(1, 0, 'Nelze kopirovat data.')
 EndFunc
 
