@@ -20,7 +20,7 @@ General:
 -Single value in "double value" fix.
 -TV max/meanPG -> TV max/meanPG.
 -RAVi, E/A Ratio, FAC%, MVAi-PHT calc() fix.
--Update default result.
+-Update default note/result.
 -User map update.
 -VTI LVOT/Ao, MR ERO two decimal round.
 

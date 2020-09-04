@@ -87,15 +87,15 @@ global const $map_template='{' _
 
 ; default note template
 global const $note_template='{' _
-	& '"lk":["nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez hypertrofie, bez poruchy kinetiky, normální celková systolická funkce, diastolická porucha relaxace v normě"],' _
+	& '"lk":["nedilatovaná, bez hypertrofie, kinetika v normě, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez hypertrofie,  kinetika v normě, normální celková systolická funkce, diastolická porucha relaxace v normě"],' _
 	& '"ls":["nedilatovaná", "nedilatovaná"],' _
 	& '"pk":["nedilatovaná, normální systolická funkce", "nedilatovaná, normální systolická funkce"],' _
 	& '"ps":["nedilatovaná", "nedilatovaná"],' _
-	& '"ao":["Ascendentní aorta nedilatovaná", "Ascendentní aorta nedilatovaná"],' _
-	& '"ach":["trojcípá, cípy jemné, bez vady,", "trojcípá, fibrózní, bez vady,"],' _
-	& '"mch":["jemná, anulus nedilat, bez vady", "fibrózní, anulus nedilat, stopová regurgitace 1/4"],' _
+	& '"ao":["ascendentní aorta nedilatovaná", "ascendentní aorta nedilatovaná"],' _
+	& '"ach":["trojcípá, cípy jemné, bez vady", "trojcípá, fibrózní, bez vady"],' _
+	& '"mch":["jemná, bez vady", "fibrózní, stopová regurgitace 1/4"],' _
 	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
-	& '"tch":["jemná, anulus nedilat, bez vady, odhad PASP torr", "jemná, anulus nedilat, stopová regurgitace 1/4, odhad PASP torr"],' _
+	& '"tch":["jemná, bez vady", "jemná, stopová regurgitace 1/4"],' _
 	& '"p":[Null, Null],' _
 	& '"other":[Null, Null]' _
 & '}'
