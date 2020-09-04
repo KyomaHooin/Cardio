@@ -96,7 +96,7 @@ global const $note_template='{' _
 	& '"mch":["jemná, bez vady", "fibrózní, stopová regurgitace 1/4"],' _
 	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
 	& '"tch":["jemná, bez vady", "jemná, stopová regurgitace 1/4"],' _
-	& '"p":[Null, Null],' _
+	& '"p":["bez patologické separace", "bez patologické separace"],' _
 	& '"other":[Null, Null]' _
 & '}'
 
