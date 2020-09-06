@@ -12,6 +12,9 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 - Export dup. Ao Diam.
 - 4 x 4 GUI
 - _WM_COMMAND dynamic check/dynamic calc().
+- UiCtrlRead(Json_Get()) cleanup
+- Number(BSA)
+- Note Edit UnFocus alignment
 
 [2.0]
 
