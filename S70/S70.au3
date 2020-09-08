@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=2.0
+#AutoIt3Wrapper_Res_ProductVersion=2.1
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -45,7 +45,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-global const $VERSION = '2.0'
+global const $VERSION = '2.1'
 global $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -87,7 +87,7 @@ global const $map_template='{' _
 
 ; default note template
 global const $note_template='{' _
-	& '"lk":["nedilatovaná, bez hypertrofie, kinetika v normě, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez hypertrofie,  kinetika v normě, normální celková systolická funkce, diastolická porucha relaxace v normě"],' _
+	& '"lk":["nedilatovaná, bez hypertrofie, kinetika v normě, normální celková systolická funkce, diastolická funkce v normě", "nedilatovaná, bez hypertrofie, kinetika v normě, normální celková systolická funkce, diastolická porucha relaxace v normě"],' _
 	& '"ls":["nedilatovaná", "nedilatovaná"],' _
 	& '"pk":["nedilatovaná, normální systolická funkce", "nedilatovaná, normální systolická funkce"],' _
 	& '"ps":["nedilatovaná", "nedilatovaná"],' _
@@ -1866,15 +1866,15 @@ $gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4]
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
-$input_height = GUICtrlCreateInput(Json_ObjGet($buffer, '.height'), 89, 2, 36, 19, 1)
+$input_height = GUICtrlCreateEdit(Json_ObjGet($buffer, '.height'), 89, 2, 36, 19, 1); ES_CENTER
 $input_height_unit = GUICtrlCreateLabel('cm', 130, 4, 45, 21)
 
 $label_wegiht = GUICtrlCreateLabel('Váha', 175, 5, 85, 17, 0x0002); right
-$input_weight = GUICtrlCreateInput(Json_ObjGet($buffer, '.weight'), 175 + 89, 2, 36, 19, 1)
+$input_weight = GUICtrlCreateEdit(Json_ObjGet($buffer, '.weight'), 175 + 89, 2, 36, 19, 1); ES_CENTER
 $input_weight_unit = GUICtrlCreateLabel('kg', 175 + 130, 4, 45, 21)
 
 $label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
-$input_bsa = GUICtrlCreateInput(Json_ObjGet($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
+$input_bsa = GUICtrlCreateEdit(Json_ObjGet($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
 $button_del_note = GUICtrlCreateButton('Vymazat poznámky', 602, 2, 110, 21)
@@ -1897,12 +1897,12 @@ for $group in Json_ObjGet($order, '.group')
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
 			if $member == 'AV max/meanPG' Then; the broken one
 				; input
-				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 41, 19, 0x0001), True); centered
+				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateEdit(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 41, 19, 0x0001), True); centered
 				; unit
 				GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset + 5, $gui_top_offset + 3, 40, 21)
 			else
 				; input
-				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateInput(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 36, 19, 0x0001), True); centered
+				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateEdit(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 36, 19, 0x0001), True); centered
 				; unit
 				GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset, $gui_top_offset + 3, 45, 21)
 			endif
@@ -1914,7 +1914,7 @@ for $group in Json_ObjGet($order, '.group')
 	next
 	; note
 	GUICtrlCreateLabel('Poznámka:', 0, 21 + $gui_top_offset + 3, 85, 21, 0x0002)
-	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateInput(Json_Get($buffer, '.group.' & $group & '.note'), 89, 21 + $gui_top_offset, 786, 21), True)
+	Json_Put($buffer, '.group.' & $group & '.id', GUICtrlCreateEdit(Json_Get($buffer, '.group.' & $group & '.note'), 89, 21 + $gui_top_offset, 786, 21, 128), True); $ES_AUTOHSCROLL
 
 	$gui_top_offset+=18; group spacing
 
@@ -1993,8 +1993,16 @@ While 1
 	if $msg = $button_recount Then
 		gui_enable(False)
 		; update height / weight
-		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
-		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
+		if GuiCtrlRead($input_height) then
+			Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
+		else
+			Json_Put($buffer, '.height', Null)
+		endif
+		if GuiCtrlRead($input_weight) then
+			Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
+		else
+			Json_Put($buffer, '.weight', Null)
+		endif
 		; update data buffer
 		for $group in Json_ObjGet($history, '.group')
 			for $member in Json_ObjGet($history, '.data.' & $group)
@@ -2314,7 +2322,7 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.ach.SVi.value', Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), True)
 	endif
 	; SV/SVi
-	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
+	if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) or IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
 		Json_Put($buffer, '.data.ach."SV/SVi".value', Json_Get($buffer,'.data.ach.SV.value') & '/' & Json_Get($buffer,'.data.ach.SVi.value'), True)
 	endif
 	; AVA

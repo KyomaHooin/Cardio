@@ -13,8 +13,19 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 - 4 x 4 GUI
 - _WM_COMMAND dynamic check/dynamic calc().
 - UiCtrlRead(Json_Get()) cleanup
-- Number(BSA)
 - Note Edit UnFocus alignment
+
+[2.1]
+
+Global
+
+-Note typo.
+-Detect null height/weight.
+-SV/SVi OR fix.
+
+GUI
+
+-GuiCtrlCreateInput() -> GuiCrtlCreateEdit().
 
 [2.0]
 
