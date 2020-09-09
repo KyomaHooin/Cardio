@@ -25,6 +25,7 @@ Global
 
 GUI
 
+-SV/SVi width.
 -GuiCtrlCreateInput() -> GuiCrtlCreateEdit().
 
 [2.0]

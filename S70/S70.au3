@@ -1895,9 +1895,9 @@ for $group in Json_ObjGet($order, '.group')
 			endif
 			; label
 			GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".label'), $gui_left_offset, $gui_top_offset + 3, 85, 21, 0x0002); align right
-			if $member == 'AV max/meanPG' Then; the broken one
+			if $member == 'AV max/meanPG' or $member == 'SV/SVi' Then; the broken one
 				; input
-				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateEdit(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 41, 19, 0x0001), True); centered
+				Json_Put($buffer,'.data.' & $group & '."' & $member & '".id', GUICtrlCreateEdit(Json_Get($buffer, '.data.' & $group & '."' & $member & '".value'), 89 + $gui_left_offset, $gui_top_offset, 43, 19, 0x0001), True); centered
 				; unit
 				GUICtrlCreateLabel(Json_Get($buffer, '.data.' & $group & '."' & $member & '".unit'), 130 + $gui_left_offset + 5, $gui_top_offset + 3, 40, 21)
 			else
