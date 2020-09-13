@@ -11,21 +11,26 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 - Export dup. Ao Diam.
 - 4 x 4 GUI
-- _WM_COMMAND dynamic check/dynamic calc().
 - GuiCtrlRead(Json_Get()) cleanup
 - Note Edit UnFocus alignment
-- Dekurz clip loogging/ tune
 
 [2.1]
 
 Global
 
+-Clip logging.
+-Experimental input validation.
 -Note typo.
 -Detect null height/weight.
 -SV/SVi OR fix.
 
+Dekurz
+
+-Delay, error text.
+
 GUI
 
+-Error label.
 -SV/SVi width.
 -GuiCtrlCreateInput() -> GuiCrtlCreateEdit().
 
