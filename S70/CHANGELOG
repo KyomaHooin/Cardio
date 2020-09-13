@@ -13,6 +13,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 - 4 x 4 GUI
 - GuiCtrlRead(Json_Get()) cleanup
 - Note Edit UnFocus alignment
+- "Ao @CRLF LVOT" group name
 
 [2.1]
 
