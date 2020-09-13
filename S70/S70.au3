@@ -1994,7 +1994,7 @@ While 1
 		endif
 		sleep(200)
 		gui_enable(True)
-		GUICtrlSetData($label_error, 'Hotovo!')
+		GUICtrlSetData($label_error, 'Hotovo.')
 	endif
 	; print data
 	if $msg = $button_tisk Then
