@@ -14,13 +14,13 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 - GuiCtrlRead(Json_Get()) cleanup
 - Note Edit UnFocus alignment
 - "Ao @CRLF LVOT" group name
+- Dynamic control/calculation.
 
 [2.1]
 
 Global
 
 -Clip logging.
--Experimental input validation.
 -Note typo.
 -Detect null height/weight.
 -SV/SVi OR fix.

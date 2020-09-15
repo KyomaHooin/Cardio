@@ -1951,10 +1951,10 @@ GUICtrlSetColor($label_error, 0xff0000)
 GUICtrlSetState($button_konec, $GUI_FOCUS)
 
 ; message handler response
-$dummy = GUICtrlCreateDummy()
+;$dummy = GUICtrlCreateDummy()
 
 ; message handler
-GUIRegisterMsg($WM_COMMAND, 'input_handler')
+;GUIRegisterMsg($WM_COMMAND, 'input_handler')
 
 ; GUI display
 GUISetState(@SW_SHOW)
@@ -1970,16 +1970,16 @@ if @error then logger($dekurz_init)
 While 1
 	$msg = GUIGetMsg()
 	; dynamic handler
-	if $msg = $dummy Then
-		; check value
-		if StringRegExp(GUICtrlRead(GUICtrlRead($dummy)), '^[.,/0-9]+$|^$') then
-			GUICtrlSetBkColor(GUICtrlRead($dummy), 0xffffff)
-		else
-			GUICtrlSetBkColor(GUICtrlRead($dummy), 0xffcccb)
-		endif
-		; dynamic dat update + get_name_from_id()
-		; ....
-	endif
+	;if $msg = $dummy Then
+	;	; check value
+	;	if StringRegExp(GUICtrlRead(GUICtrlRead($dummy)), '^[.,/0-9]+$|^$') then
+	;		GUICtrlSetBkColor(GUICtrlRead($dummy), 0xffffff)
+	;	else
+	;		GUICtrlSetBkColor(GUICtrlRead($dummy), 0xffcccb)
+	;	endif
+	;	; dynamic dat update + get_name_from_id()
+	;	; ....
+	;endif
 	; generate dekurz clipboard
 	if $msg = $button_dekurz then
 		gui_enable(False)
@@ -2139,30 +2139,30 @@ func logger($text)
 endfunc
 
 ; get name from id
-func get_name_from_id($id)
-	if $id = $input_height then return 'height'
-	if $id = $input_weight then return 'weight'
-	for $group in Json_ObjGet($history, '.group')
-		for $member in Json_ObjGet($history, '.data.' & $group)
-			if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return $member
-		next
-	next
-endfunc
+;func get_name_from_id($id)
+;	if $id = $input_height then return 'height'
+;	if $id = $input_weight then return 'weight'
+;	for $group in Json_ObjGet($history, '.group')
+;		for $member in Json_ObjGet($history, '.data.' & $group)
+;			if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return $member
+;		next
+;	next
+;endfunc
 
 ; message handler
-func input_handler($window, $message, $param, $control)
-	local $id = BitAND($param, 0x0000ffff); loword
-	local $code = BitShift($param, 16); hiword
-	if $code = $EN_CHANGE then
-		if $id = $input_height then return GUICtrlSendToDummy($dummy, $id)
-		if $id = $input_weight then return GUICtrlSendToDummy($dummy, $id)
-		for $group in Json_ObjGet($history, '.group')
-			for $member in Json_ObjGet($history, '.data.' & $group)
-				if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return GUICtrlSendToDummy($dummy, $id)
-			next
-		next
-	endif
-EndFunc
+;func input_handler($window, $message, $param, $control)
+;	local $id = BitAND($param, 0x0000ffff); loword
+;	local $code = BitShift($param, 16); hiword
+;	if $code = $EN_CHANGE then
+;		if $id = $input_height then return GUICtrlSendToDummy($dummy, $id)
+;		if $id = $input_weight then return GUICtrlSendToDummy($dummy, $id)
+;		for $group in Json_ObjGet($history, '.group')
+;			for $member in Json_ObjGet($history, '.data.' & $group)
+;				if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return GUICtrlSendToDummy($dummy, $id)
+;			next
+;		next
+;	endif
+;EndFunc
 
 ; determine age over fifty from UIN
 func fifty($rc)
