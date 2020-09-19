@@ -4,7 +4,7 @@
 #include-once
 
 Const $fpbold = 1, $fpitalic = 2, $fpunderline = 4, $fpstrikeout = 8;
-Const $sUDFVersion = 'PrintMG.au3 V2.68'
+Const $sUDFVersion = 'Print V2.68'
 
 
 ;V2    add missing '$fPrinterOpen = false' to _PrintDllClose
