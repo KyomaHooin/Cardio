@@ -1808,6 +1808,7 @@ if FileExists($export_file) then
 		logger('Export: Nepodařilo se načíst export. ' & $cmdline[2])
 	else
 		FileMove($export_file, $export_file & '.old', 1); overwrite
+		logger('Export: Soubor načten.')
 	endif
 endif
 
