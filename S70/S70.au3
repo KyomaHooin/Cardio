@@ -1774,7 +1774,7 @@ endif
 ; -------------------------------------------------------------------------------------------
 
 ; logging
-logger('Program start: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('Program spuštěn: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC & ' [' & $cmdline[2] & ']')
 
 ; read configuration
 if FileExists($config_file) then
@@ -1798,14 +1798,14 @@ global $archive_file = $archive_path & '\' & $cmdline[2] & '.dat'
 
 ; export  file full path
 global $export_file = get_export_file($export_path, $cmdline[2])
-if @error or not $export_file then logger('Soubor exportu nebyl nalezen: ' & $cmdline[2])
+if @error or not $export_file then logger('Export: Soubor exportu nebyl nalezen. ' & $cmdline[2])
 
 ; update data buffer from export
 if FileExists($export_file) then
 	$parse = export_parse($export_file)
 	if @error then
 		FileMove($export_file, $export_file & '.err', 1); overwrite
-		logger('Nepodařilo se načíst export: ' & $cmdline[2])
+		logger('Export: Nepodařilo se načíst export. ' & $cmdline[2])
 	else
 		FileMove($export_file, $export_file & '.old', 1); overwrite
 	endif
@@ -1814,7 +1814,7 @@ endif
 ; update history buffer from archive
 if FileExists($archive_file) then
 	$history = Json_Decode(FileRead($archive_file))
-	if @error then logger('Nepodařilo se načíst historii: ' & $cmdline[2] & '.dat')
+	if @error then logger('Historie: Nepodařilo se načíst historii. ' & $cmdline[2] & '.dat')
 endif
 
 ; update note from history
@@ -2112,18 +2112,18 @@ While 1
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / NOBOM overwrite
 		FileWrite($out, Json_Encode($buffer))
-		if @error then logger('Zápis archivu selhal: ' & $cmdline[2] & '.dat')
+		if @error then logger('Program: Zápis archivu selhal. ' & $cmdline[2] & '.dat')
 		FileClose($out)
 		; update history
 		FileCopy($archive_file, $history_path & '\' & $cmdline[2] & '\' & $cmdline[2] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
-		if @error then logger('Zápis historie selhal: ' & $cmdline[2])
+		if @error then logger('Program: Zápis historie selhal. ' & $cmdline[2])
 		; exit
 		exitloop
 	endif
 wend
 
 ;exit
-logger('Program exit: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
+logger('Program ukončen: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC)
 logger('----')
 FileClose($log)
 
@@ -2214,7 +2214,7 @@ endfunc
 func export_parse($export)
 	local $raw
 	_FileReadToArray($export, $raw, 0); no count
-	if @error then return SetError(1, 0, 'Nelze načíst souboru exportu.')
+	if @error then return SetError(1, 0, 'Export: Nelze načíst souboru exportu. ' & $export)
 	; parse basic
 	for $i = 0 to UBound($raw) - 1
 		if StringRegExp($raw[$i], '^BSA\h.*') then Json_Put($buffer, '.bsa', Number(StringRegExpReplace($raw[$i], '^BSA\h(.*) .*', '$1')), True)
@@ -2430,9 +2430,11 @@ func dekurz_init()
 	; excel
 ;	$excel = _Excel_Open()
 	$excel = _Excel_Open(False, False, False, False, True)
-	if @error then return SetError(1, 0, 'Nelze spustit aplikaci Excel.')
+	if @error then return SetError(1, 0, 'Dekurz: Nelze spustit aplikaci Excel.')
 	$book = _Excel_BookNew($excel)
-	if @error then return SetError(1, 0, 'Nelze vytvořit Excel book.')
+	if @error then return SetError(1, 0, 'Dekurz: Nelze vytvořit Excel book.')
+	; logging
+	logger('Dekurz: Inicializace.')
 	; columns width [ group. label | member.label | member.value | member.unit | ... ]
 	$book.Activesheet.Range('A1').ColumnWidth = 14.5; group A-E
 	for $i = 0 to 3; four columns starts B[66]
@@ -2453,14 +2455,14 @@ endFunc
 ; update XLS data & write clipboard
 func dekurz()
 	; check init
-	if $dekurz_init <> 0 then return SetError(1, 0, 'Inicializace aplikace Excel selhala.')
+	if $dekurz_init <> 0 then return SetError(1, 0, 'Dekurz: Inicializace aplikace Excel selhala.')
 	;clear the clip
 	_ClipBoard_Open(0)
 	_ClipBoard_Empty()
 	if @error then
-		logger('Dekurz: Clip empty failed.')
+		logger('Dekurz: Vyprázdnění schránky selhalo.')
 	else
-		logger('Dekurz: Clip empty passed.')
+		logger('Dekurz: Vyprázdnění schránky.')
 	endif
 	_ClipBoard_Close()
 
@@ -2546,10 +2548,10 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index + 1); data + one empty line..
 	if @error then
-		return SetError(1, 0, 'Dekurz: Nelze kopirovat data.')
-		logger('Dekurz: Clip copy failed.')
+		return SetError(1, 0, 'Dekurz: Nelze kopírovat data.')
+		logger('Dekurz: Kopírování do schránky selhalo.')
 	else
-		logger('Dekurz: Clip copy passed.')
+		logger('Dekurz: Kopírování do schránky.')
 	endif
 EndFunc
 
@@ -2563,10 +2565,23 @@ func print(); 2100 x 2970
 	$qr_handle = _GDIPlus_BitmapCreateHBITMAPFromBitmap($qr)
 	;priner init
 	$printer = _PrintDllStart($printer_error)
-	if $printer = 0 then return SetError(1, 0, 'Printer error: ' & $printer_error)
+	if @error then return SetError(1, 0, 'Tisk: ' & $printer_error)
+	; select printer
+	_PrintSetPrinter($printer)
+	; log printer name
+	$printer_name = _PrintGetPrinter($printer)
+	if @error Then
+		logger('Tisk: Nepodařilo se získat název tiskárny.')
+	else
+		logger('Tisk: Tiskárna ' & $printer_name)
+	endif
 	; printer create page
 	_PrintStartPrint($printer)
-
+	if @error then
+		logger('Tisk: Inicializace selhala.')
+	else
+		logger('Tisk: Inicializace.')
+	endif
 	$max_height = _PrintGetPageHeight($printer) - _PrintGetYOffset($printer)
 	$max_width = _PrintGetPageWidth($printer) - _PrintGetXOffset($printer)
 	$line_offset = 5
@@ -2715,6 +2730,12 @@ func print(); 2100 x 2970
 	_PrintText($printer, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
+	if @error Then
+		logger('Tisk: Tisk selhal.')
+	else
+		logger('Tisk: Tisk.')
+	endif
+	; print de-init
 	_printDllClose($printer)
 	; GDI+ de-init
 	 _WinAPI_DeleteObject($logo_handle)

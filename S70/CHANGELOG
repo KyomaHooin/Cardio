@@ -20,7 +20,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 Global
 
--Clip logging.
+-Czech logging and verbosity.
 -Note typo.
 -Detect null height/weight.
 -SV/SVi OR fix.
