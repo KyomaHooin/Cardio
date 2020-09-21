@@ -2568,7 +2568,7 @@ func print(); 2100 x 2970
 	$printer = _PrintDllStart($printer_error)
 	if @error then return SetError(1, 0, 'Tisk: ' & $printer_error)
 	; select printer
-	_PrintSetPrinter($printer)
+	;_PrintSetPrinter($printer)
 	; log printer name
 	$printer_name = _PrintGetPrinter($printer)
 	if @error Then
