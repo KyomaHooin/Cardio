@@ -2230,11 +2230,10 @@ func export_parse($export)
 					StringReplace($raw[$j], @TAB, ''); test tabs
 					if @extended = 2 Then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '^.*\t(.*)\t.*', '$1')), 1), True)
-						ExitLoop
 					elseif @extended = 1 then
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Round(Number(StringRegExpReplace($raw[$j], '.*\t(.*)$', '$1')), 1), True)
-						ExitLoop
 					endif
+					ExitLoop; skip full traversal
 				endif
 			next
 		next
