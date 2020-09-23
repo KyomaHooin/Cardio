@@ -20,6 +20,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 Global
 
+-Tune parsing.
 -Czech logging and verbosity.
 -Note typo.
 -Detect null height/weight.
