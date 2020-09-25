@@ -2113,11 +2113,11 @@ While 1
 		; write data buffer to archive
 		$out = FileOpen($archive_file, 2 + 256); UTF8 / NOBOM overwrite
 		FileWrite($out, Json_Encode($buffer))
-		if @error then logger('Program: Zápis archivu selhal. ' & $cmdline[2] & '.dat')
+		if @error then logger('Program: Zápis historie selhal. ' & $cmdline[2] & '.dat')
 		FileClose($out)
 		; update history
 		FileCopy($archive_file, $history_path & '\' & $cmdline[2] & '\' & $cmdline[2] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
-		if @error then logger('Program: Zápis historie selhal. ' & $cmdline[2])
+		if @error then logger('Program: Zápis archivu selhal. ' & $cmdline[2])
 		; exit
 		exitloop
 	endif
