@@ -2550,8 +2550,8 @@ func dekurz()
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index + 1); data + one empty line..
 	if @error then
-		return SetError(1, 0, 'Dekurz: Nelze kopírovat data.')
 		logger('Dekurz: Kopírování do schránky selhalo.')
+		return SetError(1, 0, 'Dekurz: Nelze kopírovat data.')
 	else
 		logger('Dekurz: Kopírování do schránky.')
 	endif

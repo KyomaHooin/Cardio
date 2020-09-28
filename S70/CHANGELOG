@@ -11,8 +11,6 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 - Export dup. Ao Diam.
 - 4 x 4 GUI
-- GuiCtrlRead(Json_Get()) cleanup
-- Note Edit UnFocus alignment
 - "Ao @CRLF LVOT" group name
 - Dynamic control/calculation.
 
@@ -21,7 +19,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 Global
 
 -Tune parsing.
--Czech logging and verbosity.
+-Czech logging, verbosity, minor fixes.
 -Note typo.
 -Detect null height/weight.
 -SV/SVi OR fix.
