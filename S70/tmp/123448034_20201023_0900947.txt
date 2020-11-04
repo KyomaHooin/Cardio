@@ -1,0 +1,102 @@
+﻿
+
+Cardiac report: Complete
+
+GE Healthcare Hospital  Ultrasound Laboratory
+
+----------
+
+Name FOO, BAR
+Birthdate 
+Patient Id 112233445
+Gender 
+Height 163.0 cm
+Weight 75.0 kg
+BSA 1.81 m²
+BP 
+
+Date 23/10/2020
+Tape 
+Sonographer S70
+Ref. Doc. 
+Physician 
+
+----------
+
+2D 
+
+RV Major	28	mm
+IVSd	9	mm
+LVIDd	43	mm
+LVIDd Index	2.40	cm/m²
+EDV(Teich)	85	ml
+EDV(Cube)	82	ml
+LVPWd	9	mm
+LVd Mass	144	g
+LVd Mass Index	80	g/m²
+LVd Mass (ASE)	127	g
+LVd Mass Ind (ASE)	70	g/m²
+LVIDs	26	mm
+LVIDs Index	1.4	cm/m²
+ESV(Teich)	25	ml
+EF(Teich)	71	%
+ESV(Cube)	17.9	ml
+EF(Cube)	78.1	%
+%FS	40	%
+SV(Teich)	60	ml
+SI(Teich)	33	ml/m²
+SV(Cube)	63.7	ml
+SI(Cube)	35.2	ml/m²
+LA Diam	37	mm
+Ao Diam SVals	32	mm
+Ao asc	32	mm
+RVIDd	33	mm
+RA Minor	35	mm
+RA Major	44	mm
+IVC Diam Exp	16	mm
+IVC Diam Ins	4	mm
+LAAd A4C	24.0	cm²
+LALd A4C	59	mm
+LAEDV A-L A4C	83	ml
+LAEDV MOD A4C	79	ml
+LAVi	45.7	ml/m²
+
+M-Mode 
+
+Doppler 
+
+MV E Vel	78	cm/s
+MV A Vel	88	cm/s
+MV E/A Ratio	0.9
+MV DecT	184	ms
+MV PHT	53.3	ms
+EmSept	8	cm/s
+EmLat	10	cm/s
+EmAver	9.1	cm/s
+E/Em	8.6
+AV Vmax	1.49	m/s
+AV maxPG	8.94	mmHg
+PV Vmax	0.72	m/s
+PV maxPG	2.08	mmHg
+TR Vmax	2.79	m/s
+TR maxPG	31	mmHg
+
+----------
+
+Referral Diagnosis 
+
+Clinical Diagnosis 
+
+Findings 
+
+Conclusions 
+
+Echo Summary 
+
+----------
+
+Date 
+
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    (physician)

@@ -6,9 +6,9 @@ GE Healthcare Hospital  Ultrasound Laboratory
 
 ----------
 
-Name AUBRECHT, VACLAV
+Name PAVEL, TOMAS
 Birthdate 
-Patient Id 5704070746
+Patient Id 2994044746
 Gender 
 Height 172.0 cm
 Weight 93.0 kg
