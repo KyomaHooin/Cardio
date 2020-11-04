@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=2.1
+#AutoIt3Wrapper_Res_ProductVersion=2.2
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -46,7 +46,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-global const $VERSION = '2.1'
+global const $VERSION = '2.2'
 global $AGE = 24; default stored data age in hours
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -162,7 +162,7 @@ global const $data_template='{' _
 			& '"RV Major":{"label":"RV-plax", "unit":"mm", "value":null, "id":null},' _
 			& '"RVIDd":{"label":"RVD1", "unit":"mm", "value":null, "id":null},' _
 			& '"TAPSE":{"label":"TAPSE", "unit":"mm", "value":null, "id":null},' _
-			& '"S-RV":{"label":"S-RV", "unit":"cm/s", "value":null, "id":null},' _
+			& '"S-RV":{"label":"Sm-RV", "unit":"cm/s", "value":null, "id":null},' _
 			& '"FAC%":{"label":"FAC%", "unit":"%", "value":null, "id":null},' _
 			& '"EDA":{"label":"EDA", "unit":"cm²", "value":null, "id":null},' _
 			& '"ESA":{"label":"ESA", "unit":"cm²", "value":null, "id":null}' _
