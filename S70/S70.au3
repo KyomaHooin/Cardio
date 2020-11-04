@@ -60,7 +60,7 @@ global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @
 
 ; default result template
 global const $result_template[2]=[ _
-	"Dobrá systolická i diastolická funkce nedilat. levé komory, dobrá funkce nedilat.. pravé komory, chlopně bez valvulopatie, ostatní srd. oddíly nedilatovány, bez známek zvýšené tenze v plicnici.", _
+	"Srdeční oddíly nedilatované, normální systolická funkce obou komor, chlopně bez významnější valvulopatie, bez známek zvýšené tenze v plicnici.", _
 	"Dobrá systolická funkce obou nedilat. komor, chlopenní aparát bez významnější valvulopatie, nejsou známky zvýšené tenze v plicnici." _
 ]
 
@@ -98,7 +98,7 @@ global const $note_template='{' _
 	& '"pch":["jemná, normální průtok, bez vady", "jemná, normální průtok, stopová regurgitace 1/4"],' _
 	& '"tch":["jemná, bez vady", "jemná, stopová regurgitace 1/4"],' _
 	& '"p":["bez patologické separace", "bez patologické separace"],' _
-	& '"other":[Null, Null]' _
+	& '"other":["DDŽ nedilatovaná, kolabuje nad 50% s respirací", "DDŽ nedilatovaná, kolabuje nad 50% s respirací"]' _
 & '}'
 
 ; data template

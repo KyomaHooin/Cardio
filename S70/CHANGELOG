@@ -16,6 +16,11 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 [2.2]
 
+Global
+
+-Update default < 50 result.
+-Update "other" default note.
+
 GUI
 
 -S-RV -> Sm-RV typo.
