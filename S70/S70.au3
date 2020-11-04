@@ -2310,7 +2310,7 @@ func calculate($is_export = True)
 	endif
 	; FAC%
 	if IsNumber(Json_Get($buffer,'.data.pk.EDA.value')) and IsNumber(Json_Get($buffer, '.data.pk.ESA.value')) then
-		Json_Put($buffer, '.data.pk."FAC%".value', Json_Get($buffer, '.data.pk.EDA.value')/100*Json_Get($buffer, '.data.pk.ESA.value'), True)
+		Json_Put($buffer, '.data.pk."FAC%".value', (Json_Get($buffer, '.data.pk.EDA.value')-Json_Get($buffer, '.data.pk.ESA.value'))/Json_Get($buffer, '.data.pk.EDA.value')*100, True)
 	endif
 	; RAVi
 	if IsNumber(Json_Get($buffer,'.data.ps.RAV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
