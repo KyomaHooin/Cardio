@@ -9,10 +9,14 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
-- Export dup. Ao Diam.
+- Export dup. Ao Diam, SV Vmax.
 - 4 x 4 GUI
 - "Ao @CRLF LVOT" group name
 - Dynamic control/calculation.
+- Long Excel clip GUIEdit() do not paste bug.
+- Asc-Ao MM/2D decurz/print 2D priority.
+- Dynamic E + A = E/A calculation.
+- History file struct update on load fix.
 
 [2.2]
 
