@@ -76,12 +76,12 @@ global const $map_template='{' _
 	& '"lk":[0,1,2,3,5,6,4,13,7,8,9,14,10,11,12,Null,15,16,17,18],' _
 	& '"ls":[0,1,2,Null,3,4,5,6],' _
 	& '"pk":[0,1,2,3,4,5,6],' _
-	& '"ps":[0,1,2,3],' _
+	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
 	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
 	& '"pch":[0,1,2,3,4],' _
-	& '"tch":[0,1,2],' _
+	& '"tch":[0,1,2,3],' _
 	& '"p":[],' _
 	& '"other":[0,1]' _
 & '}'
@@ -172,6 +172,7 @@ global const $data_template='{' _
 			& '"RA Major":{"label":"RA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"RAV":{"label":"RAV", "unit":"ml", "value":null, "id":null},' _
 			& '"RAVi":{"label":"RAVi", "unit":"ml/m²", "value":null, "id":null}' _
+			& '"R-Area A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
 		& '},' _
 		& '"ao":{' _
 			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
@@ -230,6 +231,7 @@ global const $data_template='{' _
 			& '"PR meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"tch":{' _
+			& '"T Anulus":{"label":"Anulus", "unit":"mm", "value":null, "id":null},' _
 			& '"TR maxPG":{"label":"TR maxPG", "unit":"torr", "value":null, "id":null},' _
 			& '"TR meanPG":{"label":"TR meanPG", "unit":"torr", "value":null, "id":null},' _
 			& '"TV max/meanPG":{"label":"PG max/mean", "unit":"torr", "value":null, "id":null},' _
