@@ -77,7 +77,7 @@ global const $map_template='{' _
 	& '"ls":[0,1,2,Null,3,4,5,6],' _
 	& '"pk":[0,1,2,3,4,5,6],' _
 	& '"ps":[0,1,2,3,4],' _
-	& '"ao":[0,1,2],' _
+	& '"ao":[0,1,2,3],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
 	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
 	& '"pch":[0,1,2,3,4],' _
@@ -175,6 +175,7 @@ global const $data_template='{' _
 			& '"R-Area A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
 		& '},' _
 		& '"ao":{' _
+			& '"A Anulus":{"label":"Anulus", "unit":"mm", "value":null, "id":null},' _
 			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
 			& '"Ao Diam":{"label":"Asc-Ao(MM)", "unit":"mm", "value":null, "id":null}' _
 			& '"Asc-Ao 2D":{"label":"Asc-Ao(2D)", "unit":"mm", "value":null, "id":null}' _
