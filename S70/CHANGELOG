@@ -23,12 +23,14 @@ Global
 -FAC% calculation fix.
 -Check history age by days. Default to 30 days.
 -Do not convert PV Vmax units.
+-LAV-2D, LAVi-2D calculation update.
+-Asc-Ao index calculation.
 
 GUI
 
 -Storno button & exit logic.
 -S-RV -> Sm-RV typo.
--New input Area-A4C(PS), Anulus(TCH), Anulus(AO).
+-New input Area-A4C(PS), Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS).
 
 [2.1]
 

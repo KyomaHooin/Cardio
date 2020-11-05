@@ -74,10 +74,10 @@ global const $user_template='{' _
 ; 5 to 4 column map template
 global const $map_template='{' _
 	& '"lk":[0,1,2,3,5,6,4,13,7,8,9,14,10,11,12,Null,15,16,17,18],' _
-	& '"ls":[0,1,2,Null,3,4,5,6],' _
+	& '"ls":[0,1,2,Null,3,4,5,6,7,8],' _
 	& '"pk":[0,1,2,3,4,5,6],' _
 	& '"ps":[0,1,2,3,4],' _
-	& '"ao":[0,1,2,3],' _
+	& '"ao":[0,1,2,3,4],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
 	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
 	& '"pch":[0,1,2,3,4],' _
@@ -151,12 +151,12 @@ global const $data_template='{' _
 			& '"LA Major":{"label":"LA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"LAV-A4C":{"label":"LAV-1D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAVi":{"label":"LAVi-1D", "unit":"ml/m²", "value":null, "id":null},' _
+			& '"L Area-A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null},' _
+			& '"L Area-A2C":{"label":"Area-A2C", "unit":"cm²", "value":null, "id":null},' _
 			& '"LAV-2D":{"label":"LAV-2D", "unit":"ml", "value":null, "id":null},' _
 			& '"LAVi-2D":{"label":"LAVi-2D", "unit":"ml/m²", "value":null, "id":null},' _
 			& '"LAEDV A-L A4C":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"LAEDV MOD A4C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"LAEDV A-L A2C":{"label":null, "unit":null, "value":null},' _; calculation
-			& '"LAEDV MOD A2C":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
 		& '"pk":{' _
 			& '"RV Major":{"label":"RV-plax", "unit":"mm", "value":null, "id":null},' _
@@ -179,6 +179,7 @@ global const $data_template='{' _
 			& '"Ao Diam SVals":{"label":"Bulbus", "unit":"mm", "value":null, "id":null},' _
 			& '"Ao Diam":{"label":"Asc-Ao(MM)", "unit":"mm", "value":null, "id":null}' _
 			& '"Asc-Ao 2D":{"label":"Asc-Ao(2D)", "unit":"mm", "value":null, "id":null}' _
+			& '"Asc-Ao index":{"label":"Asc-Ao index", "unit":"mm/m²", "value":null, "id":null}' _
 		& '},' _
 		& '"ach":{' _
 			& '"AV Vmax":{"label":"Vmax", "unit":"m/s", "value":null, "id":null},' _
@@ -2314,8 +2315,8 @@ func calculate($is_export = True)
 		Json_Put($buffer, '.data.ls.LAVi.value', Json_Get($buffer, '.data.ls.LAV-A4C.value')/Json_Get($buffer, '.bsa'), True)
 	endif
 	; LAV-2D
-	if IsNumber(Json_Get($buffer,'.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value')) then
-		Json_Put($buffer, '.data.ls.LAV-2D.value', (Json_Get($buffer, '.data.ls.LAV-A4C.value')+(Json_Get($buffer, '.data.ls."LAEDV A-L A2C".value') + Json_Get($buffer, '.data.ls."LAEDV MOD A2C".value'))/2)/2, True)
+	if IsNumber(Json_Get($buffer,'.data.ls."L Area-A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."L Area-A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LA Major".value')) then
+		Json_Put($buffer, '.data.ls.LAV-2D.value', 0.85*Json_Get($buffer, '.data.ls."L Area-A4C".value')*Json_Get($buffer, '.data.ls."L Area-A2C".value')/Json_Get($buffer, '.data.ls."LA Major".value')*10, True)
 	endif
 	; LAVi-2D
 	if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
@@ -2328,6 +2329,14 @@ func calculate($is_export = True)
 	; RAVi
 	if IsNumber(Json_Get($buffer,'.data.ps.RAV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 		Json_Put($buffer, '.data.ps.RAVi.value', Json_Get($buffer, '.data.ps.RAV.value')/Json_Get($buffer, '.bsa'), True)
+	endif
+	; Asc-Ao index
+	if (IsNumber(Json_Get($buffer,'.data.ao."Ao Diam".value')) or IsNumber(Json_Get($buffer,'.data.ao."Asc-Ao 2D".value'))) and IsNumber(Json_Get($buffer, '.bsa')) then
+		if IsNumber(Json_Get($buffer,'.data.ao."Asc-Ao 2D".value')) then
+			Json_Put($buffer, '.data.ao."Asc-Ao index".value', Json_Get($buffer, '.data.ao."Asc-Ao 2D".value')/Json_Get($buffer, '.bsa'), True)
+		ElseIf IsNumber(Json_Get($buffer,'.data.ao."Ao Diam".value')) then
+			Json_Put($buffer, '.data.ao."Asc-Ao index".value', Json_Get($buffer, '.data.ao."Ao Diam".value')/Json_Get($buffer, '.bsa'), True)
+		endif
 	endif
 	if $is_export then
 		;MR Rad
