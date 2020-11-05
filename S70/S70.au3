@@ -2336,9 +2336,9 @@ func calculate($is_export = True)
 			Json_Put($buffer, '.data.ach."AR Rad".value', Json_Get($buffer, '.data.ach."AR Rad".value')*100, True)
 		endif
 		;PV Vmax
-		if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-			Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
-		endif
+		;if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
+		;	Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
+		;endif
 	endif
 	; PV max/meanPG
 	if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then

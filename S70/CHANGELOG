@@ -22,6 +22,7 @@ Global
 -Update "other" default note.
 -FAC% calculation fix.
 -Check history age by days. Default to 30 days.
+-Do not convert PV Vmax units.
 
 GUI
 
