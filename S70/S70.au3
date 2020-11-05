@@ -1863,8 +1863,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
@@ -1941,15 +1941,16 @@ $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 1
 ; error
 $label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 108, 40, 17)
 
-; button
-$button_history = GUICtrlCreateButton('Historie', 574, $gui_group_top_offset + 104, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 652, $gui_group_top_offset + 104, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 730, $gui_group_top_offset + 104, 75, 21)
-$button_konec = GUICtrlCreateButton('Konec', 808, $gui_group_top_offset + 104, 75, 21)
+; button 26 + 52 = 78 step 496
+$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 104, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 574, $gui_group_top_offset + 104, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 652, $gui_group_top_offset + 104, 75, 21)
+$button_store = GUICtrlCreateButton('Uložit', 730, $gui_group_top_offset + 104, 75, 21)
+$button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 104, 75, 21)
 
 ; GUI tune
 GUICtrlSetColor($label_error, 0xff0000)
-GUICtrlSetState($button_konec, $GUI_FOCUS)
+GUICtrlSetState($button_exit, $GUI_FOCUS)
 
 ; message handler response
 ;$dummy = GUICtrlCreateDummy()
@@ -2081,7 +2082,7 @@ While 1
 		endif
 	endif
 	; write & exit
-	if $msg = $GUI_EVENT_CLOSE or $msg = $button_konec then
+	if $msg = $button_store then
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
@@ -2118,6 +2119,14 @@ While 1
 		; update history
 		FileCopy($archive_file, $history_path & '\' & $cmdline[2] & '\' & $cmdline[2] & '_'  & @YEAR & @MDAY & @MON & @HOUR & @MIN & @SEC & '.dat')
 		if @error then logger('Program: Zápis archivu selhal. ' & $cmdline[2])
+		; exit
+		exitloop
+	endif
+	; storno & default exit
+	if $msg = $GUI_EVENT_CLOSE or $msg = $button_exit then
+		; close dekurz
+		_Excel_BookClose($book)
+		_Excel_Close($excel)
 		; exit
 		exitloop
 	endif
@@ -2186,7 +2195,8 @@ func gui_enable($visible)
 	GUICtrlSetState($button_history, $state)
 	GUICtrlSetState($button_tisk, $state)
 	GUICtrlSetState($button_dekurz, $state)
-	GUICtrlSetState($button_konec, $state)
+	GUICtrlSetState($button_store, $state)
+	GUICtrlSetState($button_exit, $state)
 EndFunc
 
 ; read configuration file
