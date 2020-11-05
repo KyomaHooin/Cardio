@@ -2061,7 +2061,7 @@ While 1
 	; load history data
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
-			if _DateDiff('h', Json_Get($history,'.date'), $runtime) < $AGE then
+			if _DateDiff('D', Json_Get($history,'.date'), $runtime) < $AGE then
 				if msgbox(4, 'S70 Echo ' & $VERSION, 'Načíst poslední naměřené hodnoty?') = 6 then
 					; update basic
 					GUICtrlSetData($input_height, Json_ObjGet($history, '.height'))
