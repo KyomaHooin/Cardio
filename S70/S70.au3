@@ -79,7 +79,7 @@ global const $map_template='{' _
 	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2,3,4],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
-	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13],' _
+	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13,14,15],' _
 	& '"pch":[0,1,2,3,4],' _
 	& '"tch":[0,1,2,3],' _
 	& '"p":[],' _
@@ -218,6 +218,8 @@ global const $data_template='{' _
 			& '"MR VTI":{"label":"MR-VTI", "unit":"cm", "value":null, "id":null},' _
 			& '"MR Rad":{"label":"PISA radius", "unit":"mm", "value":null, "id":null},' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/m²", "value":null, "id":null},' _
+			& '"Anulus-AP":{"label":"Anulus-AP", "unit":"mm", "value":null, "id":null},' _
+			& '"Anulus-IC":{"label":"Anulus-IC", "unit":"mm", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
@@ -1936,21 +1938,21 @@ for $group in Json_ObjGet($order, '.group')
 next
 
 ; dekurz
-$label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 85, 21,0x0002); align right
-$edit_dekurz = GUICtrlCreateEdit(Json_ObjGet($buffer, '.result'), 89, $gui_group_top_offset + 8, 793, 90, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
+$label_dekurz = GUICtrlCreateLabel('Závěr:', 0, $gui_group_top_offset + 8, 87, 21,0x0002); align right
+$edit_dekurz = GUICtrlCreateEdit(Json_ObjGet($buffer, '.result'), 89, $gui_group_top_offset + 8, 793, 69, BitOR(64, 4096, 0x00200000)); $ES_AUTOVSCROLL, $ES_WANTRETURN, $WS_VSCROLL
 
 ; date
-$label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 108, 105, 17)
+$label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 87, 105, 17)
 
 ; error
-$label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 108, 40, 17)
+$label_error = GUICtrlCreateLabel('Hotovo!', 120, $gui_group_top_offset + 87, 40, 17)
 
-; button 26 + 52 = 78 step 496
-$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 104, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 574, $gui_group_top_offset + 104, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 652, $gui_group_top_offset + 104, 75, 21)
-$button_store = GUICtrlCreateButton('Uložit', 730, $gui_group_top_offset + 104, 75, 21)
-$button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 104, 75, 21)
+; button
+$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 183, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 574, $gui_group_top_offset + 83, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 652, $gui_group_top_offset + 83, 75, 21)
+$button_store = GUICtrlCreateButton('Uložit', 730, $gui_group_top_offset + 83, 75, 21)
+$button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 83, 75, 21)
 
 ; GUI tune
 GUICtrlSetColor($label_error, 0xff0000)
