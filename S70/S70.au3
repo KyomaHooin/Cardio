@@ -221,7 +221,7 @@ global const $data_template='{' _
 			& '"Anulus-AP":{"label":"Anulus-AP", "unit":"mm", "value":null, "id":null},' _
 			& '"Anulus-IC":{"label":"Anulus-IC", "unit":"mm", "value":null, "id":null},' _
 			& '"M Spid":{"label":"Přední cíp", "unit":"mm", "value":null, "id":null},' _
-			& '"AP Spid ratio":{"label":"Anulus-AP/Přední cíp", "unit":"ratio", "value":null, "id":null},' _
+			& '"AP Spid ratio":{"label":"Anulus-AP/P.cíp", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
@@ -2426,7 +2426,7 @@ func calculate($is_export = True)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal
-					case 'RWT', 'AVA', 'AVAi', 'VTI LVOT/Ao', 'AR ERO', 'MVA-PHT', 'MR ERO', 'MVAi-PHT', 'AR ERO'
+					case 'RWT', 'AVA', 'AVAi', 'VTI LVOT/Ao', 'AR ERO', 'MVA-PHT', 'MR ERO', 'MVAi-PHT', 'AR ERO', 'AP Spid ratio'
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', StringFormat("%.2f", Json_Get($buffer, '.data.' & $group & '."' & $member & '".value')), True)
 					; round 1 decimal
 					case 'AV Vmax', 'MV E/A Ratio', 'PV Vmax'
