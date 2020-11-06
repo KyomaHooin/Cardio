@@ -16,8 +16,6 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 - Long Excel clip GUIEdit() do not paste bug.
 - Asc-Ao MM/2D decurz/print 2D priority.
 - Dynamic E + A = E/A calculation.
-- History file struct update on load fix.
-- History message update.
 
 [2.2]
 
@@ -30,16 +28,25 @@ Global
 -Do not convert PV Vmax units.
 -LAV-2D, LAVi-2D calculation update.
 -Asc-Ao index calculation.
--Anulus-AP/Predni cip ratio calc.
+-Anulus-AP/P.cip ratio calc.
 -Loop over order struct.
+-History message update.
 
 GUI
 
 -Storno button & exit logic.
 -S-RV -> Sm-RV typo.
 -New input Area-A4C(PS), Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS), Anulus-AP(MCH), Anulus-IC(MCH),
- Prdni cip(MCH), Anulus-AP/Predni cip(MCH).
+ Predni cip(MCH), Anulus-AP/P.cip(MCH).
 -Removed line from dekurz.
+
+Dekurz
+
+- Asc-Ao MM/2D decurz/print 2D priority.
+
+Tisk
+
+- Asc-Ao MM/2D decurz/print 2D priority.
 
 [2.1]
 

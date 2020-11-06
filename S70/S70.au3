@@ -2534,6 +2534,13 @@ func dekurz()
 					$step=False
 					$column_index = 65
 				endif
+				; skip Ao Diam if Asc-Ao 2D
+				if $members[$i] == 'Ao Diam' Then
+					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
+				endif
+				if $members[$i] == 'Asc-Ao 2D' Then
+					if not GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')) then continueloop
+				endif
 				; write value
 				if $i <> Null then; not hole
 					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')) then; has value
@@ -2691,6 +2698,13 @@ func print(); 2100 x 2970
 					if $step then $top_offset += $text_height + $line_offset
 					$step=False
 					$line_index = 1
+				endif
+				; skip Ao Diam if Asc-Ao 2D
+				if $members[$i] == 'Ao Diam' Then
+					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
+				endif
+				if $members[$i] == 'Asc-Ao 2D' Then
+					if not GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i] & '".id')) then continueloop
 				endif
 				; write value
 				if $i <> Null then; not hole
