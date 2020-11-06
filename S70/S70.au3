@@ -79,7 +79,7 @@ global const $map_template='{' _
 	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2,3,4],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
-	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13,14,15],' _
+	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13,14,15,16,17],' _
 	& '"pch":[0,1,2,3,4],' _
 	& '"tch":[0,1,2,3],' _
 	& '"p":[],' _
@@ -220,6 +220,8 @@ global const $data_template='{' _
 			& '"MVAi-PHT":{"label":"MVAi-PHT", "unit":"cm²/m²", "value":null, "id":null},' _
 			& '"Anulus-AP":{"label":"Anulus-AP", "unit":"mm", "value":null, "id":null},' _
 			& '"Anulus-IC":{"label":"Anulus-IC", "unit":"mm", "value":null, "id":null},' _
+			& '"M Spid":{"label":"Přední cíp", "unit":"mm", "value":null, "id":null},' _
+			& '"AP Spid ratio":{"label":"Anulus-AP/Přední cíp", "unit":"ratio", "value":null, "id":null},' _
 			& '"MV maxPG":{"label":null, "unit":null, "value":null},' _; calculation
 			& '"MV meanPG":{"label":null, "unit":null, "value":null}' _; calculation
 		& '},' _
@@ -1818,14 +1820,14 @@ if FileExists($export_file) then
 	endif
 endif
 
-; update history buffer from archive
+; populate history buffer from archive
 if FileExists($archive_file) then
 	$history = Json_Decode(FileRead($archive_file))
 	if @error then logger('Historie: Nepodařilo se načíst historii. ' & $cmdline[2] & '.dat')
 endif
 
 ; update note from history
-for $group in Json_ObjGet($history, '.group')
+for $group in Json_ObjGet($order, '.group')
 	Json_Put($buffer, '.group.' & $group & '.note', Json_ObjGet($history, '.group.' & $group & '.note'), True)
 next
 
@@ -1945,7 +1947,7 @@ $edit_dekurz = GUICtrlCreateEdit(Json_ObjGet($buffer, '.result'), 89, $gui_group
 $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 87, 105, 17)
 
 ; error
-$label_error = GUICtrlCreateLabel('Hotovo!', 120, $gui_group_top_offset + 87, 40, 17)
+$label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 87, 40, 17)
 
 ; button
 $button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 183, 75, 21)
@@ -2015,7 +2017,7 @@ While 1
 		gui_enable(True)
 	endif
 	if $msg = $button_del_note Then
-		for $group in Json_ObjGet($history, '.group')
+		for $group in Json_ObjGet($order, '.group')
 			GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), '')
 		next
 	endif
@@ -2037,8 +2039,8 @@ While 1
 			Json_Put($buffer, '.weight', Null)
 		endif
 		; update data buffer
-		for $group in Json_ObjGet($history, '.group')
-			for $member in Json_ObjGet($history, '.data.' & $group)
+		for $group in Json_ObjGet($order, '.group')
+			for $member in Json_ObjGet($order, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
@@ -2057,8 +2059,8 @@ While 1
 		; re-fill BSA
 		GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
 		; re-fill data
-		for $group in Json_ObjGet($history, '.group')
-			for $member in Json_ObjGet($history, '.data.' & $group)
+		for $group in Json_ObjGet($order, '.group')
+			for $member in Json_ObjGet($order, '.data.' & $group)
 				GUICtrlSetData(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id'), Json_Get($buffer,'.data.' & $group & '."' & $member & '".value'))
 			next
 		next
@@ -2098,11 +2100,11 @@ While 1
 		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
 		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
 		; update data buffer
-		for $group in Json_ObjGet($history, '.group')
+		for $group in Json_ObjGet($order, '.group')
 			; update note
 			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')), True)
 			; update data
-			for $member in Json_ObjGet($history, '.data.' & $group)
+			for $member in Json_ObjGet($order, '.data.' & $group)
 				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
 					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
 				else
@@ -2158,8 +2160,8 @@ endfunc
 ;func get_name_from_id($id)
 ;	if $id = $input_height then return 'height'
 ;	if $id = $input_weight then return 'weight'
-;	for $group in Json_ObjGet($history, '.group')
-;		for $member in Json_ObjGet($history, '.data.' & $group)
+;	for $group in Json_ObjGet($order, '.group')
+;		for $member in Json_ObjGet($order, '.data.' & $group)
 ;			if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return $member
 ;		next
 ;	next
@@ -2172,8 +2174,8 @@ endfunc
 ;	if $code = $EN_CHANGE then
 ;		if $id = $input_height then return GUICtrlSendToDummy($dummy, $id)
 ;		if $id = $input_weight then return GUICtrlSendToDummy($dummy, $id)
-;		for $group in Json_ObjGet($history, '.group')
-;			for $member in Json_ObjGet($history, '.data.' & $group)
+;		for $group in Json_ObjGet($order, '.group')
+;			for $member in Json_ObjGet($order, '.data.' & $group)
 ;				if $id = Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id') then return GUICtrlSendToDummy($dummy, $id)
 ;			next
 ;		next
@@ -2239,8 +2241,8 @@ func export_parse($export)
 		if StringRegExp($raw[$i], '^Weight\h.*') then Json_Put($buffer, '.weight', Number(StringRegExpReplace($raw[$i], '^Weight\h(.*) .*', '$1')), True)
 	next
 	; parse data
-	for $group in Json_ObjGet($history, '.group')
-		for $member in Json_ObjGet($history, '.data.' & $group)
+	for $group in Json_ObjGet($order, '.group')
+		for $member in Json_ObjGet($order, '.data.' & $group)
 			for $j = 0 to UBound($raw) - 1
 				if StringRegExp($raw[$j], '^' & $member & '\t.*') then
 					StringReplace($raw[$j], @TAB, ''); test tabs
@@ -2414,9 +2416,13 @@ func calculate($is_export = True)
 	if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
 		Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value'), True)
 	endif
+	; AP Spid ratio
+	if IsNumber(Json_Get($buffer, '.data.mch.Anulus-AP.value')) and IsNumber(Json_Get($buffer, '.data.mch."M Spid".value')) then
+		Json_Put($buffer, '.data.mch."AP Spid ratio".value', Json_Get($buffer,'.data.mch.Anulus-AP.value')/Json_Get($buffer,'.data.mch."M Spid".value'), True)
+	endif
 	; round it!
-	for $group in Json_ObjGet($history, '.group')
-		for $member in Json_ObjGet($history, '.data.' & $group)
+	for $group in Json_ObjGet($order, '.group')
+		for $member in Json_ObjGet($order, '.data.' & $group)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal

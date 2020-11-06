@@ -29,12 +29,15 @@ Global
 -Do not convert PV Vmax units.
 -LAV-2D, LAVi-2D calculation update.
 -Asc-Ao index calculation.
+-Anulus-AP/Predni cip ratio calc.
+-Loop over order struct.
 
 GUI
 
 -Storno button & exit logic.
 -S-RV -> Sm-RV typo.
--New input Area-A4C(PS), Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS), Anulus-AP(MCH), Anulus-IC(MCH).
+-New input Area-A4C(PS), Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS), Anulus-AP(MCH), Anulus-IC(MCH),
+ Prdni cip(MCH), Anulus-AP/Predni cip(MCH).
 -Removed line from dekurz.
 
 [2.1]
