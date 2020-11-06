@@ -1871,8 +1871,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
-$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
