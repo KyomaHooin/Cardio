@@ -1950,7 +1950,7 @@ $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 87, 10
 $label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 87, 40, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 183, 75, 21)
+$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 83, 75, 21)
 $button_tisk = GUICtrlCreateButton('Tisk', 574, $gui_group_top_offset + 83, 75, 21)
 $button_dekurz = GUICtrlCreateButton('Dekurz', 652, $gui_group_top_offset + 83, 75, 21)
 $button_store = GUICtrlCreateButton('Uložit', 730, $gui_group_top_offset + 83, 75, 21)
@@ -2083,10 +2083,10 @@ While 1
 					next
 				endif
 			else
-				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načís historii. Příliš stará data.')
+				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načíst historii starší '& $AGE & ' dnů.')
 			endif
 		else
-			MsgBox(48, 'S70 Echo ' & $VERSION, 'Historie není dostupná.')
+			MsgBox(48, 'S70 Echo ' & $VERSION, 'Žádná historie není dostupná.')
 		endif
 	endif
 	; write & exit
