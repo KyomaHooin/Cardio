@@ -172,7 +172,7 @@ global const $data_template='{' _
 			& '"RA Major":{"label":"RA délka", "unit":"mm", "value":null, "id":null},' _
 			& '"RAV":{"label":"RAV", "unit":"ml", "value":null, "id":null},' _
 			& '"RAVi":{"label":"RAVi", "unit":"ml/m²", "value":null, "id":null}' _
-			& '"R-Area A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
+			& '"P Area-A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
 		& '},' _
 		& '"ao":{' _
 			& '"A Anulus":{"label":"Anulus", "unit":"mm", "value":null, "id":null},' _

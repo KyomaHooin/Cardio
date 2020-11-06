@@ -36,7 +36,7 @@ GUI
 
 -Storno button & exit logic.
 -S-RV -> Sm-RV typo.
--New input Area-A4C(PS), Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS), Anulus-AP(MCH), Anulus-IC(MCH),
+-New input P Area-A4C(PS),T Anulus(TCH), Anulus(AO),Asc-Ao index(AO),Area-A4C(LS), Area-A2C(LS), Anulus-AP(MCH), Anulus-IC(MCH),
  Predni cip(MCH), Anulus-AP/P.cip(MCH).
 -Removed line from dekurz.
 
