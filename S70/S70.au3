@@ -47,7 +47,7 @@
 ; -------------------------------------------------------------------------------------------
 
 global const $VERSION = '2.2'
-global $AGE = 24; default stored data age in hours
+global $AGE = 30; default stored data age in days
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
