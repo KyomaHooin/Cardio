@@ -74,7 +74,7 @@ global const $user_template='{' _
 ; 5 to 4 column map template
 global const $map_template='{' _
 	& '"lk":[0,1,2,3,5,6,4,13,7,8,9,14,10,11,12,Null,15,16,17,18],' _
-	& '"ls":[0,1,2,Null,3,4,5,6,7,8],' _
+	& '"ls":[0,1,2,Null,7,8],' _
 	& '"pk":[0,1,2,3,4,5,6],' _
 	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2,3,4],' _
@@ -170,9 +170,9 @@ global const $data_template='{' _
 		& '"ps":{' _
 			& '"RA Minor":{"label":"RA šířka", "unit":"mm", "value":null, "id":null},' _
 			& '"RA Major":{"label":"RA délka", "unit":"mm", "value":null, "id":null},' _
+			& '"P Area-A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
 			& '"RAV":{"label":"RAV", "unit":"ml", "value":null, "id":null},' _
 			& '"RAVi":{"label":"RAVi", "unit":"ml/m²", "value":null, "id":null}' _
-			& '"P Area-A4C":{"label":"Area-A4C", "unit":"cm²", "value":null, "id":null}' _
 		& '},' _
 		& '"ao":{' _
 			& '"A Anulus":{"label":"Anulus", "unit":"mm", "value":null, "id":null},' _
