@@ -79,7 +79,7 @@ global const $map_template='{' _
 	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2,3,4],' _
 	& '"ach":[0,1,2,7,3,4,13,14,5,6,Null,8,9,10,11,12],' _
-	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13,14,15,16,17],' _
+	& '"mch":[0,1,2,3,5,6,7,Null,4,8,9,14,10,11,12,13,14,15,16,17,18],' _
 	& '"pch":[0,1,2,3,4],' _
 	& '"tch":[0,1,2,3],' _
 	& '"p":[],' _
@@ -1950,10 +1950,10 @@ $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 87, 10
 $label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 87, 40, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 496, $gui_group_top_offset + 83, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 574, $gui_group_top_offset + 83, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 652, $gui_group_top_offset + 83, 75, 21)
-$button_store = GUICtrlCreateButton('Uložit', 730, $gui_group_top_offset + 83, 75, 21)
+$button_history = GUICtrlCreateButton('Historie', 486, $gui_group_top_offset + 83, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 564, $gui_group_top_offset + 83, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz', 642, $gui_group_top_offset + 83, 75, 21)
+$button_store = GUICtrlCreateButton('Uložit a zavřít', 720, $gui_group_top_offset + 83, 85, 21)
 $button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 83, 75, 21)
 
 ; GUI tune
