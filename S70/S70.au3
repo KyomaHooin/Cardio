@@ -2083,7 +2083,7 @@ While 1
 					next
 				endif
 			else
-				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načíst historii starší '& $AGE & ' dnů.')
+				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načíst historii starší ' & $AGE & ' dnů.')
 			endif
 		else
 			MsgBox(48, 'S70 Echo ' & $VERSION, 'Žádná historie není dostupná.')
@@ -2215,7 +2215,7 @@ func read_config_file($file)
 	for $i = 0 to UBound($cfg) - 1
 		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
 		if $cfg[$i][0] == 'archive' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'history' then $AGE = $cfg[$i][1]
+		if $cfg[$i][0] == 'history' then $AGE = Number($cfg[$i][1])
 	next
 endfunc
 
