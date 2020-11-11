@@ -1848,7 +1848,7 @@ if Json_ObjGet($buffer, '.result') = Null then
 endif
 
 ; update note on default
-for $group in Json_ObjGet($history, '.group')
+for $group in Json_ObjGet($order, '.group')
 	if Json_ObjGet($buffer, '.group.' & $group & '.note') = Null then
 		if fifty($cmdline[2]) then
 			Json_Put($buffer, '.group.' & $group & '.note', Json_Get($note, '.' & $group & '[1]'), True)
@@ -2075,9 +2075,9 @@ While 1
 					GUICtrlSetData($input_height, Json_ObjGet($history, '.height'))
 					GUICtrlSetData($input_weight, Json_ObjGet($history, '.weight'))
 					GUICtrlSetData($input_bsa, Json_ObjGet($history, '.bsa'))
-					for $group in Json_ObjGet($buffer, '.group')
-						; update data
-						for $member in Json_ObjGet($buffer, '.data.' & $group)
+					; update data
+					for $group in Json_ObjGet($order, '.group')
+						for $member in Json_ObjGet($order, '.data.' & $group)
 							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'), Json_Get($history,'.data.' & $group & '."' & $member & '".value'))
 						next
 					next
@@ -2478,7 +2478,7 @@ endFunc
 
 func not_empty_group($group)
 	if StringLen(GUICtrlRead(Json_Get($buffer, '.group.' & $group & '.id'))) > 0 then return True
-	for $member in Json_ObjGet($history, '.data.' & $group)
+	for $member in Json_ObjGet($order, '.data.' & $group)
 		if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id')) then return True
 	next
 	return False
@@ -2571,17 +2571,17 @@ func dekurz()
 		endif
 	next
 	; result
-	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
+	$book.Activesheet.Range('A' & $row_index).Font.Size = 10
 	$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, 'Závěr:', 'A' & $row_index)
 	$row_index+=1
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).MergeCells = True
-	$book.Activesheet.Range('A' & $row_index).Font.Size = 9
+	$book.Activesheet.Range('A' & $row_index).Font.Size = 10
 	$book.Activesheet.Range('A' & $row_index).Font.Bold = True
 	_Excel_RangeWrite($book, $book.Activesheet, StringReplace(GUICtrlRead($edit_dekurz), @CRLF, @LF), 'A' & $row_index)
 	$row_index+=1
 	; footer
-	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Font.Size = 9
+	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Font.Size = 10
 	_Excel_RangeWrite($book, $book.Activesheet, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 'A' & $row_index)
 	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]), 'D' & $row_index)
 	; clip
