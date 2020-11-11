@@ -5,6 +5,7 @@
 #AutoIt3Wrapper_Change2CUI=y
 
 #include <File.au3>
+#include <String.au3>
 
 ; conversion map
 global $map[10][2] = [ _
@@ -22,7 +23,7 @@ global $map[10][2] = [ _
 
 ;check cmdline
 if UBound($cmdline) <> 2 then
-	ConsoleWrite('Usage patch.exe [path]')
+	ConsoleWrite('Usage: patch.exe [path]')
 	Exit
 endif
 
@@ -35,7 +36,7 @@ endif
 ;load files
 $data = _FileListToArrayRec($cmdline[1], '*.dat', 1, 1, 1, 2); files only, recursion, sorted, full path
 
-;patch strings
+;patch
 for $i=1 to UBound($data) - 1
 	; in memory replace
 	$f = FileOpen($data[$i], 256); UTF8 NOBOM read
@@ -48,8 +49,10 @@ for $i=1 to UBound($data) - 1
 	$f = FileOpen($data[$i], 2 + 256); UTF8 NOBOM overwrite
 	FileWrite($f, $buffer)
 	FileClose($f)
-	; verbose
-	ConsoleWrite('Zpracovavam.. ' & StringRegExpReplace($data[$i], '^.*\\(.*)', '$1') & @CRLF)
+	; progressbar
+	$progress_head = _StringRepeat(Chr(219), Ceiling(79 * Ceiling($i/(UBound($data)-1)*100)/100))
+	$progress_tail = _StringRepeat(Chr(177), 79 - Ceiling(79 * Ceiling($i/(UBound($data)-1)*100)/100))
+	ConsoleWrite(@CR & $progress_head & $progress_tail)
 next
 
 ; exit

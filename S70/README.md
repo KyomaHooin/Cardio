@@ -20,8 +20,7 @@ FILE
         Print.au3 - Printing library by "martin".
          Json.au3 - JSON library by "Ward".
    BinaryCall.au3 - JSON binary wrapper.
-
-        patch.au3 - Update machine codes in archive.
+        patch.au3 - Update archived files machine code.
 
         print.dll - Printing DLL.
           S70.ini - Program configuration file.    
