@@ -21,6 +21,8 @@ FILE
          Json.au3 - JSON library by "Ward".
    BinaryCall.au3 - JSON binary wrapper.
 
+        patch.au3 - Update machine codes in archive.
+
         print.dll - Printing DLL.
           S70.ini - Program configuration file.    
           LICENSE - License & disclaimer.
