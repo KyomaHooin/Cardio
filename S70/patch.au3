@@ -23,13 +23,13 @@ global $map[10][2] = [ _
 
 ;check cmdline
 if UBound($cmdline) <> 2 then
-	ConsoleWrite('Usage: patch.exe [path]')
+	ConsoleWrite('Pouziti: patch.exe [cesta]')
 	Exit
 endif
 
 ;check directory
 if not FileExists($cmdline[1]) Then
-	ConsoleWrite('Invalid directory.')
+	ConsoleWrite('Neplatna cesta.')
 	Exit
 endif
 
@@ -50,8 +50,8 @@ for $i=1 to UBound($data) - 1
 	FileWrite($f, $buffer)
 	FileClose($f)
 	; progressbar
-	$progress_head = _StringRepeat(Chr(219), Ceiling(79 * Ceiling($i/(UBound($data)-1)*100)/100))
-	$progress_tail = _StringRepeat(Chr(177), 79 - Ceiling(79 * Ceiling($i/(UBound($data)-1)*100)/100))
+	$progress_head = _StringRepeat(Chr(219), Ceiling(79*Ceiling($i/(UBound($data)-1)*100)/100))
+	$progress_tail = _StringRepeat(Chr(177), 79 - Ceiling(79*Ceiling($i/(UBound($data)-1)*100)/100))
 	ConsoleWrite(@CR & $progress_head & $progress_tail)
 next
 
