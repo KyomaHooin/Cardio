@@ -23,18 +23,26 @@ global $map[10][2] = [ _
 
 ;check cmdline
 if UBound($cmdline) <> 2 then
-	ConsoleWrite('Pouziti: patch.exe [cesta]')
+	ConsoleWrite(@CRLF & 'Pouziti: patch.exe [cesta]')
 	Exit
 endif
 
 ;check directory
 if not FileExists($cmdline[1]) Then
-	ConsoleWrite('Neplatna cesta.')
+	ConsoleWrite(@CRLF & 'Neplatna cesta.')
 	Exit
 endif
 
+; header
+ConsoleWrite('-----------------------------------------' & @CRLF)
+ConsoleWrite('  OPRAVA STROJOVYCH NAZVU V ARCHIVU S70' & @CRLF)
+ConsoleWrite('-----------------------------------------' & @CRLF)
+
 ;load files
 $data = _FileListToArrayRec($cmdline[1], '*.dat', 1, 1, 1, 2); files only, recursion, sorted, full path
+
+; header
+ConsoleWrite('Adresar: ' & $cmdline[1] & @CRLF)
 
 ;patch
 for $i=1 to UBound($data) - 1
@@ -50,8 +58,8 @@ for $i=1 to UBound($data) - 1
 	FileWrite($f, $buffer)
 	FileClose($f)
 	; progressbar
-	$progress_head = _StringRepeat(Chr(219), Ceiling(79*Ceiling($i/(UBound($data)-1)*100)/100))
-	$progress_tail = _StringRepeat(Chr(177), 79 - Ceiling(79*Ceiling($i/(UBound($data)-1)*100)/100))
+	$progress_head = _StringRepeat(Chr(219), Ceiling(60*Ceiling($i/(UBound($data)-1)*100)/100))
+	$progress_tail = _StringRepeat(Chr(177), 60 - Ceiling(60*Ceiling($i/(UBound($data)-1)*100)/100))
 	ConsoleWrite(@CR & $progress_head & $progress_tail)
 next
 
