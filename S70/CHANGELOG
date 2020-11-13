@@ -11,7 +11,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 -Export dup. Ao Diam, SV Vmax.
 -"Ao @CRLF LVOT" group name.
--Dynamic calculation(E + A= E/A..).
+-Dynamic calculation(E + A= E/A..) EM_CHANGE(_GUICtrlEdit_GetModify) vs EN_CHANGE
 -Long Excel clip GUIEdit() do not paste bug.
 
 [2.2]
