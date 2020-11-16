@@ -9,11 +9,15 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
--Export dup. Ao Diam, SV Vmax.
+-Export 'Ao Diam', 'SV Vmax' dup.
 -"Ao @CRLF LVOT" group name.
--Dynamic calculation(E + A= E/A..)
- EM_CHANGE(_GUICtrlEdit_GetModify) vs EN_CHANGE/EN_KILLFOCUS
--Long Excel clip GUIEdit() do not paste bug.
+-Long Excel clip paste bug.
+
+[2.3]
+
+General:
+
+-Dynamic re-calculation.
 
 [2.2]
 
