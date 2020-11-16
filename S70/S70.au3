@@ -2426,7 +2426,7 @@ func calculate($is_export = True)
 			if Json_Get($buffer, '.data.' & $group & '."' & $member & '".value') <> Null then
 				switch $member
 					; round 2 decimal
-					case 'RWT', 'AVA', 'AVAi', 'VTI LVOT/Ao', 'AR ERO', 'MVA-PHT', 'MR ERO', 'MVAi-PHT', 'AR ERO', 'AP Spid ratio'
+					case 'RWT', 'AVA', 'AVAi', 'VTI LVOT/Ao', 'AR ERO', 'MVA-PHT', 'MR ERO', 'MVAi-PHT', 'AP Spid ratio'
 						Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', StringFormat("%.2f", Json_Get($buffer, '.data.' & $group & '."' & $member & '".value')), True)
 					; round 1 decimal
 					case 'AV Vmax', 'MV E/A Ratio', 'PV Vmax'
