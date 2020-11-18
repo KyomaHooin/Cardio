@@ -2321,7 +2321,6 @@ func calculate($id, $name, $export=False)
 			else
 				Json_Put($buffer,  '.data.ls.LAV-A4C.value', Null, True)
 			endif
-			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ls.LAV-A4C.id'), Json_Get($buffer, '.data.ls.LAV-A4C.value'))
 			ContinueCase
 		; LAVi (LAVi-1D)
 		case 'LAV-A4C', 'height', 'weight', 'default'
@@ -2346,7 +2345,7 @@ func calculate($id, $name, $export=False)
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ls.LAV-2D.id'), Json_Get($buffer, '.data.ls.LAV-2D.value'))
 			ContinueCase
 		; LAVi-2D
-		case 'LAV-2D', 'height', 'weight', 'default'
+		case 'LAV-2D', 'L Area-A4C', 'L Area-A2C', 'LA Major', 'height', 'weight', 'default'
 			if $name == 'LAV-2D' then Json_Put($buffer, '.data.ls.LAV-2D.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 0), True)
@@ -2413,7 +2412,7 @@ func calculate($id, $name, $export=False)
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MVA-PHT".id'), Json_Get($buffer, '.data.mch."MVA-PHT".value'))
 			ContinueCase
 		; MVAi-PHT
-		case 'MV PHT', 'height', 'weight', 'default'
+		case 'MVA-PHT', 'MV PHT', 'height', 'weight', 'default'
 			if $name == 'MVA-PHT' then Json_Put($buffer, '.data.mch."MVA-PHT".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
 				Json_Put($buffer, '.data.mch."MVAi-PHT".value', StringFormat("%.2f", Json_Get($buffer, '.data.mch."MVA-PHT".value')/Json_Get($buffer, '.bsa')), True)
@@ -2467,7 +2466,7 @@ func calculate($id, $name, $export=False)
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
 			ContinueCase
 		; AVAi
-		case 'LVOT Diam', 'LVOT VTI', 'AV VTI', 'height', 'weight', 'default'
+		case 'AVA', 'AV VTI', 'LVOT Diam', 'LVOT VTI', 'height', 'weight', 'default'
 			if $name == 'AVA' then Json_Put($buffer, '.data.ach.AVA.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ach.AVAi.value', StringFormat("%.2f", Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer, '.bsa')), True)
