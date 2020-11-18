@@ -13,6 +13,9 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 -"Ao @CRLF LVOT" group name.
 -Long Excel clip paste bug.
 
+-Calc: Global vs History buffer collision.
+-Cals: Invalid calculated value(-,-333 etc).
+
 [2.3]
 
 General:
