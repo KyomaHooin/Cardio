@@ -2379,169 +2379,171 @@ func calculate($id, $name, $export=False)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ps.RAVi.id'), Json_Get($buffer, '.data.ps.RAVi.value'))
 			ContinueCase
+		; Asc-Ao index
 		case 'Ao Diam', 'Asc-Ao 2D', 'height', 'weight', 'default'
-			; Asc-Ao index
+			if $name == 'Ao Diam' then Json_Put($buffer, '.data.ao."Ao Diam".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
+			if $name == 'Asc-Ao 2D' then Json_Put($buffer, '.data.ao."Asc-Ao 2D".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if (IsNumber(Json_Get($buffer,'.data.ao."Ao Diam".value')) or IsNumber(Json_Get($buffer,'.data.ao."Asc-Ao 2D".value'))) and IsNumber(Json_Get($buffer, '.bsa')) then
 				if IsNumber(Json_Get($buffer,'.data.ao."Asc-Ao 2D".value')) then
 					Json_Put($buffer, '.data.ao."Asc-Ao index".value', Round(Json_Get($buffer, '.data.ao."Asc-Ao 2D".value')/Json_Get($buffer, '.bsa'), 0), True)
 				ElseIf IsNumber(Json_Get($buffer,'.data.ao."Ao Diam".value')) then
 					Json_Put($buffer, '.data.ao."Asc-Ao index".value', Round(Json_Get($buffer, '.data.ao."Ao Diam".value')/Json_Get($buffer, '.bsa'), 0), True)
 				endif
-				GUICtrlSetData(Json_Get($buffer, '.data.ao."Asc-Ao index".id'), Json_Get($buffer, '.data.ao."Asc-Ao index".value'))
+			else
+				Json_Put($buffer,  '.data.ao."Asc-Ao index".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ao."Asc-Ao index".id'), Json_Get($buffer, '.data.ao."Asc-Ao index".value'))
 			ContinueCase
-		case 'MR Rad', 'default'
-			if $export then
-				;MR Rad
-				if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
-					Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 0), True)
-				endif
-			endif
-			ContinueCase
-		case 'AR Rad', 'default'
-			if $export then
-				;AR Rad
-				if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
-					Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 0), True)
-					GUICtrlSetData(Json_Get($buffer, '.data.ach."AR Rad".id'), Json_Get($buffer, '.data.ach."AR Rad".value'))
-				endif
-			endif
-			ContinueCase
-		case 'PV Vmax', 'default'
-			if $export then
-				;PV Vmax
-				if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-					;Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
-					Json_Put($buffer, '.data.pch."PV Vmax".value', StringFormat("%.1f", Json_Get($buffer, '.data.pch."PV Vmax".value')), True)
-				endif
-			endif
-			ContinueCase
-		case 'PV maxPG', 'PV meanPG', 'default'
-			; PV max/meanPG
-			if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then
-				Json_Put($buffer, '.data.pch."PV max/meanPG".value', Round(Json_Get($buffer, '.data.pch."PV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.pch."PV meanPG".value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.pch."PV max/meanPG".id'), Json_Get($buffer, '.data.pch."PV max/meanPG".value'))
-			endif
-			ContinueCase
-		case 'PR maxPG', 'PR meanPG', 'default'
-			; PR max/meanPG
-			if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
-				Json_Put($buffer, '.data.pch."PR max/meanPG".value', Round(Json_Get($buffer, '.data.pch."PR maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.pch."PR meanPG".value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.pch."PR max/meanPG".id'), Json_Get($buffer, '.data.pch."PR max/meanPG".value'))
-			endif
-			ContinueCase
+		;MV E/A Ratio
 		case 'MV E Vel', 'MV A Vel', 'default'
-			;MV E/A Ratio
+			if $name == 'MV E Vel' then Json_Put($buffer, '.data.mch."MV E Vel".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
+			if $name == 'MV A Vel' then Json_Put($buffer, '.data.mch."MV A Vel".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV A Vel".value')) then
 				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', StringFormat("%.1f", Json_Get($buffer, '.data.mch."MV E Vel".value')/Json_Get($buffer, '.data.mch."MV A Vel".value')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."MV E/A Ratio".id'), Json_Get($buffer, '.data.mch."MV E/A Ratio".value'))
+			else
+				Json_Put($buffer,  '.data.mch."MV E/A Ratio".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MV E/A Ratio".id'), Json_Get($buffer, '.data.mch."MV E/A Ratio".value'))
 			ContinueCase
-		case 'MV maxPG', 'MV meanPG', 'default'
-			; MV max/meanPG
-			if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
-				Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."MV max/meanPG".id'), Json_Get($buffer, '.data.mch."MV max/meanPG".value'))
-			endif
-			ContinueCase
+		; MVA-PHT
 		case 'MV PHT', 'default'
-			; MVA-PHT
+			if $name == 'MV PHT' then Json_Put($buffer, '.data.mch."MV PHT".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
 				Json_Put($buffer, '.data.mch."MVA-PHT".value', StringFormat("%.2f", 220/Json_Get($buffer, '.data.mch."MV PHT".value')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."MVA-PHT".id'), Json_Get($buffer, '.data.mch."MVA-PHT".value'))
+			else
+				Json_Put($buffer,  '.data.mch."MVA-PHT".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MVA-PHT".id'), Json_Get($buffer, '.data.mch."MVA-PHT".value'))
 			ContinueCase
+		; MVAi-PHT
 		case 'MV PHT', 'height', 'weight', 'default'
-			; MVAi-PHT
+			if $name == 'MVA-PHT' then Json_Put($buffer, '.data.mch."MVA-PHT".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
 				Json_Put($buffer, '.data.mch."MVAi-PHT".value', StringFormat("%.2f", Json_Get($buffer, '.data.mch."MVA-PHT".value')/Json_Get($buffer, '.bsa')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."MVAi-PHT".id'), Json_Get($buffer, '.data.mch."MVAi-PHT".value'))
+			else
+				Json_Put($buffer,  '.data.mch."MVAi-PHT".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MVAi-PHT".id'), Json_Get($buffer, '.data.mch."MVAi-PHT".value'))
 			ContinueCase
-		case 'MV E Vel', 'EmSept', 'EmLat', 'default'
-			;E/Em
+		;E/Em
+		case 'EmSept', 'EmLat', 'MV E Vel', 'default'
+			if $name == 'EmSept' then Json_Put($buffer, '.data.mch.EmSept.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
+			if $name == 'EmLat' then Json_Put($buffer, '.data.mch.EmLat.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
 				Json_Put($buffer, '.data.mch."E/Em".value', Round(2*Json_Get($buffer, '.data.mch."MV E Vel".value')/(Json_Get($buffer, '.data.mch.EmSept.value') + Json_Get($buffer, '.data.mch.EmLat.value')), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."E/Em".id'), Json_Get($buffer, '.data.mch."E/Em".value'))
+			else
+				Json_Put($buffer,  '.data.mch."E/Em".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."E/Em".id'), Json_Get($buffer, '.data.mch."E/Em".value'))
 			ContinueCase
-		case 'TV maxPG', 'TV meanPG', 'default'
-			; TV max/meanPG
-			if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.tch."TV meanPG".value')) then
-				Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.tch."TV max/meanPG".id'), Json_Get($buffer, '.data.tch."TV max/meanPG".value'))
-			endif
-			ContinueCase
-		case 'AV maxPG', 'AV meanPG', 'default'
-			; AV max/meanPG
-			if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.ach."AV meanPG".value')) then
-				Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach."AV max/meanPG".id'), Json_Get($buffer, '.data.ach."AV max/meanPG".value'))
-			endif
-			ContinueCase
+		; SV
 		case 'LVOT Diam', 'LVOT VTI', 'default'
-			; SV
+			if $name == 'LVOT Diam' then Json_Put($buffer, '.data.ach."LVOT Diam".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
+			if $name == 'LVOT VTI' then Json_Put($buffer, '.data.ach."LVOT VTI".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
 				Json_Put($buffer, '.data.ach.SV.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.14159265/4/100, 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach.SV.id'), Json_Get($buffer, '.data.ach.SV.value'))
+			else
+				Json_Put($buffer,  '.data.ach.SV.value', Null, True)
 			endif
 			ContinueCase
+		; SVi
 		case 'LVOT Diam', 'LVOT VTI', 'height', 'weight', 'default'
-			; SVi
 			if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ach.SVi.value', Round(Json_Get($buffer,'.data.ach.SV.value')/Json_Get($buffer,'.bsa'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach.SVi.id'), Json_Get($buffer, '.data.ach.SVi.value'))
 			endif
-			ContinueCase
-		case 'LVOT Diam', 'LVOT VTI', 'height', 'weight', 'default'
-			; SV/SVi
+		; SV/SVi
 			if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) or IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
 				Json_Put($buffer, '.data.ach."SV/SVi".value', Round(Json_Get($buffer,'.data.ach.SV.value'), 0) & '/' & Round(Json_Get($buffer,'.data.ach.SVi.value'), 0), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach."SV/SVi".id'), Json_Get($buffer, '.data.ach."SV/SVi".value'))
+			else
+				Json_Put($buffer,  '.data.ach."SV/SVi".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach."SV/SVi".id'), Json_Get($buffer, '.data.ach."SV/SVi".value'))
 			ContinueCase
-		case 'LVOT Diam', 'LVOT VTI', 'AV VTI', 'height', 'weight', 'default'
-			; AVA
+		; AVA
+		case 'AV VTI', 'LVOT Diam', 'LVOT VTI', 'default'
+			if $name == 'AV VTI' then Json_Put($buffer, '.data.ach."AV VTI".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
 				Json_Put($buffer, '.data.ach.AVA.value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.14159265/4/Json_Get($buffer,'.data.ach."AV VTI".value')/100), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
+			else
+				Json_Put($buffer,  '.data.ach.AVA.value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
 			ContinueCase
+		; AVAi
 		case 'LVOT Diam', 'LVOT VTI', 'AV VTI', 'height', 'weight', 'default'
-			; AVAi
+			if $name == 'AVA' then Json_Put($buffer, '.data.ach.AVA.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ach.AVAi.value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
+			else
+				Json_Put($buffer,  '.data.ach.AVAi.value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
 			ContinueCase
+		; VTI LVOT/Ao
 		case 'LVOT VTI', 'AV VTI', 'default'
-			; VTI LVOT/Ao
 			if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
 				Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.ach."VTI LVOT/Ao".id'), Json_Get($buffer, '.data.ach."VTI LVOT/Ao".value'))
+			else
+				Json_Put($buffer,  '.data.ach."VTI LVOT/Ao".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach."VTI LVOT/Ao".id'), Json_Get($buffer, '.data.ach."VTI LVOT/Ao".value'))
 			ContinueCase
+		; AP Spid ratio
 		case 'Anulus-AP', 'M Spid', 'default'
-			; AP Spid ratio
+			if $name == 'Anulus-AP' then Json_Put($buffer, '.data.mch.Anulus-AP.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
+			if $name == 'M Spid' then Json_Put($buffer, '.data.mch."M Spid".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer, '.data.mch.Anulus-AP.value')) and IsNumber(Json_Get($buffer, '.data.mch."M Spid".value')) then
 				Json_Put($buffer, '.data.mch."AP Spid ratio".value', StringFormat("%.2f", Json_Get($buffer,'.data.mch.Anulus-AP.value')/Json_Get($buffer,'.data.mch."M Spid".value')), True)
-				GUICtrlSetData(Json_Get($buffer, '.data.mch."AP Spid ratio".id'), Json_Get($buffer, '.data.mch."AP Spid ratio".value'))
+			else
+				Json_Put($buffer,  '.data.mch."AP Spid ratio".value', Null, True)
 			endif
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."AP Spid ratio".id'), Json_Get($buffer, '.data.mch."AP Spid ratio".value'))
 			ContinueCase
+		;MR Rad
 		case 'default'
-			if $export then
-				; AR ERO
-				if IsNumber(Json_Get($buffer, '.data.ach."AR ERO".value')) then
-					Json_Put($buffer, '.data.ach."AR ERO".value', StringFormat("%.2f", Json_Get($buffer, '.data.ach."AR ERO".value')), True)
-				endif
-				; MR ERO
-				if IsNumber(Json_Get($buffer, '.data.mch."MR ERO".value')) then
-					Json_Put($buffer, '.data.mch."MR ERO".value', StringFormat("%.2f", Json_Get($buffer, '.data.mch."MR ERO".value')), True)
-				endif
-				; AV Vmax
-				if IsNumber(Json_Get($buffer, '.data.ach."AV Vmax".value')) then
-					Json_Put($buffer, '.data.ach."AV Vmax".value', StringFormat("%.1f", Json_Get($buffer, '.data.ach."AV Vmax".value')), True)
-				endif
+			if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
+				Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 0), True)
+			endif
+		;AR Rad
+			if IsNumber(Json_Get($buffer,'.data.ach."AR Rad".value')) then
+				Json_Put($buffer, '.data.ach."AR Rad".value', Round(Json_Get($buffer, '.data.ach."AR Rad".value')*100, 0), True)
+			endif
+		;PV Vmax
+			if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
+				;Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
+				Json_Put($buffer, '.data.pch."PV Vmax".value', StringFormat("%.1f", Json_Get($buffer, '.data.pch."PV Vmax".value')), True)
+			endif
+		; PV max/meanPG
+			if IsNumber(Json_Get($buffer,'.data.pch."PV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PV meanPG".value')) then
+				Json_Put($buffer, '.data.pch."PV max/meanPG".value', Round(Json_Get($buffer, '.data.pch."PV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.pch."PV meanPG".value'), 0), True)
+			endif
+		; PR max/meanPG
+			if IsNumber(Json_Get($buffer,'.data.pch."PR maxPG".value')) or IsNumber(Json_Get($buffer, '.data.pch."PR meanPG".value')) then
+				Json_Put($buffer, '.data.pch."PR max/meanPG".value', Round(Json_Get($buffer, '.data.pch."PR maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.pch."PR meanPG".value'), 0), True)
+			endif
+		; MV max/meanPG
+			if IsNumber(Json_Get($buffer,'.data.mch."MV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.mch."MV meanPG".value')) then
+				Json_Put($buffer, '.data.mch."MV max/meanPG".value', Round(Json_Get($buffer, '.data.mch."MV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.mch."MV meanPG".value'), 0), True)
+			endif
+		; TV max/meanPG
+			if IsNumber(Json_Get($buffer,'.data.tch."TV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.tch."TV meanPG".value')) then
+				Json_Put($buffer, '.data.tch."TV max/meanPG".value', Round(Json_Get($buffer, '.data.tch."TV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.tch."TV meanPG".value'), 0), True)
+			endif
+		; AV max/meanPG
+			if IsNumber(Json_Get($buffer,'.data.ach."AV maxPG".value')) or IsNumber(Json_Get($buffer, '.data.ach."AV meanPG".value')) then
+				Json_Put($buffer, '.data.ach."AV max/meanPG".value', Round(Json_Get($buffer, '.data.ach."AV maxPG".value'), 0) & '/' & Round(Json_Get($buffer, '.data.ach."AV meanPG".value'), 0), True)
+			endif
+		; AR ERO
+			if IsNumber(Json_Get($buffer, '.data.ach."AR ERO".value')) then
+				Json_Put($buffer, '.data.ach."AR ERO".value', StringFormat("%.2f", Json_Get($buffer, '.data.ach."AR ERO".value')), True)
+			endif
+		; MR ERO
+			if IsNumber(Json_Get($buffer, '.data.mch."MR ERO".value')) then
+				Json_Put($buffer, '.data.mch."MR ERO".value', StringFormat("%.2f", Json_Get($buffer, '.data.mch."MR ERO".value')), True)
+			endif
+		; AV Vmax
+			if IsNumber(Json_Get($buffer, '.data.ach."AV Vmax".value')) then
+				Json_Put($buffer, '.data.ach."AV Vmax".value', StringFormat("%.1f", Json_Get($buffer, '.data.ach."AV Vmax".value')), True)
 			endif
 	EndSwitch
 EndFunc
