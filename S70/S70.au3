@@ -1890,9 +1890,8 @@ $label_bsa = GUICtrlCreateLabel('BSA', 175 + 175, 5, 85, 17, 0x0002); right
 $input_bsa = GUICtrlCreateEdit(Json_ObjGet($buffer, '.bsa'), 175 + 175 + 89, 2, 36, 19, BitOr(0x0001, 0x0800)); read-only
 $input_bsa_unit = GUICtrlCreateLabel('m²', 175 + 175 + 130, 4, 45, 21)
 
-$button_del_note = GUICtrlCreateButton('Vymazat poznámky', 602, 2, 110, 21)
-$button_del_result = GUICtrlCreateButton('Vymazat závěr', 715, 2, 90, 21)
-;$button_recount = GUICtrlCreateButton('Přepočítat', 808, 2, 75, 21)
+$button_del_note = GUICtrlCreateButton('Vymazat poznámky', 680, 2, 110, 21)
+$button_del_result = GUICtrlCreateButton('Vymazat závěr', 793, 2, 90, 21)
 
 ; groups
 for $group in Json_ObjGet($order, '.group')
@@ -2210,17 +2209,15 @@ endfunc
 func calculate($id, $name, $export=False)
 	switch $name
 		; BSA
-		case 'weight', 'height', 'default'
-			if not $export then
-				Json_Put($buffer, '.height', GuiCtrlRead($input_height) ? Number(StringReplace(GuiCtrlRead($input_height), ',', '.')) : Null, True)
-				Json_Put($buffer, '.weight', GuiCtrlRead($input_weight) ? Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')) : Null, True)
-				if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
-					Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 2), True)
-				else
-					Json_Put($buffer, '.bsa', Null, True)
-				endif
-				GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
+		case 'weight', 'height'
+			Json_Put($buffer, '.height', GuiCtrlRead($input_height) ? Number(StringReplace(GuiCtrlRead($input_height), ',', '.')) : Null, True)
+			Json_Put($buffer, '.weight', GuiCtrlRead($input_weight) ? Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')) : Null, True)
+			if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
+				Json_Put($buffer, '.bsa', Round((Json_Get($buffer, '.weight')^0.425)*(Json_Get($buffer, '.height')^0.725)*71.84*(10^-4), 2), True)
+			else
+				Json_Put($buffer, '.bsa', Null, True)
 			endif
+			GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
 			ContinueCase
 		; LVd index
 		case 'LVIDd', 'weight', 'height', 'default'
