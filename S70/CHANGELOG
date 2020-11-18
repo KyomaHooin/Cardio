@@ -14,7 +14,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 -Long Excel clip paste bug.
 
 -Calc: Global vs History buffer collision.
- $buffer = $history; + patch.exe(update history struct = decode/update/encode)
+ $buffer = $history(execept note/result!!); + patch.exe(update history struct = decode/update/encode)
 -Calc: Invalid calculated value(-,-333 etc).
 -exit: Update only note/result in $buffer on write.
 
