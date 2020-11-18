@@ -2251,7 +2251,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVIDs.value')) then
 				Json_Put($buffer, '.data.lk.FS.value', Round((Json_Get($buffer, '.data.lk.LVIDd.value')-Json_Get($buffer, '.data.lk.LVIDs.value'))/Json_Get($buffer, '.data.lk.LVIDd.value')*100, 0), True)
 			else
-				Json_Put($buffer,  '.data.lk.FS.value', Null, True)
+				Json_Put($buffer, '.data.lk.FS.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.FS.id'), Json_Get($buffer, '.data.lk.FS.value'))
 			ContinueCase
@@ -2262,7 +2262,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.IVSd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
 				Json_Put($buffer, '.data.lk.LVmass.value', Round(1.04*(Json_get($buffer, '.data.lk.LVIDd.value')/10 + Json_Get($buffer, '.data.lk.IVSd.value')/10 + Json_Get($buffer, '.data.lk.LVPWd.value')/10)^3-(Json_Get($buffer, '.data.lk.LVIDd.value')/10)^3-13.6, 0), True)
 			else
-				Json_Put($buffer,  '.data.lk.LVmass.value', Null, True)
+				Json_Put($buffer, '.data.lk.LVmass.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.LVmass.id'), Json_Get($buffer, '.data.lk.LVmass.value'))
 			ContinueCase
@@ -2272,7 +2272,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.bsa')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
 				Json_Put($buffer, '.data.lk.LVmass-BSA.value',Round(Json_Get($buffer, '.data.lk.LVmass.value')/Json_Get($buffer, '.bsa'), 0), True)
 			else
-				Json_Put($buffer,  '.data.lk.LVmass-BSA.value', Null, True)
+				Json_Put($buffer, '.data.lk.LVmass-BSA.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.LVmass-BSA.id'), Json_Get($buffer, '.data.lk.LVmass-BSA.value'))
 			ContinueCase
@@ -2281,18 +2281,18 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.height')) and IsNumber(Json_Get($buffer, '.data.lk.LVmass.value')) then
 				Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Round(Json_Get($buffer, '.data.lk.LVmass.value')/(Json_Get($buffer, '.height')/100)^2.7, 0), True)
 			else
-				Json_Put($buffer,  '.data.lk."LVmass-i^2,7".value', Null, True)
+				Json_Put($buffer, '.data.lk."LVmass-i^2,7".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk."LVmass-i^2,7".id'), Json_Get($buffer, '.data.lk."LVmass-i^2,7".value'))
 			ContinueCase
-		; SV-biplane
-		case 'SV MOD A2C', 'SV MOD A4C', 'default'
-			if IsNumber(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and IsNumber(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
-				Json_Put($buffer, '.data.lk.SV-biplane.value', Round((Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, 0), True)
+		; RWT
+		case 'LVPWd', 'LVIDd', 'default'
+			if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
+				Json_Put($buffer, '.data.lk.RWT.value', 2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), True)
 			else
-				Json_Put($buffer,  '.data.lk.SV-biplane.value', Null, True)
+				Json_Put($buffer, '.data.lk.RWT.value', Null, True)
 			endif
-			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.SV-biplane.id'), Json_Get($buffer, '.data.lk.SV-biplane.value'))
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.RWT.id'), Json_Get($buffer, '.data.lk.RWT.value'))
 			ContinueCase
 		;EDVi
 		case 'LVEDV MOD BP', 'height', 'weight', 'default'
@@ -2300,7 +2300,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.lk.EDVi.value', Round(Json_Get($buffer, '.data.lk."LVEDV MOD BP".value')/Json_Get($buffer, '.bsa'), 0), True)
 			else
-				Json_Put($buffer,  '.data.lk.EDVi.value', Null, True)
+				Json_Put($buffer, '.data.lk.EDVi.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.lk.EDVi.id'), Json_Get($buffer, '.data.lk.EDVi.value'))
 			ContinueCase
@@ -2329,7 +2329,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.ls.LAV-A4C.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ls.LAVi.value', Round(Json_Get($buffer, '.data.ls.LAV-A4C.value')/Json_Get($buffer, '.bsa'), 0), True)
 			else
-				Json_Put($buffer,  '.data.ls.LAVi.value', Null, True)
+				Json_Put($buffer, '.data.ls.LAVi.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ls.LAVi.id'), Json_Get($buffer, '.data.ls.LAVi.value'))
 			ContinueCase
@@ -2341,7 +2341,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.ls."L Area-A4C".value')) and IsNumber(Json_Get($buffer, '.data.ls."L Area-A2C".value')) and IsNumber(Json_Get($buffer, '.data.ls."LA Major".value')) then
 				Json_Put($buffer, '.data.ls.LAV-2D.value', Round(0.85*Json_Get($buffer, '.data.ls."L Area-A4C".value')*Json_Get($buffer, '.data.ls."L Area-A2C".value')/Json_Get($buffer, '.data.ls."LA Major".value')*10, 0), True)
 			else
-				Json_Put($buffer,  '.data.ls.LAV-2D.value', Null, True)
+				Json_Put($buffer, '.data.ls.LAV-2D.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ls.LAV-2D.id'), Json_Get($buffer, '.data.ls.LAV-2D.value'))
 			ContinueCase
@@ -2351,7 +2351,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.ls.LAV-2D.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ls.LAVi-2D.value', Round(Json_Get($buffer, '.data.ls.LAV-2D.value')/Json_Get($buffer, '.bsa'), 0), True)
 			else
-				Json_Put($buffer,  '.data.ls.LAVi-2D.value', Null, True)
+				Json_Put($buffer, '.data.ls.LAVi-2D.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ls.LAVi-2D.id'), Json_Get($buffer, '.data.ls.LAVi-2D.value'))
 			ContinueCase
@@ -2372,7 +2372,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.ps.RAV.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
 				Json_Put($buffer, '.data.ps.RAVi.value', Round(Json_Get($buffer, '.data.ps.RAV.value')/Json_Get($buffer, '.bsa'), 0), True)
 			else
-				Json_Put($buffer,  '.data.ps.RAVi.value', Null, True)
+				Json_Put($buffer, '.data.ps.RAVi.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ps.RAVi.id'), Json_Get($buffer, '.data.ps.RAVi.value'))
 			ContinueCase
@@ -2387,7 +2387,7 @@ func calculate($id, $name, $export=False)
 					Json_Put($buffer, '.data.ao."Asc-Ao index".value', Round(Json_Get($buffer, '.data.ao."Ao Diam".value')/Json_Get($buffer, '.bsa'), 0), True)
 				endif
 			else
-				Json_Put($buffer,  '.data.ao."Asc-Ao index".value', Null, True)
+				Json_Put($buffer, '.data.ao."Asc-Ao index".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ao."Asc-Ao index".id'), Json_Get($buffer, '.data.ao."Asc-Ao index".value'))
 			ContinueCase
@@ -2398,7 +2398,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV A Vel".value')) then
 				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', StringFormat("%.1f", Json_Get($buffer, '.data.mch."MV E Vel".value')/Json_Get($buffer, '.data.mch."MV A Vel".value')), True)
 			else
-				Json_Put($buffer,  '.data.mch."MV E/A Ratio".value', Null, True)
+				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MV E/A Ratio".id'), Json_Get($buffer, '.data.mch."MV E/A Ratio".value'))
 			ContinueCase
@@ -2408,7 +2408,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.mch."MV PHT".value')) then
 				Json_Put($buffer, '.data.mch."MVA-PHT".value', StringFormat("%.2f", 220/Json_Get($buffer, '.data.mch."MV PHT".value')), True)
 			else
-				Json_Put($buffer,  '.data.mch."MVA-PHT".value', Null, True)
+				Json_Put($buffer, '.data.mch."MVA-PHT".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MVA-PHT".id'), Json_Get($buffer, '.data.mch."MVA-PHT".value'))
 			ContinueCase
@@ -2418,7 +2418,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.mch."MVA-PHT".value')) and IsNumber(Json_Get($buffer,'.bsa')) then
 				Json_Put($buffer, '.data.mch."MVAi-PHT".value', StringFormat("%.2f", Json_Get($buffer, '.data.mch."MVA-PHT".value')/Json_Get($buffer, '.bsa')), True)
 			else
-				Json_Put($buffer,  '.data.mch."MVAi-PHT".value', Null, True)
+				Json_Put($buffer, '.data.mch."MVAi-PHT".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MVAi-PHT".id'), Json_Get($buffer, '.data.mch."MVAi-PHT".value'))
 			ContinueCase
@@ -2429,7 +2429,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer,'.data.mch.EmSept.value')) and IsNumber(Json_Get($buffer,'.data.mch.EmLat.value')) then
 				Json_Put($buffer, '.data.mch."E/Em".value', Round(2*Json_Get($buffer, '.data.mch."MV E Vel".value')/(Json_Get($buffer, '.data.mch.EmSept.value') + Json_Get($buffer, '.data.mch.EmLat.value')), 0), True)
 			else
-				Json_Put($buffer,  '.data.mch."E/Em".value', Null, True)
+				Json_Put($buffer, '.data.mch."E/Em".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."E/Em".id'), Json_Get($buffer, '.data.mch."E/Em".value'))
 			ContinueCase
@@ -2440,7 +2440,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) then
 				Json_Put($buffer, '.data.ach.SV.value', Round(Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.14159265/4/100, 0), True)
 			else
-				Json_Put($buffer,  '.data.ach.SV.value', Null, True)
+				Json_Put($buffer, '.data.ach.SV.value', Null, True)
 			endif
 			ContinueCase
 		; SVi
@@ -2452,7 +2452,7 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer,'.data.ach.SV.value')) or IsNumber(Json_Get($buffer, '.data.ach.SVi.value')) then
 				Json_Put($buffer, '.data.ach."SV/SVi".value', Round(Json_Get($buffer,'.data.ach.SV.value'), 0) & '/' & Round(Json_Get($buffer,'.data.ach.SVi.value'), 0), True)
 			else
-				Json_Put($buffer,  '.data.ach."SV/SVi".value', Null, True)
+				Json_Put($buffer, '.data.ach."SV/SVi".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach."SV/SVi".id'), Json_Get($buffer, '.data.ach."SV/SVi".value'))
 			ContinueCase
@@ -2460,9 +2460,9 @@ func calculate($id, $name, $export=False)
 		case 'AV VTI', 'LVOT Diam', 'LVOT VTI', 'default'
 			if $name == 'AV VTI' then Json_Put($buffer, '.data.ach."AV VTI".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach."LVOT Diam".value')) and IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-				Json_Put($buffer, '.data.ach.AVA.value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach."LVOT VTI".value')*Json_Get($buffer,'.data.ach."LVOT Diam".value')^2*3.14159265/4/Json_Get($buffer,'.data.ach."AV VTI".value')/100), True)
+				Json_Put($buffer, '.data.ach.AVA.value', StringFormat("%.2f", Json_Get($buffer, '.data.ach."LVOT VTI".value')*Json_Get($buffer, '.data.ach."LVOT Diam".value')^2*3.14159265/4/Json_Get($buffer,'.data.ach."AV VTI".value')/100), True)
 			else
-				Json_Put($buffer,  '.data.ach.AVA.value', Null, True)
+				Json_Put($buffer, '.data.ach.AVA.value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
 			ContinueCase
@@ -2470,18 +2470,18 @@ func calculate($id, $name, $export=False)
 		case 'LVOT Diam', 'LVOT VTI', 'AV VTI', 'height', 'weight', 'default'
 			if $name == 'AVA' then Json_Put($buffer, '.data.ach.AVA.value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.ach.AVA.value')) and IsNumber(Json_Get($buffer, '.bsa')) then
-				Json_Put($buffer, '.data.ach.AVAi.value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer,'.bsa')), True)
+				Json_Put($buffer, '.data.ach.AVAi.value', StringFormat("%.2f", Json_Get($buffer,'.data.ach.AVA.value')/Json_Get($buffer, '.bsa')), True)
 			else
-				Json_Put($buffer,  '.data.ach.AVAi.value', Null, True)
+				Json_Put($buffer, '.data.ach.AVAi.value', Null, True)
 			endif
-			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVA.id'), Json_Get($buffer, '.data.ach.AVA.value'))
+			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach.AVAi.id'), Json_Get($buffer, '.data.ach.AVAi.value'))
 			ContinueCase
 		; VTI LVOT/Ao
 		case 'LVOT VTI', 'AV VTI', 'default'
 			if IsNumber(Json_Get($buffer, '.data.ach."LVOT VTI".value')) and IsNumber(Json_Get($buffer, '.data.ach."AV VTI".value')) then
-				Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value',  StringFormat("%.2f", Json_Get($buffer,'.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value')), True)
+				Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', StringFormat("%.2f", Json_Get($buffer, '.data.ach."LVOT VTI".value')/Json_Get($buffer,'.data.ach."AV VTI".value')), True)
 			else
-				Json_Put($buffer,  '.data.ach."VTI LVOT/Ao".value', Null, True)
+				Json_Put($buffer, '.data.ach."VTI LVOT/Ao".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.ach."VTI LVOT/Ao".id'), Json_Get($buffer, '.data.ach."VTI LVOT/Ao".value'))
 			ContinueCase
@@ -2492,12 +2492,18 @@ func calculate($id, $name, $export=False)
 			if IsNumber(Json_Get($buffer, '.data.mch.Anulus-AP.value')) and IsNumber(Json_Get($buffer, '.data.mch."M Spid".value')) then
 				Json_Put($buffer, '.data.mch."AP Spid ratio".value', StringFormat("%.2f", Json_Get($buffer,'.data.mch.Anulus-AP.value')/Json_Get($buffer,'.data.mch."M Spid".value')), True)
 			else
-				Json_Put($buffer,  '.data.mch."AP Spid ratio".value', Null, True)
+				Json_Put($buffer, '.data.mch."AP Spid ratio".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."AP Spid ratio".id'), Json_Get($buffer, '.data.mch."AP Spid ratio".value'))
 			ContinueCase
-		;MR Rad
 		case 'default'
+		; SV-biplane
+			if IsNumber(Json_Get($buffer, '.data.lk."SV MOD A2C".value')) and IsNumber(Json_Get($buffer, '.data.lk."SV MOD A4C".value')) then
+				Json_Put($buffer, '.data.lk.SV-biplane.value', Round((Json_Get($buffer, '.data.lk."SV MOD A4C".value') + Json_Get($buffer, '.data.lk."SV MOD A2C".value'))/2, 0), True)
+			else
+				Json_Put($buffer, '.data.lk.SV-biplane.value', Null, True)
+			endif
+		;MR Rad
 			if IsNumber(Json_Get($buffer,'.data.mch."MR Rad".value')) then
 				Json_Put($buffer, '.data.mch."MR Rad".value', Round(Json_Get($buffer, '.data.mch."MR Rad".value')*100, 0), True)
 			endif
