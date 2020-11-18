@@ -2549,11 +2549,7 @@ EndFunc
 
 ; gui get group index
 func gui_get_group_index($i, $mod)
-	if mod($i, $mod) = 0 then
-		return int($i/5)
-	Else
-		return int($i/5 + 1)
-	endif
+	return mod($i, $mod) = 0 ? int($i/5) : int($i/5 + 1)
 EndFunc
 
 ; initialize XLS template
