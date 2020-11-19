@@ -13,11 +13,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 -"Ao @CRLF LVOT" group name.
 -Long Excel clip paste bug.
 
--History: global buffer collision.
- -> $buffer = $history
- -> patch.exe(update history struct = decode/update/encode)
- -> Update only note/result in $buffer on write.
-
+-Patch: Update structure.
 -Calc: Invalid calculated value(-,-333 etc).
 
 [2.3]

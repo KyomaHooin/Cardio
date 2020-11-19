@@ -1874,8 +1874,8 @@ $gui_left_offset = 0
 $gui_group_top_offset = 20
 $gui_group_index = 0
 
-$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
-;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
+;$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' &$cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, @DesktopWidth - 895, 0)
+$gui = GUICreate('S70 Echo ' & $VERSION & ' - ' & $cmdline[3] & ' ' & $cmdline[4] & ' - ' & StringLeft($cmdline[2], 6) & '/' & StringTrimLeft($cmdline[2], 6), 890, 1010, 120, 0)
 
 ; header
 $label_height = GUICtrlCreateLabel('Výška', 0, 5, 85, 17, 0x0002); right
@@ -2029,9 +2029,18 @@ While 1
 					GUICtrlSetData($input_weight, Json_ObjGet($history, '.weight'))
 					GUICtrlSetData($input_bsa, Json_ObjGet($history, '.bsa'))
 					; update data
-					for $group in Json_ObjGet($order, '.group')
-						for $member in Json_ObjGet($order, '.data.' & $group)
-							GUICtrlSetData(Json_Get($buffer,'.data.' & $group & '."' & $member & '".id'), Json_Get($history,'.data.' & $group & '."' & $member & '".value'))
+					for $group in Json_ObjGet($history, '.group')
+						for $member in Json_ObjGet($history, '.data.' & $group)
+							GUICtrlSetData(Json_Get($buffer, '.data.' & $group & '."' & $member & '".id'), Json_Get($history, '.data.' & $group & '."' & $member & '".value'))
+						next
+					next
+					; update buffer
+					Json_Put($buffer, '.height', Json_ObjGet($history, '.height'))
+					Json_Put($buffer, '.weight', Json_ObjGet($history, '.weight'))
+					Json_Put($buffer, '.bsa', Json_ObjGet($history, '.bsa'))
+					for $group in Json_ObjGet($history, '.group')
+						for $member in Json_ObjGet($history, '.data.' & $group)
+							Json_Put($buffer, '.data.' & $group & '."' & $member & '".value', Json_Get($history, '.data.' & $group & '."' & $member & '".value'), True)
 						next
 					next
 				endif
