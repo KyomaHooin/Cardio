@@ -2218,7 +2218,7 @@ endfunc
 ; calculate aditional variables
 func calculate($id, $name, $export=False)
 	switch $name; BSA
-		case 'weight', 'height'
+		case 'weight', 'height', 'default'
 			if $name == 'height' then Json_Put($buffer, '.height', GuiCtrlRead($input_height) ? Number(StringReplace(GuiCtrlRead($input_height), ',', '.')) : Null, True)
 			if $name == 'weight' then Json_Put($buffer, '.weight', GuiCtrlRead($input_weight) ? Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer, '.weight')) and IsNumber(Json_Get($buffer, '.height')) then
@@ -2297,7 +2297,7 @@ func calculate($id, $name, $export=False)
 	switch $name; RWT
 		case 'LVPWd', 'LVIDd', 'default'
 			if IsNumber(Json_Get($buffer, '.data.lk.LVIDd.value')) and IsNumber(Json_Get($buffer, '.data.lk.LVPWd.value')) then
-				Json_Put($buffer, '.data.lk.RWT.value', 2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'), True)
+				Json_Put($buffer, '.data.lk.RWT.value', Number(StringFormat("%.2f", 2*Json_Get($buffer, '.data.lk.LVPWd.value')/Json_Get($buffer, '.data.lk.LVIDd.value'))), True)
 			else
 				Json_Put($buffer, '.data.lk.RWT.value', Null, True)
 			endif
