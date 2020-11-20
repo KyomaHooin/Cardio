@@ -2226,7 +2226,7 @@ func calculate($id, $name, $export=False)
 			else
 				Json_Put($buffer, '.bsa', Null, True)
 			endif
-			GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
+			if not $export then GUICtrlSetData($input_bsa, Json_ObjGet($buffer, '.bsa'))
 	EndSwitch
 	switch $name; LVd index
 		case 'LVIDd', 'weight', 'height', 'default'
