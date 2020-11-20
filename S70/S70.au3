@@ -2137,6 +2137,7 @@ func edit_handler($window, $message, $param, $control)
 			return GUICtrlSendToDummy($dummy, $id); pass ID to main loop
 		endif
 	endif
+	return $GUI_RUNDEFMSG; return to internal handler
 EndFunc
 
 ; determine age over fifty from UIN
