@@ -1836,8 +1836,8 @@ next
 
 ; update height & weight if not export
 if UBound($cmdline) = 7  Then
-		if Json_ObjGet($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[5]), True)
-		if Json_ObjGet($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[6]), True)
+	if Json_ObjGet($buffer, '.height') = Null then Json_Put($buffer, '.height', Number($cmdline[5]), True)
+	if Json_ObjGet($buffer, '.weight') = Null then Json_Put($buffer, '.weight', Number($cmdline[6]), True)
 endif
 
 ; update result from history or template
@@ -1964,7 +1964,7 @@ $button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 83, 75
 GUICtrlSetColor($label_error, 0xff0000)
 GUICtrlSetState($button_exit, $GUI_FOCUS)
 
-; message handler response
+; message handler response dummy control
 $dummy = GUICtrlCreateDummy()
 
 ; message handler
@@ -2011,14 +2011,14 @@ While 1
 		endif
 		gui_enable(True)
 	endif
+	; clear notes
 	if $msg = $button_del_note Then
 		for $group in Json_ObjGet($order, '.group')
 			GUICtrlSetData(Json_Get($buffer, '.group.' & $group & '.id'), '')
 		next
 	endif
-	if $msg = $button_del_result Then
-		GUICtrlSetData($edit_dekurz, '')
-	endif
+	; clear result
+	if $msg = $button_del_result Then GUICtrlSetData($edit_dekurz, '')
 	; load history data
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
