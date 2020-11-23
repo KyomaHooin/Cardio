@@ -9,17 +9,15 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
--Export 'Ao Diam', 'SV Vmax' dup.
--"Ao @CRLF LVOT" group name.
--Long Excel clip paste bug.
-
+-Export: 'Ao Diam', 'SV Vmax' dup.
+-GUI: Long Excel clip paste bug.
 -Patch: Update structure.
--Calc: Invalid calculated value(-,-333 etc).
 
 [2.3]
 
 General:
 
+-LZNT1 bitmap compression.
 -Dynamic re-calculation.
 
 [2.2]
