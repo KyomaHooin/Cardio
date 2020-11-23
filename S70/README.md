@@ -20,6 +20,7 @@ FILE
         Print.au3 - Printing library by "martin".
          Json.au3 - JSON library by "Ward".
    BinaryCall.au3 - JSON binary wrapper.
+        LZNT1.au3 - LZNT1 de-compression library by "tracexx".
         patch.au3 - Update archived files machine code.
 
         print.dll - Printing DLL.
