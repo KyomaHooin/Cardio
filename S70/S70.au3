@@ -134,8 +134,8 @@ global const $data_template='{' _
 			& '"FS":{"label":"FS", "unit":"%", "value":null, "id":null},' _
 			& '"LVd index":{"label":"LVd index", "unit":"mm/m²", "value":null, "id":null},' _
 			& '"LVs index":{"label":"LVs index", "unit":"mm/m²", "value":null, "id":null},' _
-			& '"LVEF % odhad":{"label":"LVEF % odhad", "unit":"%", "value":null, "id":null},' _
-			& '"LVEF % Teich":{"label":"LVEF % Teich.", "unit":"%", "value":null, "id":null},' _
+			& '"LVEF % odhad":{"label":"LVEF odhad", "unit":"%", "value":null, "id":null},' _
+			& '"LVEF % Teich":{"label":"LVEF Teich.", "unit":"%", "value":null, "id":null},' _
 			& '"EF Biplane":{"label":"LVEF biplane", "unit":"%", "value":null, "id":null},' _
 			& '"LVmass":{"label":"LVmass", "unit":"g", "value":null, "id":null},' _
 			& '"LVmass-BSA":{"label":"LVmass-BSA", "unit":"g/m²", "value":null, "id":null},' _
@@ -721,6 +721,8 @@ $button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 83, 75
 ; GUI tune
 GUICtrlSetColor($label_error, 0xff0000)
 GUICtrlSetState($button_exit, $GUI_FOCUS)
+GUICtrlSetBkColor($input_weight, 0xfffcbb)
+GUICtrlSetBkColor($input_height, 0xfffdd0)
 
 ; message handler response dummy control
 $dummy = GUICtrlCreateDummy()
@@ -1166,8 +1168,8 @@ func calculate($id, $name, $export=False)
 			if $name == 'MV A Vel' then Json_Put($buffer, '.data.mch."MV A Vel".value', GuiCtrlRead($id) ? Number(StringReplace(GuiCtrlRead($id), ',', '.')) : Null, True)
 			if IsNumber(Json_Get($buffer,'.data.mch."MV E Vel".value')) and IsNumber(Json_Get($buffer, '.data.mch."MV A Vel".value')) then
 				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', Number(StringFormat("%.1f", Json_Get($buffer, '.data.mch."MV E Vel".value')/Json_Get($buffer, '.data.mch."MV A Vel".value'))), True)
-			else
-				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', Null, True)
+;			else
+;				Json_Put($buffer, '.data.mch."MV E/A Ratio".value', Null, True)
 			endif
 			if not $export then GUICtrlSetData(Json_Get($buffer, '.data.mch."MV E/A Ratio".id'), Json_Get($buffer, '.data.mch."MV E/A Ratio".value'))
 	EndSwitch

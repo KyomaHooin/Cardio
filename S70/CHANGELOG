@@ -12,6 +12,7 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 -Export: 'Ao Diam', 'SV Vmax' dup.
 -GUI: Long Excel clip paste bug.
 -Patch: Update structure.
+-Calc: Color VS null update result clear fix
 
 [2.3]
 
@@ -19,6 +20,10 @@ General:
 
 -LZNT1 bitmap compression.
 -Dynamic re-calculation.
+
+GUI:
+
+-LVEF label update.
 
 [2.2]
 
