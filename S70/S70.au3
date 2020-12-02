@@ -78,7 +78,7 @@ global const $user_template='{' _
 ; 5 to 4 column map template
 global const $map_template='{' _
 	& '"lk":[0,1,2,3,5,6,4,13,7,8,9,14,10,11,12,Null,15,16,17,18],' _
-	& '"ls":[0,1,2,Null,7,8],' _
+	& '"ls":[0,1,2,Null,3,4,7,8],' _
 	& '"pk":[0,1,2,3,4,5,6],' _
 	& '"ps":[0,1,2,3,4],' _
 	& '"ao":[0,1,2,3,4],' _
@@ -1436,6 +1436,10 @@ func dekurz()
 					$step=False
 					$column_index = 65
 				endif
+				; skip LAV-1D if LAV-2D
+				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then 
+					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAV-2D.id')) then continueloop
+					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAVi-2D.id')) then continueloop
 				; skip Ao Diam if Asc-Ao 2D
 				if $members[$i] == 'Ao Diam' Then
 					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
@@ -1601,6 +1605,10 @@ func print(); 2100 x 2970
 					$step=False
 					$line_index = 1
 				endif
+				; skip LAV-1D if LAV-2D
+				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then 
+					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAV-2D.id')) then continueloop
+					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAVi-2D.id')) then continueloop
 				; skip Ao Diam if Asc-Ao 2D
 				if $members[$i] == 'Ao Diam' Then
 					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
