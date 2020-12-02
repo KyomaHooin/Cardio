@@ -17,13 +17,20 @@ http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.
 
 General:
 
--Skip LAV-1D if LAV-2D.
 -LZNT1 bitmap compression.
 -Dynamic re-calculation.
 
 GUI:
 
 -LVEF label update.
+
+Dekurz:
+
+-Skip LAV-1D if LAV-2D.
+
+Print:
+
+-Skip LAV-1D if LAV-2D.
 
 [2.2]
 
