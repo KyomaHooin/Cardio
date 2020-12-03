@@ -1435,9 +1435,10 @@ func dekurz()
 					$column_index = 65
 				endif
 				; skip LAV-1D if LAV-2D
-				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then 
+				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then
 					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAV-2D.id')) then continueloop
 					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAVi-2D.id')) then continueloop
+				endif
 				; skip Ao Diam if Asc-Ao 2D
 				if $members[$i] == 'Ao Diam' Then
 					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
@@ -1604,9 +1605,10 @@ func print(); 2100 x 2970
 					$line_index = 1
 				endif
 				; skip LAV-1D if LAV-2D
-				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then 
+				if $members[$i] == 'LAV-A4C' or $members[$i] == 'LAVi' then
 					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAV-2D.id')) then continueloop
 					if GUICtrlRead(Json_Get($buffer, '.data.ls.LAVi-2D.id')) then continueloop
+				endif
 				; skip Ao Diam if Asc-Ao 2D
 				if $members[$i] == 'Ao Diam' Then
 					if GUICtrlRead(Json_Get($buffer, '.data.' & $group & '."' & $members[$i+1] & '".id')) then continueloop
