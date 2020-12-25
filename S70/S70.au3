@@ -1529,7 +1529,6 @@ func print(); 2100 x 2970
 	$max_width = _PrintGetPageWidth($printer) - _PrintGetXOffset($printer)
 	$line_offset = 5
 	$top_offset = 0
-
 	;logo
 	_PrintImageFromDC($printer, $logo_handle, 0, 0, 128, 128, 50, 45, 338, 338); 128 x 128 inch 96 DPI => 338 mm
 	; QR code
