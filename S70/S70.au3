@@ -528,7 +528,7 @@ endif
 ; logging
 $log = FileOpen($log_file, 1)
 if @error then
-	MsgBox(48, 'S70 Echo ' & $VERSION, 'System je připojen pouze pro čtení.')
+	MsgBox(48, 'S70 Echo ' & $VERSION, 'Systém je připojen pouze pro čtení.')
 	exit
 endif
 
@@ -1397,7 +1397,6 @@ func dekurz()
 		logger('Dekurz: Vyprázdnění schránky.')
 	endif
 	_ClipBoard_Close()
-
 	; clean-up
 	_Excel_RangeDelete($book.Activesheet, 'A1:E49')
 	; default font
