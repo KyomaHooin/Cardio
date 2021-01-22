@@ -1376,6 +1376,7 @@ func dekurz_init()
 	$book.Activesheet.Range('A1').RowHeight = 20
 endFunc
 
+; test empty group
 func not_empty_group($group)
 	if StringLen(GUICtrlRead(Json_Get($buffer, '.group.' & $group & '.id'))) > 0 then return True
 	for $member in Json_ObjGet($order, '.data.' & $group)
@@ -1498,6 +1499,7 @@ func dekurz()
 	endif
 EndFunc
 
+; print to default printer
 func print(); 2100 x 2970
 	local $printer, $printer_error
 	; GDI+ init
