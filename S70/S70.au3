@@ -887,9 +887,9 @@ func edit_handler($window, $message, $param, $control)
 	local $id = BitAND($param, 0x0000ffff); loword
 	local $code = BitShift($param, 16); hiword
 	if $code = $EN_MAXTEXT then; multiline clip overflow
-		$clip_buff = ClipGet()
-		if $clip_buff <> '' then
-			GUICtrlSetData($id, GUICtrlRead($id) & StringReplace(StringReplace($clip_buff, @CRLF, ' '), @LF, ' '))
+		$clip = ClipGet()
+		if $clip <> '' then
+			GUICtrlSetData($id, GUICtrlRead($id) & StringReplace(StringReplace($clip, @CRLF, ' '), @LF, ' '))
 		endif
 	endif
 	if $code = $EN_CHANGE then
