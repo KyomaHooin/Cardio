@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=2.3
+#AutoIt3Wrapper_Res_ProductVersion=2.4
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -47,7 +47,7 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-global const $VERSION = '2.3'
+global const $VERSION = '2.4'
 global $AGE = 30; default stored data age in days
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
@@ -886,6 +886,12 @@ endfunc
 func edit_handler($window, $message, $param, $control)
 	local $id = BitAND($param, 0x0000ffff); loword
 	local $code = BitShift($param, 16); hiword
+	if $code = $EN_MAXTEXT then; multiline clip overflow
+		$clip_buff = ClipGet()
+		if $clip_buff <> '' then
+			GUICtrlSetData($id, GUICtrlRead($id) & StringReplace(StringReplace($clip_buff, @CRLF, ' '), @CR, ' '))
+		endif
+	endif
 	if $code = $EN_CHANGE then
 		_ArrayBinarySearch($hook_text_map, $id)
 		if not @error then
