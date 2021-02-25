@@ -889,7 +889,7 @@ func edit_handler($window, $message, $param, $control)
 	if $code = $EN_MAXTEXT then; multiline clip overflow
 		$clip_buff = ClipGet()
 		if $clip_buff <> '' then
-			GUICtrlSetData($id, GUICtrlRead($id) & StringReplace(StringReplace($clip_buff, @CRLF, ' '), @CR, ' '))
+			GUICtrlSetData($id, GUICtrlRead($id) & StringReplace(StringReplace($clip_buff, @CRLF, ' '), @LF, ' '))
 		endif
 	endif
 	if $code = $EN_CHANGE then
