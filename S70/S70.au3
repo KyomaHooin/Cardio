@@ -741,7 +741,7 @@ if @error then logger($dekurz_init)
 While 1
 	$msg = GUIGetMsg()
 	; dynamic re-calculation
-	if $msg = $dummy then calculate(GUICtrlRead($dummy), get_control(GUICtrlRead($dummy)), False)
+	if $msg = $dummy then calculate(GUICtrlRead($dummy), get_control(GUICtrlRead($dummy)))
 	; generate dekurz clipboard
 	if $msg = $button_dekurz then
 		gui_enable(False)
@@ -1291,7 +1291,6 @@ func calculate($id, $name, $export=False)
 			endif
 		;PV Vmax
 			if IsNumber(Json_Get($buffer,'.data.pch."PV Vmax".value')) then
-				;Json_Put($buffer, '.data.pch."PV Vmax".value', Json_Get($buffer, '.data.pch."PV Vmax".value')/100, True)
 				Json_Put($buffer, '.data.pch."PV Vmax".value', Number(StringFormat("%.1f", Json_Get($buffer, '.data.pch."PV Vmax".value'))), True)
 			endif
 		; PV max/meanPG
@@ -1517,8 +1516,6 @@ func print(); 2100 x 2970
 	;priner init
 	$printer = _PrintDllStart($printer_error)
 	if @error then return SetError(1, 0, 'Tisk: ' & $printer_error)
-	; select printer
-	;_PrintSetPrinter($printer)
 	; log printer name
 	$printer_name = _PrintGetPrinter($printer)
 	if @error Then
