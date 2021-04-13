@@ -5,8 +5,8 @@ Cardiology support software.
 
 FILE
 <pre>
-NASBackup/ - Secure NAS Rsync backup for Win64.
-      S70/ - GE Vivid S70 Echo Medicus 3 integration.
+NAS/ - NAS RSync backup for Win64.
+S70/ - GE Vivid S70 Echo Medicus 3 integration.
 </pre>
 SOURCE
 
