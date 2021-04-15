@@ -1,8 +1,29 @@
 ;
-; rsync.exe GUI
+; Rsync GUI
+;
+; Copyright (c) 2021 Kyoma Hooin
+;
+; This program is free software: you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 3 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;
 
-#AutoIt3Wrapper_Icon="NAS.ico"
+#AutoIt3Wrapper_Res_Description=NAS Rsync GUI
+#AutoIt3Wrapper_Res_ProductName=NAS
+#AutoIt3Wrapper_Res_ProductVersion=1.2
+#AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
+#AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
+#AutoIt3Wrapper_Res_Language=1029
+#AutoIt3Wrapper_Icon=NAS.ico
 #NoTrayIcon
 
 ; ---------------------------------------------------------
@@ -18,8 +39,9 @@
 ;VAR
 ; ---------------------------------------------------------
 
-global $version = '1.1'
+global $version = '1.2'
 global $ini = @ScriptDir & '\NAS.ini'
+global $rsync = @ScriptDir & '\bin\rsync.exe'
 global $configuration[0][2]
 
 ; ---------------------------------------------------------
@@ -68,28 +90,33 @@ endif
 ; GUI
 ; ---------------------------------------------------------
 
-$gui = GUICreate('NAS Záloha' & $version, 574, 238, Default, Default)
-$gui_source_group = GUICtrlCreateGroup('Zdroj', 5, 5, 564, 146)
-GUICtrlSetFont(-1, 8, 800, 0, 'MS Sans Serif')
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-$gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir1')][1], 14, 24, 465, 21)
-$gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 14, 48, 465, 21)
-$gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 14, 72, 465, 21)
-$gui_input_source4 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 14, 96, 465, 21)
-$gui_input_source5 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 14, 120, 465, 21)
-$gui_button_source1 = GUICtrlCreateButton("Procházet", 484, 24, 75, 21)
-$gui_button_source2 = GUICtrlCreateButton("Procházet", 484, 48, 75, 21)
-$gui_button_source3 = GUICtrlCreateButton('Procházet', 484, 72, 75, 21)
-$gui_button_source4 = GUICtrlCreateButton('Procházet', 484, 96, 75, 21)
-$gui_button_source5 = GUICtrlCreateButton('Procházet', 484, 120, 75, 21)
-$gui_target_group = GUICtrlCreateGroup('Cíl', 5, 152, 564, 50)
-GUICtrlSetFont(-1, 8, 800, 0, 'MS Sans Serif')
-GUICtrlCreateGroup('', -99, -99, 1, 1)
-$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 14, 170, 465, 21)
-$gui_button_target1 = GUICtrlCreateButton('Procházet', 484, 170, 75, 21)
+$gui = GUICreate('NAS Záloha ' & $version, 574, 234, Default, Default)
+$gui_group1 = GUICtrlCreateGroup('', 5, 0, 564, 68)
+$gui_label_source1 = GUICtrlCreateLabel('Zdroj:', 12,18,30,21)
+$gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir1')][1], 42, 15, 438, 21)
+$gui_button_source1 = GUICtrlCreateButton("Procházet", 486, 15, 75, 21)
+$gui_label_target1 = GUICtrlCreateLabel('Cíl:', 22,42,30,21)
+$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 42, 38, 438, 21)
+$gui_button_target1 = GUICtrlCreateButton("Procházet", 486, 38, 75, 21)
 
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 404, 208, 75, 21)
-$gui_button_exit = GUICtrlCreateButton('Konec', 484, 208, 75, 21)
+$gui_group2 = GUICtrlCreateGroup('', 5, 68, 564, 68)
+$gui_label_source2 = GUICtrlCreateLabel('Zdroj:', 12, 86,30,21)
+$gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 42, 83, 438, 21)
+$gui_button_source2 = GUICtrlCreateButton('Procházet', 486, 82, 75, 21)
+$gui_label_target2 = GUICtrlCreateLabel('Cíl:', 22, 110, 30, 21)
+$gui_input_target2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 42, 106, 438, 21)
+$gui_button_target2 = GUICtrlCreateButton('Procházet', 486, 105, 75, 21)
+
+$gui_group3 = GUICtrlCreateGroup('', 5, 136, 564, 68)
+$gui_label_source3 = GUICtrlCreateLabel('Zdroj:', 12, 154,30,21)
+$gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 42, 150, 438, 21)
+$gui_button_source3 = GUICtrlCreateButton('Procházet', 486, 150, 75, 21)
+$gui_label_target3 = GUICtrlCreateLabel('Cíl:', 22, 176, 30, 21)
+$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 42, 172, 438, 21)
+$gui_button_target3 = GUICtrlCreateButton('Procházet', 486, 173, 75, 21)
+
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 412, 208, 75, 21)
+$gui_button_exit = GUICtrlCreateButton('Konec', 492, 208, 75, 21)
 
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
@@ -102,81 +129,70 @@ GUISetState(@SW_SHOW)
 
 while 1
 	$event = GUIGetMsg()
-	; source selection
+	; source/target selection
 	if $event = $gui_button_source1 Then
-		$path = FileSelectFolder("NAS / Zdrojový adresář", @HomeDrive, Default, $configuration['dir1'][1])
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($gui_input_source1, $path)
 	endif
+	if $event = $gui_button_target1 Then
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Cílový adresář', @HomeDrive)
+		if not @error then GUICtrlSetData($gui_input_target1, $path)
+	endif
 	if $event = $gui_button_source2 Then
-		$path = FileSelectFolder("NAS / Zdrojový adresář", @HomeDrive, Default, $configuration['dir2'][1])
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($gui_input_source2, $path)
 	endif
+	if $event = $gui_button_target2 Then
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Cílový adresář', @HomeDrive)
+		if not @error then GUICtrlSetData($gui_input_target2, $path)
+	endif
 	if $event = $gui_button_source3 Then
-		$path = FileSelectFolder("NAS / Zdrojový adresář", @HomeDrive, Default, $configuration['dir3'][1])
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($gui_input_source3, $path)
 	endif
-	if $event = $gui_button_source4 Then
-		$path = FileSelectFolder("NAS / Zdrojový adresář", @HomeDrive, Default, $configuration['dir4'][1])
-		if not @error then GUICtrlSetData($gui_input_source4, $path)
-	endif
-	if $event = $gui_button_source5 Then
-		$path = FileSelectFolder("NAS / Zdrojový adresář", @HomeDrive, Default, $configuration['dir5'][1])
-		if not @error then GUICtrlSetData($gui_input_source5, $path)
-	endif
-	; target selection
-	if $event = $gui_button_target1 Then
-		$path = FileSelectFolder("NAS / Cílový adresář", @HomeDrive, Default, $configuration['dir6'][1])
-		if not @error then GUICtrlSetData($gui_input_target1, $path)
+	if $event = $gui_button_target3 Then
+		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Cílový adresář', @HomeDrive)
+		if not @error then GUICtrlSetData($gui_input_target3, $path)
 	endif
 	; backup
 	if $event = $gui_button_backup then
-		; log
-		logger('Zálohovaní zahájeno.')
 		; disable button
 		GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
-		GUICtrlSetState($gui_button_exit, $GUI_DISABLE)
 		; backup
 		if FileExists(GUICtrlRead($gui_input_source1)) and FileExists(GUICtrlRead($gui_input_target1)) then
+			logger('[1] Zálohovaní zahájeno.')
 			rsync(get_cygwin_path(GUICtrlRead($gui_input_source1)),get_cygwin_path(GUICtrlRead($gui_input_target1)))
+			logger('[1] Zalohování dokončeno.')
 		else
 			logger('[1] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
 		endif
-;		if FileExists(GUICtrlRead($gui_input_source2)) and FileExists(GUICtrlRead($gui_input_target2)) then
-;			rsync(get_cygwin_path(GUICtrlRead($gui_input_source2)),get_cygwin_path(GUICtrlRead($gui_input_target2)))
-;		else
-;			logger('[2] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-;		endif
-;		if FileExists(GUICtrlRead($gui_input_source3)) and FileExists(GUICtrlRead($gui_input_target3)) then
-;			rsync(get_cygwin_path(GUICtrlRead($gui_input_source3)),get_cygwin_path(GUICtrlRead($gui_input_target3)))
-;		else
-;			logger('[3] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-;		endif
-;		if FileExists(GUICtrlRead($gui_input_source4)) and FileExists(GUICtrlRead($gui_input_target4)) then
-;			rsync(get_cygwin_path(GUICtrlRead($gui_input_source4)),get_cygwin_path(GUICtrlRead($gui_input_target4)))
-;		else
-;			logger('[4] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-;		endif
-;		if FileExists(GUICtrlRead($gui_input_source5)) and FileExists(GUICtrlRead($gui_input_target5)) then
-;			rsync(get_cygwin_path(GUICtrlRead($gui_input_source5)),get_cygwin_path(GUICtrlRead($gui_input_target5)))
-;		else
-;			logger('[5] Chyba: Zdrojový, nebo cílový adresář neexistuje')
-;		endif
+		if FileExists(GUICtrlRead($gui_input_source2)) and FileExists(GUICtrlRead($gui_input_target2)) then
+			logger('[2] Zálohovaní zahájeno.')
+			rsync(get_cygwin_path(GUICtrlRead($gui_input_source2)),get_cygwin_path(GUICtrlRead($gui_input_target2)))
+			logger('[2] Zalohování dokončeno.')
+		else
+			logger('[2] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
+		endif
+		if FileExists(GUICtrlRead($gui_input_source3)) and FileExists(GUICtrlRead($gui_input_target3)) then
+			logger('[3] Zálohovaní zahájeno.')
+			rsync(get_cygwin_path(GUICtrlRead($gui_input_source3)),get_cygwin_path(GUICtrlRead($gui_input_target3)))
+			logger('[3] Zalohování dokončeno.')
+		else
+			logger('[3] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
+		endif
 		; enable button
 		GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
-		GUICtrlSetState($gui_button_exit, $GUI_ENABLE)
-		; log
-		logger('Zalohování dokončeno.')
 	endif
 	; exit
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		; write configuration
 		$f = FileOpen($ini, 2); overwrite
 		FileWriteLine($ini, 'dir1=' & GUICtrlRead($gui_input_source1))
-		FileWriteLine($ini, 'dir2=' & GUICtrlRead($gui_input_source2))
-		FileWriteLine($ini, 'dir3=' & GUICtrlRead($gui_input_source3))
-		FileWriteLine($ini, 'dir4=' & GUICtrlRead($gui_input_source4))
-		FileWriteLine($ini, 'dir5=' & GUICtrlRead($gui_input_source5))
-		FileWriteLine($ini, 'dir6=' & GUICtrlRead($gui_input_target1))
+		FileWriteLine($ini, 'dir2=' & GUICtrlRead($gui_input_target1))
+		FileWriteLine($ini, 'dir3=' & GUICtrlRead($gui_input_source2))
+		FileWriteLine($ini, 'dir4=' & GUICtrlRead($gui_input_target2))
+		FileWriteLine($ini, 'dir5=' & GUICtrlRead($gui_input_source3))
+		FileWriteLine($ini, 'dir6=' & GUICtrlRead($gui_input_target3))
 		FileClose($f)
 		; exit
 		exitloop
@@ -213,7 +229,7 @@ func rsync($source,$target)
 	; show RSync
 	GUISetState(@SW_SHOW, $gui_rsync)
 	; backup
-	$rsync = Run(@ComSpec & ' /c ' & 'rsync.exe -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD));STDOUT
+	$rsync = Run(@ComSpec & ' /c ' & $rsync & ' -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD));STDOUT
 	; progress
 	while ProcessExists($rsync)
 		$buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)

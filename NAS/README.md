@@ -15,6 +15,8 @@ FILE
      rsync.exe - 64bin RSync v 3.1.2
     cygwin.dll - Cygwin core library.
 cygiconv-2.dll - Cygwin incov library.
+
+       LICENSE - GNU GLPv3 license.
 </pre>
 SOURCE
 
