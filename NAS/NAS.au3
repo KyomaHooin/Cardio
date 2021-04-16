@@ -41,7 +41,7 @@
 
 global $version = '1.2'
 global $ini = @ScriptDir & '\NAS.ini'
-global $rsync = @ScriptDir & '\bin\rsync.exe'
+global $binary = @ScriptDir & '\bin\rsync.exe'
 global $configuration[0][2]
 
 ; ---------------------------------------------------------
@@ -229,12 +229,16 @@ func rsync($source,$target)
 	; show RSync
 	GUISetState(@SW_SHOW, $gui_rsync)
 	; backup
-	$rsync = Run(@ComSpec & ' /c ' & $rsync & ' -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD));STDOUT
+	$rsync = Run(@ComSpec & ' /c ' & $binary & ' --info=name,stats -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD));STDOUT
 	; progress
 	while ProcessExists($rsync)
-		$buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
-		if $buffer <> '' then
-			GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $buffer)
+		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
+		if $out_buffer <> '' then
+			GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $out_buffer)
+		endif
+		$err_buffer = StringReplace(StderrRead($rsync), @LF, @CRLF)
+		if $err_buffer <> '' then
+			GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $err_buffer)
 		endif
 		_GUICtrlEdit_Scroll($gui_rsync_edit, 4); scroll down
 	wend
