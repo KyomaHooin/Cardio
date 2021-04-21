@@ -1,4 +1,5 @@
 ;
+
 ; Rsync GUI
 ;
 ; Copyright (c) 2021 Kyoma Hooin
@@ -222,39 +223,22 @@ endfunc
 func rsync($source,$target)
 	$gui_rsync = GUICreate("NAS Záloha - Rsync 3.1.2", 625, 320, Default, Default)
 	$gui_rsync_edit = GUICtrlCreateEdit("", 8, 8, 609, 305, BitOR($ES_AUTOVSCROLL,$ES_READONLY,$ES_WANTRETURN,$WS_VSCROLL))
-	;register dummy
-	;global $dummy = GUICtrlCreateDummy()
-	;register key down
-	;GUIRegisterMsg($WM_KEYDOWN, "keypress")
 	; show RSync
 	GUISetState(@SW_SHOW, $gui_rsync)
 	; backup
-	$rsync = Run(@ComSpec & ' /c ' & $binary & ' --info=name,stats -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD));STDOUT
+	$rsync = Run(@ComSpec & ' /c ' & $binary & ' --info=name,stats -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
 	; progress
 	while ProcessExists($rsync)
 		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
-		if $out_buffer <> '' then
-			GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $out_buffer)
-		endif
+		if $out_buffer <> '' then GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $out_buffer)
 		$err_buffer = StringReplace(StderrRead($rsync), @LF, @CRLF)
-		if $err_buffer <> '' then
-			GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $err_buffer)
-		endif
+		if $err_buffer <> '' then GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $err_buffer)
 		_GUICtrlEdit_Scroll($gui_rsync_edit, 4); scroll down
 	wend
-	; debug
-	while 1
-		$rsync_event = GUIGetMsg()
-		;if $rsync_event = $dummy then exitloop
-		if $rsync_event = $GUI_EVENT_CLOSE then exitloop
-	wend
-	;destroy GUI
+	; logging
+	logger(GUICtrlRead($gui_rsync_edit))
+	; destroy GUI
 	GUIDelete($gui_rsync)
 	;exit
 	return
 EndFunc
-
-;func keypress($window, $message, $param, $control)
-;	return GUICtrlSendToDummy($dummy)
-;	return $GUI_RUNDEFMSG
-;EndFunc
