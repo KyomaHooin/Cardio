@@ -18,7 +18,7 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;
 
-#AutoIt3Wrapper_Res_Description=NAS Rsync GUI
+#AutoIt3Wrapper_Res_Description=Secure Rsync NAS backup
 #AutoIt3Wrapper_Res_ProductName=NAS
 #AutoIt3Wrapper_Res_ProductVersion=1.3
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
@@ -87,7 +87,7 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'dir6=')
 	FileClose($f)
 endif
-_FileReadToArray($ini, $configuration, 0, '='); 0-based_ArrayDisplay($configuration)
+_FileReadToArray($ini, $configuration, 0, '='); 0-based
 if @error then
 	MsgBox(0, 'NAS Záloha ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
@@ -106,7 +106,7 @@ $gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($confi
 $gui_button_source1 = GUICtrlCreateButton("Procházet", 314, 15, 75, 21)
 $gui_label_target1 = GUICtrlCreateLabel('Cíl:', 22, 42, 30, 21)
 $gui_label_prefix1 = GUICtrlCreateLabel($remote_prefix, 48, 42, 50, 21)
-$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 102, 38, 286, 21)
+$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 102, 39, 286, 21)
 $gui_group2 = GUICtrlCreateGroup('', 5, 68, 392, 68)
 $gui_label_source2 = GUICtrlCreateLabel('Zdroj:', 12, 86, 30, 21)
 $gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 42, 83, 268, 21)
@@ -115,15 +115,15 @@ $gui_label_target2 = GUICtrlCreateLabel('Cíl:', 22, 110, 30, 21)
 $gui_label_prefix2 = GUICtrlCreateLabel($remote_prefix, 48, 110, 50, 21)
 $gui_input_target2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 102, 106, 286, 21)
 $gui_group3 = GUICtrlCreateGroup('', 5, 136, 392, 68)
-$gui_label_source3 = GUICtrlCreateLabel('Zdroj:', 12, 154, 30, 21)
+$gui_label_source3 = GUICtrlCreateLabel('Zdroj:', 12, 153, 30, 21)
 $gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 42, 150, 268, 21)
 $gui_button_source3 = GUICtrlCreateButton('Procházet', 314, 150, 75, 21)
-$gui_label_target3 = GUICtrlCreateLabel('Cíl:', 22, 176, 30, 21)
-$gui_label_prefix3 = GUICtrlCreateLabel($remote_prefix, 48, 176, 50, 21)
-$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 102, 172, 286, 21)
+$gui_label_target3 = GUICtrlCreateLabel('Cíl:', 22, 178, 30, 21)
+$gui_label_prefix3 = GUICtrlCreateLabel($remote_prefix, 48, 178, 50, 21)
+$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 102, 174, 286, 21)
 
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 234, 208, 75, 21)
-$gui_button_exit = GUICtrlCreateButton('Konec', 314, 208, 75, 21)
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 240, 208, 75, 21)
+$gui_button_exit = GUICtrlCreateButton('Konec', 320, 208, 75, 21)
 
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
