@@ -12,9 +12,8 @@ FILE
             NAS.ico - ICON file.
             NAS.png - Application screen.
 
-     /bin/rsync.exe - 64bin Rsync v 3.1.2.
-    /bin/cygwin.dll - Cygwin core library.
-/bin/cygiconv-2.dll - Cygwin iconv library.
+               bin/ - Cygwin lib/binary.
+               key/ - Key directory.
 
           CHANGELOG - Changelog.
             LICENSE - GNU GLPv3 license.
