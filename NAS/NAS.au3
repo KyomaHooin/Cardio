@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=NAS Rsync GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.2
+#AutoIt3Wrapper_Res_ProductVersion=1.3
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -40,7 +40,7 @@
 ;VAR
 ; ---------------------------------------------------------
 
-global $version = '1.2'
+global $version = '1.3'
 global $ini = @ScriptDir & '\NAS.ini'
 global $configuration[0][2]
 
@@ -51,7 +51,7 @@ global $key = @ScriptDir & '\key\id_ed25519'
 global $remote_user = 'backup'
 global $remote_host = '10.8.0.1'
 global $remote_port = '22'
-global $remote_prefix = '/volume1/DATA/'
+global $remote_prefix = '/volume1/'
 
 ; ---------------------------------------------------------
 ;CONTROL
@@ -87,7 +87,7 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'dir6=')
 	FileClose($f)
 endif
-_FileReadToArray($ini, $configuration, 0, '='); 0-based
+_FileReadToArray($ini, $configuration, 0, '='); 0-based_ArrayDisplay($configuration)
 if @error then
 	MsgBox(0, 'NAS Záloha ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
@@ -99,30 +99,31 @@ endif
 ; GUI
 ; ---------------------------------------------------------
 
-$gui = GUICreate('NAS Záloha ' & $version, 574, 234, Default, Default)
-$gui_group1 = GUICtrlCreateGroup('', 5, 0, 564, 68)
+$gui = GUICreate('NAS Záloha ' & $version, 402, 234, Default, Default)
+$gui_group1 = GUICtrlCreateGroup('', 5, 0, 392, 68)
 $gui_label_source1 = GUICtrlCreateLabel('Zdroj:', 12, 18, 30, 21)
-$gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir1')][1], 42, 15, 438, 21)
-$gui_button_source1 = GUICtrlCreateButton("Procházet", 486, 15, 75, 21)
+$gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir1')][1], 42, 15, 268, 21)
+$gui_button_source1 = GUICtrlCreateButton("Procházet", 314, 15, 75, 21)
 $gui_label_target1 = GUICtrlCreateLabel('Cíl:', 22, 42, 30, 21)
-$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 42, 38, 438, 21)
-
-$gui_group2 = GUICtrlCreateGroup('', 5, 68, 564, 68)
+$gui_label_prefix1 = GUICtrlCreateLabel($remote_prefix, 48, 42, 50, 21)
+$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 102, 38, 286, 21)
+$gui_group2 = GUICtrlCreateGroup('', 5, 68, 392, 68)
 $gui_label_source2 = GUICtrlCreateLabel('Zdroj:', 12, 86, 30, 21)
-$gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 42, 83, 438, 21)
-$gui_button_source2 = GUICtrlCreateButton('Procházet', 486, 82, 75, 21)
+$gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 42, 83, 268, 21)
+$gui_button_source2 = GUICtrlCreateButton('Procházet', 314, 82, 75, 21)
 $gui_label_target2 = GUICtrlCreateLabel('Cíl:', 22, 110, 30, 21)
-$gui_input_target2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 42, 106, 438, 21)
-
-$gui_group3 = GUICtrlCreateGroup('', 5, 136, 564, 68)
+$gui_label_prefix2 = GUICtrlCreateLabel($remote_prefix, 48, 110, 50, 21)
+$gui_input_target2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 102, 106, 286, 21)
+$gui_group3 = GUICtrlCreateGroup('', 5, 136, 392, 68)
 $gui_label_source3 = GUICtrlCreateLabel('Zdroj:', 12, 154, 30, 21)
-$gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 42, 150, 438, 21)
-$gui_button_source3 = GUICtrlCreateButton('Procházet', 486, 150, 75, 21)
+$gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 42, 150, 268, 21)
+$gui_button_source3 = GUICtrlCreateButton('Procházet', 314, 150, 75, 21)
 $gui_label_target3 = GUICtrlCreateLabel('Cíl:', 22, 176, 30, 21)
-$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 42, 172, 438, 21)
+$gui_label_prefix3 = GUICtrlCreateLabel($remote_prefix, 48, 176, 50, 21)
+$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 102, 172, 286, 21)
 
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 412, 208, 75, 21)
-$gui_button_exit = GUICtrlCreateButton('Konec', 492, 208, 75, 21)
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 234, 208, 75, 21)
+$gui_button_exit = GUICtrlCreateButton('Konec', 314, 208, 75, 21)
 
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
@@ -160,20 +161,20 @@ while 1
 		else
 			logger('[1] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
 		endif
-		;if FileExists(GUICtrlRead($gui_input_source2)) and FileExists(GUICtrlRead($gui_input_target2)) then
-		;	logger('[2] Zálohovaní zahájeno.')
-		;	rsync(get_cygwin_path(GUICtrlRead($gui_input_source2)),get_cygwin_path(GUICtrlRead($gui_input_target2)))
-		;	logger('[2] Zalohování dokončeno.')
-		;else
-		;	logger('[2] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-		;endif
-		;if FileExists(GUICtrlRead($gui_input_source3)) and FileExists(GUICtrlRead($gui_input_target3)) then
-		;	logger('[3] Zálohovaní zahájeno.')
-		;	rsync(get_cygwin_path(GUICtrlRead($gui_input_source3)),get_cygwin_path(GUICtrlRead($gui_input_target3)))
-		;	logger('[3] Zalohování dokončeno.')
-		;else
-		;	logger('[3] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-		;endif
+		if FileExists(GUICtrlRead($gui_input_source2)) then
+			logger('[2] Zálohovaní zahájeno.')
+			rsync(get_cygwin_path(GUICtrlRead($gui_input_source2)),StringRegExpReplace(GUICtrlRead($gui_input_target2), '\\', '\/'))
+			logger('[2] Zalohování dokončeno.')
+		else
+			logger('[2] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
+		endif
+		if FileExists(GUICtrlRead($gui_input_source3)) then
+			logger('[3] Zálohovaní zahájeno.')
+			rsync(get_cygwin_path(GUICtrlRead($gui_input_source3)),StringRegExpReplace(GUICtrlRead($gui_input_target3), '\\', '\/'))
+			logger('[3] Zalohování dokončeno.')
+		else
+			logger('[3] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
+		endif
 		; enable button
 		GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
 	endif
@@ -219,7 +220,7 @@ func rsync($source,$target)
 	; show RSync
 	GUISetState(@SW_SHOW, $gui_rsync)
 	;return
-	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h -e ' & "'" _
+	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h --progress -e ' & "'" _
 		& get_cygwin_path($ssh_binary) _
 		& ' -o "StrictHostKeyChecking no"' _
 		& ' -o "UserKnownHostsFile=/dev/null"' _
