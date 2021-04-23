@@ -226,7 +226,8 @@ func rsync($source,$target)
 	; show RSync
 	GUISetState(@SW_SHOW, $gui_rsync)
 	; backup
-	$rsync = Run(@ComSpec & ' /c ' & $binary & ' --info=name,stats -avz ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
+	;rsync.exe -avz -e /cygdrive/../ssh.exe /cygdrive/c/.../in user@IP:/target/path
+	$rsync = Run(@ComSpec & ' /c ' & $binary & ' --info=name,stats -avz -h ' & "'" & $source & "' '" & $target & "'", @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
 	; progress
 	while ProcessExists($rsync)
 		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
