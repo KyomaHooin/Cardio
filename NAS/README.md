@@ -16,7 +16,8 @@ FILE
     /bin/cygwin.dll - Cygwin core library.
 /bin/cygiconv-2.dll - Cygwin iconv library.
 
-       LICENSE - GNU GLPv3 license.
+          CHANGELOG - Changelog.
+            LICENSE - GNU GLPv3 license.
 </pre>
 SOURCE
 
