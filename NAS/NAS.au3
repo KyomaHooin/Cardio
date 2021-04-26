@@ -166,6 +166,7 @@ while 1
 			if FileExists(GUICtrlRead($ctrl[$i][0])) then
 				logger('[' & $i + 1 & '] Zálohovaní zahájeno.')
 				GUICtrlSetBkColor($ctrl[$i][0], 0xffb347)
+				GUICtrlSetData($gui_error, 'Probíhá záloha..')
 				rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][0])),StringRegExpReplace(GUICtrlRead($ctrl[$i][3]), '\\', '\/'), $ctrl[$i][0])
 				logger('[' & $i + 1 & '] Zalohování dokončeno.')
 			ElseIf GUICtrlRead($ctrl[$i][0]) <> '' then
@@ -242,7 +243,6 @@ func rsync($source,$target,$handle)
 			if not @error then
 				GUICtrlSetData($gui_error, $error_code[$code_index][1])
 				GUICtrlSetBkColor($handle, 0xff6961)
-				GUICtrlSetColor($gui_error, 0xff0000)
 			Else
 				logger('rsync: Kód  ukončení ' & $exit_code[2] & '.')
 			endif
