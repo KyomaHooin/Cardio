@@ -244,7 +244,7 @@ func rsync($source,$target,$handle)
 				GUICtrlSetBkColor($handle, 0xff6961)
 				GUICtrlSetColor($gui_error, 0xff0000)
 			Else
-				logger('rsync: Kód  ukončení' & $exit_code[2] & '.')
+				logger('rsync: Kód  ukončení ' & $exit_code[2] & '.')
 			endif
 		endif
 	endif
