@@ -72,7 +72,7 @@ global $error_code[21][2]=[ _
 	[24,'Nedostupný zdroj během přenosu.'], _
 	[25,'Omezení smazání souboru.'], _
 	[30,'Vypršení časového limitu přenosu.'], _
-	[35,'Vypršení časového limitu spojení'], _
+	[35,'Vypršení časového limitu spojení.'], _
 	[255,'Neočekávaná chyba.']]
 
 ; ---------------------------------------------------------
