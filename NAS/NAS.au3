@@ -17,7 +17,7 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;
 
-#AutoIt3Wrapper_Res_Description=Secure Rsync NAS backup
+#AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
 #AutoIt3Wrapper_Res_ProductVersion=1.4
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
@@ -34,6 +34,7 @@
 #Include <GuiEdit.au3>
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
+#include <WinAPIProc.au3>
 
 ; ---------------------------------------------------------
 ;VAR
@@ -52,7 +53,7 @@ global $remote_prefix = '/volume1/'
 
 global $configuration[0][2]
 global $ctrl[10][4]
-global $error_code[21][2]=[ _
+global $error_code[25][2]=[ _
 	[0,'Dokončeno.'], _
 	[1,'Chyba syntaxe.'], _
 	[2,'Chyba kompatibility protokolu.'], _
@@ -73,6 +74,10 @@ global $error_code[21][2]=[ _
 	[25,'Omezení smazání souboru.'], _
 	[30,'Vypršení časového limitu přenosu.'], _
 	[35,'Vypršení časového limitu spojení.'], _
+	[124,'Neočekávaná chyba.'], _
+	[125,'Příkaz ukončen signálem.'], _
+	[126,'Příkaz nelze spustit.'], _
+	[127,'Příkaz nebyl nalezen.'], _
 	[255,'Neočekávaná chyba.']]
 
 ; ---------------------------------------------------------
@@ -160,7 +165,8 @@ while 1
 		for $i = 0 to 9
 			if FileExists(GUICtrlRead($ctrl[$i][0])) then
 				logger('[' & $i + 1 & '] Zálohovaní zahájeno.')
-				rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][0])),StringRegExpReplace(GUICtrlRead($ctrl[$i][3]), '\\', '\/'))
+				GUICtrlSetBkColor($ctrl[$i][0], 0xffb347)
+				rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][0])),StringRegExpReplace(GUICtrlRead($ctrl[$i][3]), '\\', '\/'), $ctrl[$i][0])
 				logger('[' & $i + 1 & '] Zalohování dokončeno.')
 			ElseIf GUICtrlRead($ctrl[$i][0]) <> '' then
 				logger('[' & $i + 1 & '] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
@@ -204,8 +210,8 @@ func get_cygwin_path($path)
 	return StringRegExpReplace($cygwin_path ,'(.*)', '$1'); catch space by doublequote
 endfunc
 
-func rsync($source,$target)
-	local $buffer, $out_buffer, $err_buffer, $code, $code_index
+func rsync($source,$target,$handle)
+	local $buffer, $out_buffer, $err_buffer, $code, $code_index, $proc, $exit_code
 	; rsync
 	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h -e ' & "'" _
 		& get_cygwin_path($ssh_binary) _
@@ -217,24 +223,37 @@ func rsync($source,$target)
 		& $remote_user & '@' & $remote_host & ':' & $remote_prefix & $target & "'" _
 		, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD) _
 	)
-	; progress
+	; stderr / stdout
 	while ProcessExists($rsync)
-		; stdout
 		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
 		if $out_buffer <> '' then $buffer &= $out_buffer
-		; stdrerr
 		$err_buffer = StringReplace(StderrRead($rsync), @LF, @CRLF)
 		if $err_buffer <> '' then $buffer &= $err_buffer
 	wend
-	if $buffer <> '' Then
-		$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
-		if not @error then
-			logger('NAS: Kód chyby ' & $code[0] & '.')
-			$code_index = _ArrayBinarySearch($error_code, $code[0])
+	; exit code
+	$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync)
+	$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
+	if not @error then
+		if $exit_code[2] = 0 then
+			GUICtrlSetBkColor($handle, 0x77dd77)
+			GUICtrlSetData($gui_error, 'Hotovo.')
+		else
+			$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
 			if not @error then
 				GUICtrlSetData($gui_error, $error_code[$code_index][1])
+				GUICtrlSetBkColor($handle, 0xff6961)
 				GUICtrlSetColor($gui_error, 0xff0000)
+			Else
+				logger('rsync: Kód  ukončení' & $exit_code[2] & '.')
 			endif
+		endif
+	endif
+	_WinAPI_CloseHandle($proc)
+	; error code
+	if $buffer <> '' then
+		$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+		if not @error then
+			logger('rsync: Kód chyby ' & $code[0] & '.')
 		endif
 	endif
 	; logging

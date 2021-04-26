@@ -3,7 +3,7 @@
 
 DESCRIPTION
 
-NAS rsync backup GUI for Win64-bit OS.
+Secure Rsync NAS GUI for Win64-bit OS.
 
 FILE
 <pre>
