@@ -52,27 +52,28 @@ global $remote_prefix = '/volume1/'
 
 global $configuration[0][2]
 global $ctrl[10][4]
-global $error_code[20][2]=[ _
-	['0','Dokončeno.'], _
-	['1','Chyba syntaxe.'], _
-	['2','Chyba kompatibility protokolu.'], _
-	['3','Chyba při výběru souborů, nebo adresářů.'], _
-	['4','Požadovaná akce není podporována.'], _
-	['5','Chyba při zahájení klient-server protokolu.'], _
-	['6','Chyba při zápisu do logu.'], _
-	['10','I/O chyba soketu.'], _
-	['11','I/O chyba souboru.'], _
-	['12','Chyba v datovém proudu.'], _
-	['13','Diagnostická chyba.'], _
-	['14','Chyba IPC.'], _
-	['20','Signál přerušení SIGUSR1, SIGINT.'], _
-	['21','Chyba při čekání procesu.'], _
-	['22','Nedostatek paměti.'], _
-	['23','Chyba během přenosu.'], _
-	['24','Nedostupný zdroj během přenosu.'], _
-	['25','Omezení smazání souboru.'], _
-	['30','Vypršení časového limit přenosu.'], _
-	['35','Vypršení časového limitu spojení']]
+global $error_code[21][2]=[ _
+	[0,'Dokončeno.'], _
+	[1,'Chyba syntaxe.'], _
+	[2,'Chyba kompatibility protokolu.'], _
+	[3,'Chyba při výběru souborů, nebo adresářů.'], _
+	[4,'Požadovaná akce není podporována.'], _
+	[5,'Chyba při zahájení klient-server protokolu.'], _
+	[6,'Chyba při zápisu do logu.'], _
+	[10,'I/O chyba soketu.'], _
+	[11,'I/O chyba souboru.'], _
+	[12,'Chyba v datovém proudu.'], _
+	[13,'Diagnostická chyba.'], _
+	[14,'Chyba IPC.'], _
+	[20,'Signál přerušení SIGUSR1, SIGINT.'], _
+	[21,'Chyba při čekání procesu.'], _
+	[22,'Nedostatek paměti.'], _
+	[23,'Chyba během přenosu.'], _
+	[24,'Nedostupný zdroj během přenosu.'], _
+	[25,'Omezení smazání souboru.'], _
+	[30,'Vypršení časového limitu přenosu.'], _
+	[35,'Vypršení časového limitu spojení'], _
+	[255,'Neočekávaná chyba.']]
 
 ; ---------------------------------------------------------
 ;CONTROL
@@ -197,18 +198,16 @@ func logger($text)
 endfunc
 
 func get_cygwin_path($path)
+	local $cygwin_path
 	$cygwin_path = StringRegExpReplace($path , '\\', '\/'); convert backslash -> slash
 	$cygwin_path = StringRegExpReplace($cygwin_path ,'^(.)\:(.*)', '\/cygdrive\/$1$2'); convert drive colon
 	return StringRegExpReplace($cygwin_path ,'(.*)', '$1'); catch space by doublequote
 endfunc
 
 func rsync($source,$target)
-	$gui_rsync = GUICreate("NAS Záloha - Rsync 3.1.2", 625, 320, Default, Default)
-	$gui_rsync_edit = GUICtrlCreateEdit("", 8, 8, 609, 305, BitOR($ES_AUTOVSCROLL,$ES_READONLY,$ES_WANTRETURN,$WS_VSCROLL))
-	; show RSync
-	GUISetState(@SW_SHOW, $gui_rsync)
-	;return
-	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h --progress -e ' & "'" _
+	local $buffer, $out_buffer, $err_buffer, $code, $code_index
+	; rsync
+	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h -e ' & "'" _
 		& get_cygwin_path($ssh_binary) _
 		& ' -o "StrictHostKeyChecking no"' _
 		& ' -o "UserKnownHostsFile=/dev/null"' _
@@ -220,16 +219,26 @@ func rsync($source,$target)
 	)
 	; progress
 	while ProcessExists($rsync)
+		; stdout
 		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
-		if $out_buffer <> '' then GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $out_buffer)
+		if $out_buffer <> '' then $buffer &= $out_buffer
+		; stdrerr
 		$err_buffer = StringReplace(StderrRead($rsync), @LF, @CRLF)
-		if $err_buffer <> '' then GUICtrlSetData($gui_rsync_edit, GUICtrlRead($gui_rsync_edit) & $err_buffer)
-		_GUICtrlEdit_Scroll($gui_rsync_edit, 4); scroll down
+		if $err_buffer <> '' then $buffer &= $err_buffer
 	wend
+	if $buffer <> '' Then
+		$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+		if not @error then
+			logger('NAS: Kód chyby ' & $code[0] & '.')
+			$code_index = _ArrayBinarySearch($error_code, $code[0])
+			if not @error then
+				GUICtrlSetData($gui_error, $error_code[$code_index][1])
+				GUICtrlSetColor($gui_error, 0xff0000)
+			endif
+		endif
+	endif
 	; logging
-	logger(GUICtrlRead($gui_rsync_edit))
-	; destroy GUI
-	GUIDelete($gui_rsync)
+	logger($buffer)
 	;exit
 	return
 EndFunc
