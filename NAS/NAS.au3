@@ -1,6 +1,5 @@
 ;
-
-; Secure Rsync Win64 GUI
+; Secure Rsync NAS GUI
 ;
 ; Copyright (c) 2021 Kyoma Hooin
 ;
@@ -20,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS backup
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.3
+#AutoIt3Wrapper_Res_ProductVersion=1.4
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -40,10 +39,8 @@
 ;VAR
 ; ---------------------------------------------------------
 
-global $version = '1.3'
+global $version = '1.4'
 global $ini = @ScriptDir & '\NAS.ini'
-global $configuration[0][2]
-
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
@@ -52,6 +49,30 @@ global $remote_user = 'backup'
 global $remote_host = '10.8.0.1'
 global $remote_port = '22'
 global $remote_prefix = '/volume1/'
+
+global $configuration[0][2]
+global $ctrl[10][4]
+global $error_code[20][2]=[ _
+	['0','Dokončeno.'], _
+	['1','Chyba syntaxe.'], _
+	['2','Chyba kompatibility protokolu.'], _
+	['3','Chyba při výběru souborů, nebo adresářů.'], _
+	['4','Požadovaná akce není podporována.'], _
+	['5','Chyba při zahájení klient-server protokolu.'], _
+	['6','Chyba při zápisu do logu.'], _
+	['10','I/O chyba soketu.'], _
+	['11','I/O chyba souboru.'], _
+	['12','Chyba v datovém proudu.'], _
+	['13','Diagnostická chyba.'], _
+	['14','Chyba IPC.'], _
+	['20','Signál přerušení SIGUSR1, SIGINT.'], _
+	['21','Chyba při čekání procesu.'], _
+	['22','Nedostatek paměti.'], _
+	['23','Chyba během přenosu.'], _
+	['24','Nedostupný zdroj během přenosu.'], _
+	['25','Omezení smazání souboru.'], _
+	['30','Vypršení časového limit přenosu.'], _
+	['35','Vypršení časového limitu spojení']]
 
 ; ---------------------------------------------------------
 ;CONTROL
@@ -79,12 +100,10 @@ logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' 
 ; read configuration
 if not FileExists($ini) then
 	$f = FileOpen($ini, 1)
-	FileWriteLine($f, 'dir1=')
-	FileWriteLine($f, 'dir2=')
-	FileWriteLine($f, 'dir3=')
-	FileWriteLine($f, 'dir4=')
-	FileWriteLine($f, 'dir5=')
-	FileWriteLine($f, 'dir6=')
+	for $i=1 to 10
+		FileWriteLine($f, 'source' & $i & '=')
+		FileWriteLine($f, 'target' & $i & '=')
+	next
 	FileClose($f)
 endif
 _FileReadToArray($ini, $configuration, 0, '='); 0-based
@@ -99,31 +118,21 @@ endif
 ; GUI
 ; ---------------------------------------------------------
 
-$gui = GUICreate('NAS Záloha ' & $version, 402, 234, Default, Default)
-$gui_group1 = GUICtrlCreateGroup('', 5, 0, 392, 68)
-$gui_label_source1 = GUICtrlCreateLabel('Zdroj:', 12, 18, 30, 21)
-$gui_input_source1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir1')][1], 42, 15, 268, 21)
-$gui_button_source1 = GUICtrlCreateButton("Procházet", 314, 15, 75, 21)
-$gui_label_target1 = GUICtrlCreateLabel('Cíl:', 22, 42, 30, 21)
-$gui_label_prefix1 = GUICtrlCreateLabel($remote_prefix, 48, 42, 50, 21)
-$gui_input_target1 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir2')][1], 102, 39, 286, 21)
-$gui_group2 = GUICtrlCreateGroup('', 5, 68, 392, 68)
-$gui_label_source2 = GUICtrlCreateLabel('Zdroj:', 12, 86, 30, 21)
-$gui_input_source2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir3')][1], 42, 83, 268, 21)
-$gui_button_source2 = GUICtrlCreateButton('Procházet', 314, 82, 75, 21)
-$gui_label_target2 = GUICtrlCreateLabel('Cíl:', 22, 110, 30, 21)
-$gui_label_prefix2 = GUICtrlCreateLabel($remote_prefix, 48, 110, 50, 21)
-$gui_input_target2 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir4')][1], 102, 106, 286, 21)
-$gui_group3 = GUICtrlCreateGroup('', 5, 136, 392, 68)
-$gui_label_source3 = GUICtrlCreateLabel('Zdroj:', 12, 153, 30, 21)
-$gui_input_source3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir5')][1], 42, 150, 268, 21)
-$gui_button_source3 = GUICtrlCreateButton('Procházet', 314, 150, 75, 21)
-$gui_label_target3 = GUICtrlCreateLabel('Cíl:', 22, 178, 30, 21)
-$gui_label_prefix3 = GUICtrlCreateLabel($remote_prefix, 48, 178, 50, 21)
-$gui_input_target3 = GUICtrlCreateInput($configuration[_ArrayBinarySearch($configuration,'dir6')][1], 102, 174, 286, 21)
+$gui = GUICreate('NAS Záloha ' & $version, 615, 300, Default, Default)
+$gui_group1 = GUICtrlCreateGroup('Zdroj', 5, 0, 378, 270)
+$gui_group100 = GUICtrlCreateGroup('Cíl', 386, 0, 224, 270)
 
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 240, 208, 75, 21)
-$gui_button_exit = GUICtrlCreateButton('Konec', 320, 208, 75, 21)
+for $i = 0 to 9
+	$ctrl[$i][0] = GUICtrlCreateInput($configuration[$i*2][1], 12, 15 + $i * 25, 282, 21)
+	$ctrl[$i][1] = GUICtrlCreateButton("Procházet", 300, 15 + $i * 25, 75, 21)
+	$ctrl[$i][2] = GUICtrlCreateLabel($remote_prefix, 394, 18 + $i * 25, 50, 21)
+	$ctrl[$i][3] = GUICtrlCreateInput($configuration[$i*2+1][1], 450, 15 + $i * 25, 153, 21)
+next
+
+$gui_error = GUICtrlCreateLabel('', 10, 278, 358, 21)
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 378, 275, 75, 21)
+$gui_button_cancel = GUICtrlCreateButton('Přerušit', 456, 275, 75, 21)
+$gui_button_exit = GUICtrlCreateButton('Konec', 534, 275, 75, 21)
 
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
@@ -137,44 +146,25 @@ GUISetState(@SW_SHOW)
 while 1
 	$event = GUIGetMsg()
 	; source/target selection
-	if $event = $gui_button_source1 Then
+	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 1)
+	if not @error then
 		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
-		if not @error then GUICtrlSetData($gui_input_source1, $path)
-	endif
-	if $event = $gui_button_source2 Then
-		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
-		if not @error then GUICtrlSetData($gui_input_source2, $path)
-	endif
-	if $event = $gui_button_source3 Then
-		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
-		if not @error then GUICtrlSetData($gui_input_source3, $path)
+			if not @error then GUICtrlSetData($ctrl[$browse][0], $path)
 	endif
 	; backup
 	if $event = $gui_button_backup then
 		; disable button
 		GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
 		; backup
-		if FileExists(GUICtrlRead($gui_input_source1)) then
-			logger('[1] Zálohovaní zahájeno.')
-			rsync(get_cygwin_path(GUICtrlRead($gui_input_source1)),StringRegExpReplace(GUICtrlRead($gui_input_target1), '\\', '\/'))
-			logger('[1] Zalohování dokončeno.')
-		else
-			logger('[1] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-		endif
-		if FileExists(GUICtrlRead($gui_input_source2)) then
-			logger('[2] Zálohovaní zahájeno.')
-			rsync(get_cygwin_path(GUICtrlRead($gui_input_source2)),StringRegExpReplace(GUICtrlRead($gui_input_target2), '\\', '\/'))
-			logger('[2] Zalohování dokončeno.')
-		else
-			logger('[2] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-		endif
-		if FileExists(GUICtrlRead($gui_input_source3)) then
-			logger('[3] Zálohovaní zahájeno.')
-			rsync(get_cygwin_path(GUICtrlRead($gui_input_source3)),StringRegExpReplace(GUICtrlRead($gui_input_target3), '\\', '\/'))
-			logger('[3] Zalohování dokončeno.')
-		else
-			logger('[3] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
-		endif
+		for $i = 0 to 9
+			if FileExists(GUICtrlRead($ctrl[$i][0])) then
+				logger('[' & $i + 1 & '] Zálohovaní zahájeno.')
+				rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][0])),StringRegExpReplace(GUICtrlRead($ctrl[$i][3]), '\\', '\/'))
+				logger('[' & $i + 1 & '] Zalohování dokončeno.')
+			ElseIf GUICtrlRead($ctrl[$i][0]) <> '' then
+				logger('[' & $i + 1 & '] Chyba: Zdrojový, nebo cílový adresář neexistuje.')
+			endif
+		next
 		; enable button
 		GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
 	endif
@@ -182,12 +172,10 @@ while 1
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		; write configuration
 		$f = FileOpen($ini, 2); overwrite
-		FileWriteLine($ini, 'dir1=' & GUICtrlRead($gui_input_source1))
-		FileWriteLine($ini, 'dir2=' & GUICtrlRead($gui_input_target1))
-		FileWriteLine($ini, 'dir3=' & GUICtrlRead($gui_input_source2))
-		FileWriteLine($ini, 'dir4=' & GUICtrlRead($gui_input_target2))
-		FileWriteLine($ini, 'dir5=' & GUICtrlRead($gui_input_source3))
-		FileWriteLine($ini, 'dir6=' & GUICtrlRead($gui_input_target3))
+		for $i=0 to 9
+			FileWriteLine($ini, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
+			FileWriteLine($ini, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][3]))
+		next
 		FileClose($f)
 		; exit
 		exitloop
