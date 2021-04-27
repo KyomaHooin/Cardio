@@ -46,7 +46,6 @@ global $log = @ScriptDir & '\' & 'NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
-global $key, $remote_user, $remote_host, $remote_port, $remote_prefix
 global $transport_token = False
 
 global $configuration[0][2]
@@ -166,8 +165,8 @@ $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 605, 84)
 $gui_tab_end = GUICtrlCreateTabItem('')
 
 $gui_error = GUICtrlCreateLabel('', 10, 318, 358, 21)
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 394, 314, 75, 21)
-$gui_button_cancel = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 472, 314, 75, 21); 394
+;$gui_button_cancel = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; set default focus
@@ -181,24 +180,30 @@ GUISetState(@SW_SHOW)
 
 while 1
 	$event = GUIGetMsg()
-	; source/target selection
+	; select source
 	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
 	if not @error then
 		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($ctrl[$browse][1], $path)
 	endif
-	; SSH key
+	; select SSH key
 	if $event = $gui_button_key Then
 		$key_path = FileOpenDialog('NAS Záloha ' & $version & ' - Soukromý klíč', @HomeDrive, 'All (*.*)')
 		if not @error then GUICtrlSetData($gui_key, $key_path)
 	endif
-	; uncheck reset color
+	; update prefix
+	if $event = $gui_tab Then
+		if GUICtrlRead($gui_tab) = 0 Then
+			for $i=0 to 9
+				GUICtrlSetData($ctrl[$i][3],GUICtrlRead($gui_prefix))
+			Next
+		endif
+	endif
+	; checkbox unset
 	$checkbox = _ArrayBinarySearch($ctrl, $event, Default, Default, 0); 0' column
 	if not @error then
 		if GUICtrlRead($ctrl[$checkbox][0]) = 4 then GUICtrlSetBkColor($ctrl[$checkbox][1], 0xffffff)
 	endif
-	; break token
-	;if $event = $gui_button_cancel then $transport_token = True
 	; backup
 	if $event = $gui_button_backup then
 		$verify = verify_setup()
@@ -262,11 +267,25 @@ func logger($text)
 	FileWriteLine($log, $text)
 endfunc
 
+func get_conf_value($conf,$item)
+	$index = _ArraySearch($conf, $item)
+	if not @error then return $conf[$index][1]
+	return ''
+endfunc
+
 func get_cygwin_path($path)
 	local $cygwin_path
 	$cygwin_path = StringRegExpReplace($path , '\\', '\/'); convert backslash -> slash
 	$cygwin_path = StringRegExpReplace($cygwin_path ,'^(.)\:(.*)', '\/cygdrive\/$1$2'); convert drive colon
 	return StringRegExpReplace($cygwin_path ,'(.*)', '$1'); catch space by doublequote
+endfunc
+
+func verify_setup()
+	if not FileExists(GUICtrlRead($gui_key)) then return SetError(1, 0, "Neplatný klíč.")
+	if GUICtrlRead($gui_user) == '' then return SetError(1, 0, "Neplatný uživatel.")
+	if not StringRegExp(GUICtrlRead($gui_host),'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, "Neplatný host.")
+	if GUICtrlRead($gui_port) < 1 or GUICtrlRead($gui_port) > 65535 then return SetError(1, 0, "Neplatné číslo portu.")
+	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, "Neplatný prefix.")
 endfunc
 
 func rsync($source,$target,$handle)
@@ -284,12 +303,6 @@ func rsync($source,$target,$handle)
 	)
 	; stderr / stdout
 	while ProcessExists($rsync)
-		; cancel
-		;if $transport_token = True then
-		;	$transport_token = False
-		;	logger("rsync: Přerušení..")
-		;	_WinAPI_TerminateProcess($rsync)
-		;endif
 		; I/O
 		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
 		if $out_buffer <> '' then $buffer &= $out_buffer
@@ -329,17 +342,3 @@ func rsync($source,$target,$handle)
 	;exit
 	return
 EndFunc
-
-func get_conf_value($conf,$item)
-	$index = _ArraySearch($conf, $item)
-	if not @error then return $conf[$index][1]
-	return ''
-endfunc
-
-func verify_setup()
-	if not FileExists(GUICtrlRead($gui_key)) then return SetError(1, 0, "Neplatný klíč.")
-	if GUICtrlRead($gui_user) == '' then return SetError(1, 0, "Neplatný uživatel.")
-	if not StringRegExp(GUICtrlRead($gui_host),'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, "Neplatný host.")
-	if GUICtrlRead($gui_port) < 1 or GUICtrlRead($gui_port) > 65535 then return SetError(1, 0, "Neplatné číslo portu.")
-	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, "Neplatný prefix.")
-endfunc
