@@ -46,8 +46,6 @@ global $log = @ScriptDir & '\' & 'NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
-global $transport_token = False
-
 global $configuration[0][2]
 global $ctrl[10][5]
 global $error_code[25][2]=[ _
