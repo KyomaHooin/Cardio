@@ -46,6 +46,8 @@ global $log = @ScriptDir & '\' & 'NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
+global $buffer; I/O buffer
+
 global $configuration[0][2]
 global $ctrl[10][5]
 global $error_code[25][2]=[ _
@@ -140,7 +142,7 @@ for $i = 0 to 9
 	$ctrl[$i][4] = GUICtrlCreateInput($configuration[$i*3+1][1], 496, 44 + $i * 25, 113, 21)
 next
 
-$gui_tab_progress = GUICtrlCreateTabItem('Průběh')
+$gui_tab_progress = GUICtrlCreateTabItem('Výstup')
 $gui_progress = GUICtrlCreateEdit('', 15, 35, 600, 262, BitOR($ES_AUTOVSCROLL,$ES_READONLY,$ES_WANTRETURN,$WS_VSCROLL))
 
 $gui_tab_setup = GUICtrlCreateTabItem('Nastavení')
@@ -163,8 +165,8 @@ $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 605, 84)
 $gui_tab_end = GUICtrlCreateTabItem('')
 
 $gui_error = GUICtrlCreateLabel('', 10, 318, 358, 21)
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 472, 314, 75, 21); 394
-;$gui_button_cancel = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
+$gui_button_backup = GUICtrlCreateButton('Zálohovat', 394, 314, 75, 21); 394
+$gui_button_dry = GUICtrlCreateButton('Test', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; set default focus
@@ -202,6 +204,33 @@ while 1
 	if not @error then
 		if GUICtrlRead($ctrl[$checkbox][0]) = 4 then GUICtrlSetBkColor($ctrl[$checkbox][1], 0xffffff)
 	endif
+	; dry run
+	if $event = $gui_button_dry then
+		$verify = verify_setup()
+		if @error Then
+			GUICtrlSetData($gui_error, $verify)
+		else
+			; disable button
+			GUICtrlSetState($gui_button_dry, $GUI_DISABLE)
+			; clear buffer
+			$buffer = ''
+			; backup
+			for $i = 0 to 9
+				if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
+					if FileExists(GUICtrlRead($ctrl[$i][1])) then
+						GUICtrlSetBkColor($ctrl[$i][1], 0xffb347)
+						GUICtrlSetData($gui_error, 'Probíhá záloha..')
+						rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][1])), StringRegExpReplace(GUICtrlRead($ctrl[$i][4]), '\\', '\/'), $ctrl[$i][1], True)
+					ElseIf GUICtrlRead($ctrl[$i][1]) <> '' then
+						GUICtrlSetBkColor($ctrl[$i][1], 0xff6961)
+						GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
+					endif
+				endif
+			next
+			; enable button
+			GUICtrlSetState($gui_button_dry, $GUI_ENABLE)
+		endif
+	endif
 	; backup
 	if $event = $gui_button_backup then
 		$verify = verify_setup()
@@ -211,6 +240,8 @@ while 1
 		else
 			; disable button
 			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
+			; clear buffer
+			$buffer = ''
 			; backup
 			for $i = 0 to 9
 				if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
@@ -218,7 +249,7 @@ while 1
 						logger('[' & $i + 1 & '] Zálohovaní zahájeno.')
 						GUICtrlSetBkColor($ctrl[$i][1], 0xffb347)
 						GUICtrlSetData($gui_error, 'Probíhá záloha..')
-						rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][1])), StringRegExpReplace(GUICtrlRead($ctrl[$i][4]), '\\', '\/'), $ctrl[$i][1])
+						rsync(get_cygwin_path(GUICtrlRead($ctrl[$i][1])), StringRegExpReplace(GUICtrlRead($ctrl[$i][4]), '\\', '\/'), $ctrl[$i][1], False)
 						logger('[' & $i + 1 & '] Zalohování dokončeno.')
 					ElseIf GUICtrlRead($ctrl[$i][1]) <> '' then
 						GUICtrlSetBkColor($ctrl[$i][1], 0xff6961)
@@ -286,10 +317,12 @@ func verify_setup()
 	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, "Neplatný prefix.")
 endfunc
 
-func rsync($source,$target,$handle)
-	local $buffer, $out_buffer, $err_buffer, $code, $code_index, $proc, $exit_code
+func rsync($source,$target,$handle, $dry)
+	local $option='', $out_buffer, $err_buffer, $code, $code_index, $proc, $exit_code
+	; dry run
+	if $dry = True then $option ='-n'
 	; rsync
-	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h -e ' & "'" _
+	$rsync = Run(@ComSpec & ' /c ' & $rsync_binary & ' -avz -h '& $option &' -e ' & "'" _
 		& get_cygwin_path($ssh_binary) _
 		& ' -o "StrictHostKeyChecking no"' _
 		& ' -o "UserKnownHostsFile=/dev/null"' _
@@ -302,13 +335,10 @@ func rsync($source,$target,$handle)
 	; stderr / stdout
 	while ProcessExists($rsync)
 		; I/O
-		$out_buffer = StringReplace(StdoutRead($rsync), @LF, @CRLF)
-		if $out_buffer <> '' then $buffer &= $out_buffer
-		$err_buffer = StringReplace(StderrRead($rsync), @LF, @CRLF)
-		if $err_buffer <> '' then $buffer &= $err_buffer
+		$buffer &= StringReplace(StdoutRead($rsync), @LF, @CRLF)
+		$buffer &= StringReplace(StderrRead($rsync), @LF, @CRLF)
 		; update progress
-		if $buffer <> '' then GUICtrlSetData($gui_progress, $buffer)
-		_GUICtrlEdit_Scroll($gui_progress, 4); scroll down
+		GUICtrlSetData($gui_progress, $buffer)
 		Sleep(1); do not scress CPU
 	wend
 	; exit code
@@ -325,18 +355,18 @@ func rsync($source,$target,$handle)
 				GUICtrlSetBkColor($handle, 0xff6961)
 			endif
 		endif
-		logger('rsync: Kód ukončení ' & $exit_code[2] & '.')
+		if $dry = False then logger('rsync: Kód ukončení ' & $exit_code[2] & '.')
 	endif
 	_WinAPI_CloseHandle($proc)
 	; error code
 	if $buffer <> '' then
 		$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 		if not @error then
-			logger('rsync: Kód chyby ' & $code[0] & '.')
+			if $dry = False then logger('rsync: Kód chyby ' & $code[0] & '.')
 		endif
 	endif
 	; logging
-	logger($buffer)
-	;exit
+	if $dry = False then logger($buffer)
+	; exit
 	return
 EndFunc
