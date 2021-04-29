@@ -1,7 +1,25 @@
 
 [TODO]
 
+-NAS DSM HTTPS
 -NAS firewall
+
+-Hotovo. => Dokonceno.
+-Core loop rewrite.
+-Partial backup + pause(_API_Terminate)/resume button.
+-Backup timeout.
+-"Backup progress" loop bug[_API?].
+-Network error loop break.
+-Rsync stdout encoding.
+-Pretify log.
+-Create drive/dir share.
+
+[DONE] -Trailng slash strip.
+[DONE] -Remove inherit permssion.
+
+[1.6]
+
+-
 
 [1.5]
 
