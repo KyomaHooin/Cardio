@@ -3,15 +3,25 @@
 
 -NAS DSM HTTPS
 -NAS firewall
--Core loop rewrite.
+
 -Partial backup + pause(_API_Terminate)/resume button.
 -Backup timeout.
 -"Backup progress" loop bug[_API?].
--Network error loop break.
--Pretify log.
--Create drive/dir share.
 
-[DONE] -Remove inherit permssion. + move back to C:\[!]
+-Network error loop break.
+
+-Core loop rewrite.
+-Pretify log.
+
+[SETUP]
+
+ -Create drive/dir share:
+
+Properties > Sharing > Advanced > NAME + PERM
+
+-Remove inherit permssion. + move back to C:\:
+
+Propertines > Permission > Advanced [dole] > Disable inherit perm. => ONLY USER FULL.
 
 [1.6]
 
