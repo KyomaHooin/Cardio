@@ -88,7 +88,7 @@ if UBound(ProcessList(@ScriptName)) > 2 then
 endif
 
 ; logging
-$log = FileOpen($log, 1)
+$log = FileOpen($log, 1); overwrite
 if @error then
 	MsgBox(48, 'NAS Záloha ' & $version, 'System je připojen pouze pro čtení.')
 	exit
@@ -333,21 +333,17 @@ func rsync($source,$target,$handle, $dry)
 		, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD) _
 	)
 	; stderr / stdout
-	while ProcessExists($rsync)
-		; I/O
-		$buffer &= StringReplace(StdoutRead($rsync), @LF, @CRLF)
-		$buffer &= StringReplace(StderrRead($rsync), @LF, @CRLF)
-		; update progress
-		GUICtrlSetData($gui_progress, $buffer)
-		Sleep(1); do not scress CPU
-	wend
+	ProcessWaitClose($rsync)
+	$buffer &= StringReplace(StderrRead($rsync), @LF, @CRLF)
+	$buffer &= StringReplace(StdoutRead($rsync), @LF, @CRLF)
+	GUICtrlSetData($gui_progress, BinaryToString(StringToBinary($buffer), $SB_UTF8))
 	; exit code
 	$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync)
 	$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 	if not @error then
 		if $exit_code[2] = 0 then
 			GUICtrlSetBkColor($handle, 0x77dd77)
-			GUICtrlSetData($gui_error, 'Hotovo.')
+			GUICtrlSetData($gui_error, 'Dokončeno.')
 		else
 			$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
 			if not @error then
