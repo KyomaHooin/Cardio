@@ -4,24 +4,40 @@
 -NAS DSM HTTPS
 -NAS firewall
 
+-global $restore, $run
+-state column[5] = state1, state2 ..
 -Partial backup + pause(_API_Terminate)/resume button.
+-Pretify log.
+-Core loop rewrite.
+
+main() {
+
+ if backup { run }
+ if pause { $terminiate }
+
+  if $run or $terminate {
+     log
+  }
+
+  if $run {
+     get_state () -> Rsync()
+  }
+}
+
+-Network error loop break.
 -Backup timeout.
 -"Backup progress" loop bug[_API?].
 
--Network error loop break.
-
--Core loop rewrite.
--Pretify log.
-
 [SETUP]
 
- -Create drive/dir share:
+-Create drive/dir share:
 
-Properties > Sharing > Advanced > NAME + PERM
+  Properties > Sharing > Advanced > NAME + PERM
 
 -Remove inherit permssion. + move back to C:\:
 
-Propertines > Permission > Advanced [dole] > Disable inherit perm. => ONLY USER FULL.
+  Propertines > Permission > Advanced [dole]
+  > Disable inherit perm. => ONLY USER FULL.
 
 [1.6]
 
