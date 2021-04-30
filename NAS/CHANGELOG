@@ -3,30 +3,10 @@
 
 -NAS DSM HTTPS
 -NAS firewall
-
--global $restore, $run
--state column[5] = state1, state2 ..
--Partial backup + pause(_API_Terminate)/resume button.
 -Pretify log.
--Core loop rewrite.
-
-main() {
-
- if backup { run }
- if pause { $terminiate }
-
-  if $run or $terminate {
-     log
-  }
-
-  if $run {
-     get_state () -> Rsync()
-  }
-}
-
 -Network error loop break.
 -Backup timeout.
--"Backup progress" loop bug[_API?].
+-"Backup .." loop bug[_API?].
 
 [SETUP]
 
@@ -43,6 +23,8 @@ main() {
 
 [General]
 
+-Pause/resume.
+-Core loop.
 -Trailng slash debug.
 -"Done" -> "Finished".
 -Rsync stdout/stderr encoding.
