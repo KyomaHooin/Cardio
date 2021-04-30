@@ -3,11 +3,14 @@
 
 -NAS DSM HTTPS
 -NAS firewall
+
 -Pretify log.
 -Network error loop break.
 -Backup timeout.
 -"Backup .." loop bug[_API?].
 -Restore test vs restore backup.
+-Reset state on re-run.
+-INI diacritic.
 
 [SETUP]
 
