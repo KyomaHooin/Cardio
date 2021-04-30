@@ -197,8 +197,8 @@ $gui_tab_end = GUICtrlCreateTabItem('')
 
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
 $gui_button_backup = GUICtrlCreateButton('Zálohovat', 316, 314, 75, 21)
-$gui_button_partial = GUICtrlCreateButton('Přerušit', 394, 314, 75, 21)
-$gui_button_dry = GUICtrlCreateButton('Test', 472, 314, 75, 21)
+$gui_button_dry = GUICtrlCreateButton('Test', 394, 314, 75, 21)
+$gui_button_partial = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; set default focus
@@ -444,12 +444,12 @@ while 1
 				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
 			next
 			; reset test states
-			if $test then
-				; reset state
-				for $i = 0 to 9
-					$conf[$i*4+3][1] = $orig[$i*4+3][1]
-				next
-			endif
+			;if $test then
+			;	; reset state
+			;	for $i = 0 to 9
+			;		$conf[$i*4+3][1] = $orig[$i*4+3][1]
+			;	next
+			;endif
 			; reset tokens
 			$backup=False
 			$terminate=False
