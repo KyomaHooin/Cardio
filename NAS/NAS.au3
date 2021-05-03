@@ -24,6 +24,7 @@
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
 #AutoIt3Wrapper_Icon=NAS.ico
+;#AutoIt3Wrapper_UseX64=y
 #NoTrayIcon
 
 ; ---------------------------------------------------------
@@ -423,14 +424,6 @@ while 1
 				; update output
 				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
 				logger('[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
-			 elseif StringInStr(GUICtrlRead($ctrl[$index][1]), ' ') then
-				; update state
-				$conf[$index*4+3][1] = $failed
-				; update color
-				GUICtrlSetBkColor($ctrl[$index][1], $red)
-				; update output
-				GUICtrlSetData($gui_error, 'Zdrojová cesta obsahuje mezeru.')
-				logger('[' & $index + 1 & '] NAS: Zdrojová cesta obsahuje mezeru.')
 			 else
 				logger('[' & $index + 1 & '] Zálohovaní zahájeno.')
 				; update color
@@ -440,14 +433,14 @@ while 1
 				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
-				& ' -avz -h ' & $option & ' -e ' _
-				& "'" & '"' & $ssh_binary & '"' _
+				& ' -avz -s -h ' & $option & ' -e ' & "'" _
+				& '"' & $ssh_binary & '"' _
 				& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
 				& ' -p ' & GUICtrlRead($gui_port) _
 				& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
 				& "'" & get_cygwin_path(GUICtrlRead($ctrl[$index][1])) & "' " _
 				& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
-				& ':' & GUICtrlRead($gui_prefix) & GUICtrlRead($ctrl[$index][4]) _
+				& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($ctrl[$index][4]) & "'" _
 				, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
 				; update token
 				$run = True

@@ -4,19 +4,15 @@
 -NAS DSM HTTPS
 -NAS firewall
 
--Pretify log.
--INI diacritic.
--Limited/unlimited version (x64?)
--Space in source/target.
--Diakritic source/target.
-
 [SETUP]
 
 -Create drive/dir share:
 
   Properties > Sharing > Advanced > NAME + PERM
 
--Remove inherit permission(NAS,VPNCert) + move back to C:\:
+-Move back to C:\ + exclude security.
+
+-Remove inherit permssion.move back to C:\:
 
   Propertines > Permission > Advanced [dole]
   > Disable inherit perm. => ONLY USER FULL.
@@ -27,7 +23,9 @@
 
 [General]
 
--Pause/resume.
+-Library upgrade.
+-Diacritic limitation.
+-Protect target.
 -Core loop.
 -Trailng slash debug.
 -"Done" -> "Finished".
