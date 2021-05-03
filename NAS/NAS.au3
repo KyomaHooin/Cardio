@@ -169,7 +169,6 @@ next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
 $gui_progress = GUICtrlCreateEdit('', 15, 35, 600, 262, BitOR($ES_AUTOVSCROLL, $ES_READONLY, $ES_WANTRETURN, $WS_VSCROLL))
-
 $gui_tab_setup = GUICtrlCreateTabItem('Nastavení')
 $gui_group_connection = GUICtrlCreateGroup('Připojení', 12, 28, 605, 94)
 $gui_host_label = GUICtrlCreateLabel('Adresa IP:', 20 ,48 , 60, 21)
@@ -186,9 +185,7 @@ $gui_group_nas = GUICtrlCreateGroup('NAS', 12, 168, 605, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Prefix:', 20 ,188, 30, 21)
 $gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
 $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 605, 84)
-
 $gui_tab_end = GUICtrlCreateTabItem('')
-
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
 $gui_button_backup = GUICtrlCreateButton('Zálohovat', 316, 314, 75, 21)
 $gui_button_test = GUICtrlCreateButton('Test', 394, 314, 75, 21)
@@ -417,29 +414,8 @@ while 1
 		if not $run and get_free() > -1 and not $terminate then
 			; free
 			$index = get_free()
-			; source
-			if FileExists(GUICtrlRead($ctrl[$index][1])) then
-				logger('[' & $index + 1 & '] Zálohovaní zahájeno.')
-				; update color
-				GUICtrlSetBkColor($ctrl[$index][1], $orange)
-				; update output
-				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha..')
-				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
-				; rsync
-				$rsync = Run('"' & $rsync_binary & '" -avz -h '& $option & ' -e ' & "'" _
-					& '"' & get_cygwin_path($ssh_binary) & '"'  _
-					& ' -o "StrictHostKeyChecking no"' _
-					& ' -o "UserKnownHostsFile=/dev/null"' _
-					& ' -p ' & GUICtrlRead($gui_port) _
-					& ' -i "' & get_cygwin_path(GUICtrlRead($gui_key)) & '"' & "' " & '"' _
-					& get_cygwin_path(GUICtrlRead($ctrl[$index][1])) & '" ' _
-					& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) & ':' & '"' _
-					& GUICtrlRead($gui_prefix) & StringRegExpReplace(GUICtrlRead($ctrl[$index][4]), '\\', '\/') & '"' _
-					, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD) _
-				)
-				; update token
-				$run = True
-			elseif GUICtrlRead($ctrl[$index][1]) <> '' then
+			; empty source
+			if GUICtrlRead($ctrl[$index][1]) <> '' and not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
 				$conf[$index*4+3][1] = $failed
 				; update color
@@ -447,6 +423,34 @@ while 1
 				; update output
 				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
 				logger('[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
+			 elseif StringInStr(GUICtrlRead($ctrl[$index][1]), ' ') then
+				; update state
+				$conf[$index*4+3][1] = $failed
+				; update color
+				GUICtrlSetBkColor($ctrl[$index][1], $red)
+				; update output
+				GUICtrlSetData($gui_error, 'Zdrojová cesta obsahuje mezeru.')
+				logger('[' & $index + 1 & '] NAS: Zdrojová cesta obsahuje mezeru.')
+			 else
+				logger('[' & $index + 1 & '] Zálohovaní zahájeno.')
+				; update color
+				GUICtrlSetBkColor($ctrl[$index][1], $orange)
+				; update output
+				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha..')
+				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
+				; rsync
+				$rsync = Run('"' & $rsync_binary & '"' _
+				& ' -avz -h ' & $option & ' -e ' _
+				& "'" & '"' & $ssh_binary & '"' _
+				& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
+				& ' -p ' & GUICtrlRead($gui_port) _
+				& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
+				& "'" & get_cygwin_path(GUICtrlRead($ctrl[$index][1])) & "' " _
+				& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
+				& ':' & GUICtrlRead($gui_prefix) & GUICtrlRead($ctrl[$index][4]) _
+				, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
+				; update token
+				$run = True
 			endif
 		endif
 		; end
@@ -515,7 +519,7 @@ func get_cygwin_path($path)
 	local $cygwin_path
 	$cygwin_path = StringRegExpReplace($path , '\\', '\/'); convert backslash -> slash
 	$cygwin_path = StringRegExpReplace($cygwin_path, '^(.)\:(.*)', '\/cygdrive\/$1$2'); convert drive colon
-	return $cygwin_path; catch space by doublequote
+	return $cygwin_path
 endfunc
 
 func verify_setup()
