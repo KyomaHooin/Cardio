@@ -5,12 +5,10 @@
 -NAS firewall
 
 -Pretify log.
--Network error loop break.
--Backup timeout.
--"Backup .." loop bug[_API?].
--Restore test vs restore backup.
--Reset state on re-run.
 -INI diacritic.
+-Limited/unlimited version (x64?)
+-Space in source/target.
+-Diakritic source/target.
 
 [SETUP]
 
@@ -18,10 +16,12 @@
 
   Properties > Sharing > Advanced > NAME + PERM
 
--Remove inherit permssion. + move back to C:\:
+-Remove inherit permission(NAS,VPNCert) + move back to C:\:
 
   Propertines > Permission > Advanced [dole]
   > Disable inherit perm. => ONLY USER FULL.
+
+-Rewrite INI.
 
 [1.6]
 
