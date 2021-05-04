@@ -104,14 +104,14 @@ global $error_code[25][2]=[ _
 
 ; one instance
 if UBound(ProcessList(@ScriptName)) > 2 then
-	MsgBox(48, 'NAS Záloha ' & $version, 'Program byl již spuštěn.')
+	MsgBox(48, 'NAS ' & $version, 'Program byl již spuštěn.')
 	exit
 endif
 
 ; logging
 $log = FileOpen($logfile, 1); overwrite
 if @error then
-	MsgBox(48, 'NAS Záloha ' & $version, 'Systém je připojen pouze pro čtení.')
+	MsgBox(48, 'NAS ' & $version, 'Systém je připojen pouze pro čtení.')
 	exit
 endif
 
@@ -142,7 +142,7 @@ endif
 ; read configuration
 _FileReadToArray($ini, $conf, 0, '='); 0-based
 if @error then
-	MsgBox(0, 'NAS Záloha ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
+	MsgBox(0, 'NAS ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
 else
 	logger('Konfigurační INI soubor byl načten.')
@@ -152,10 +152,10 @@ endif
 ; GUI
 ; ---------------------------------------------------------
 
-$gui = GUICreate('NAS Záloha ' & $version, 632, 340, Default, Default)
+$gui = GUICreate('NAS ' & $version, 632, 340, Default, Default)
 $gui_tab = GUICtrlCreateTab(5, 5, 621, 302)
 
-$gui_tab_dir = GUICtrlCreateTabItem('Adresář')
+$gui_tab_dir = GUICtrlCreateTabItem('Záloha')
 $gui_group_source = GUICtrlCreateGroup('Zdroj', 12, 28, 379, 270)
 $gui_group_target = GUICtrlCreateGroup('Cíl', 394, 28, 224, 270)
 
@@ -186,9 +186,18 @@ $gui_group_nas = GUICtrlCreateGroup('NAS', 12, 168, 605, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Prefix:', 20 ,188, 30, 21)
 $gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
 $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 605, 84)
+$gui_tab_dir = GUICtrlCreateTabItem('Obnova')
+$gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 244, 46)
+$gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
+$gui_restore_source_label = GUICtrlCreateLabel(conf_get_value('prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
+$gui_restore_source = GUICtrlCreateInput('', 136, 44, 113, 21)
+$gui_group_restore_target = GUICtrlCreateGroup('Cíl', 260, 28, 358, 46)
+$gui_restore_target = GUICtrlCreateInput('', 268, 44, 263, 21)
+$gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
+$gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 605, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
-$gui_button_backup = GUICtrlCreateButton('Zálohovat', 316, 314, 75, 21)
+$gui_button_backup = GUICtrlCreateButton('Spustit', 316, 314, 75, 21)
 $gui_button_test = GUICtrlCreateButton('Test', 394, 314, 75, 21)
 $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
@@ -226,17 +235,17 @@ while 1
 	; select source
 	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
 	if not @error then
-		$path = FileSelectFolder('NAS Záloha ' & $version & ' - Zdrojový adresář', @HomeDrive)
+		$path = FileSelectFolder('NAS ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($ctrl[$browse][1], $path)
 	endif
 	; select SSH key
 	if $event = $gui_button_key Then
-		$key_path = FileOpenDialog('NAS Záloha ' & $version & ' - Soukromý klíč', @HomeDrive, 'All (*.*)')
+		$key_path = FileOpenDialog('NAS ' & $version & ' - Soukromý klíč', @HomeDrive, 'All (*.*)')
 		if not @error then GUICtrlSetData($gui_key, $key_path)
 	endif
 	; update prefix
 	if $event = $gui_tab Then
-		if GUICtrlRead($gui_tab) = 0 Then
+		if GUICtrlRead($gui_tab) = 0 Then; tab change to first
 			for $i=0 to 9
 				GUICtrlSetData($ctrl[$i][3], GUICtrlRead($gui_prefix))
 			Next
@@ -373,7 +382,7 @@ while 1
 			GUICtrlSetData($gui_progress, BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync)
-			if @error then logger('ERROR: WinAPI OpenProcess (limited)')
+			if @error then logger('CHYBA: WinAPI OpenProcess (limited)')
 			$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 			if not @error then
 				if $exit_code[2] = 0 then
@@ -406,7 +415,7 @@ while 1
 			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
 			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
 			; round
-			logger('[' & $index + 1 & '] Zalohování dokončeno.')
+			logger('[' & $index + 1 & '] Zálohování dokončeno.')
 			; update state
 			if $terminate then
 				$conf[$index*4+3][1] = $paused
@@ -524,15 +533,15 @@ endfunc
 
 func verify_setup()
 	; invalid key file
-	if not FileExists(GUICtrlRead($gui_key)) then return SetError(1, 0, "Neplatný klíč.")
+	if not FileExists(GUICtrlRead($gui_key)) then return SetError(1, 0, 'Neplatný klíč.')
 	; empty user
-	if GUICtrlRead($gui_user) == '' then return SetError(1, 0, "Neplatný uživatel.")
+	if GUICtrlRead($gui_user) == '' then return SetError(1, 0, 'Neplatný uživatel.')
 	; invalid IP address
-	if not StringRegExp(GUICtrlRead($gui_host), '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, "Neplatný host.")
+	if not StringRegExp(GUICtrlRead($gui_host), '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, 'Neplatný host.')
 	; invalid port number
-	if GUICtrlRead($gui_port) < 1 or GUICtrlRead($gui_port) > 65535 then return SetError(1, 0, "Neplatné číslo portu.")
+	if GUICtrlRead($gui_port) < 1 or GUICtrlRead($gui_port) > 65535 then return SetError(1, 0, 'Neplatné číslo portu.')
 	; empty prefix
-	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, "Neplatný prefix.")
+	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, 'Neplatný prefix.')
 endfunc
 
 func get_free()
