@@ -311,8 +311,11 @@ while 1
 		if $run then
 			ProcessClose($rsync)
 			if @error then
-				logger("ERROR: ProcessClose")
+				logger("CHYBA: ProcessClose")
 			else
+				while ProcessExists($rsync)
+					logger('rsync: Probíhá ukončení.')
+				wend
 				; set token
 				$terminate=True
 				;set restore
@@ -374,20 +377,24 @@ while 1
 			$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 			if not @error then
 				if $exit_code[2] = 0 then
-					if not $terminate then GUICtrlSetBkColor($ctrl[$index][1], $green)
-					GUICtrlSetData($gui_error, 'Dokončeno.')
+					if not $terminate then
+						GUICtrlSetBkColor($ctrl[$index][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					else
+						GUICtrlSetData($gui_error, 'Přerušeno.')
+					endif
 				else
 					$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
 					if not @error then
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						GUICtrlSetBkColor($ctrl[$index][1], $red)
 					else
-						logger("ERROR: Unknown code " & $exit_code[2])
+						logger("CHYBA: Neznámý kód " & $exit_code[2])
 					endif
 				endif
 				logger('rsync: Kód ukončení ' & $exit_code[2] & '.')
 			else
-				logger('ERROR: GetExitCodeProcess')
+				logger('CHYBA: GetExitCodeProcess')
 			endif
 			_WinAPI_CloseHandle($proc)
 			; error code

@@ -23,6 +23,7 @@
 
 [General]
 
+-Wait for terminate.
 -Library upgrade.
 -Diacritic limitation.
 -Protect target.
