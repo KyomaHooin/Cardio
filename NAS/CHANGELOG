@@ -4,10 +4,7 @@
 -NAS DSM HTTPS
 -NAS firewall
 
--Fix empty / invalid source (== <> or) fix
--Fix backup + restore verify.
--Restore code. 
--Fix backup/test vs restore overide.
+-Restore from NAS. 
 
 [SETUP]
 

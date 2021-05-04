@@ -43,7 +43,7 @@
 
 global $version = '1.6'
 global $ini = @ScriptDir & '\NAS.ini'
-global $logfile = @ScriptDir & '\' & 'NAS.log'
+global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
@@ -423,7 +423,7 @@ while 1
 			; free
 			$index = get_free()
 			; empty source
-			if GUICtrlRead($ctrl[$index][1]) <> '' and not FileExists(GUICtrlRead($ctrl[$index][1])) then
+			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
 				$conf[$index*4+3][1] = $failed
 				; update color
