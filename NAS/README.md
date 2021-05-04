@@ -13,7 +13,6 @@ FILE
             NAS.png - Application screen.
 
                bin/ - Cygwin lib/binary.
-               key/ - Key directory.
 
           CHANGELOG - Changelog.
             LICENSE - GNU GLPv3 license.
