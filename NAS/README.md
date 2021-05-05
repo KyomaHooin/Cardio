@@ -10,7 +10,7 @@ FILE
                bin/ - Cygwin lib/binary.
 
             NAS.au3 - Source code.
-            NAS.ini - INI file.
+            NAS.ini - Default INI file.
             NAS.ico - ICON file.
             NAS.png - Application screen.
 
