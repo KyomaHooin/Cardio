@@ -269,10 +269,12 @@ while 1
 	endif
 	; update prefix
 	if $event = $gui_tab Then
-		if GUICtrlRead($gui_tab) = 0 Then; tab change to first
+		if GUICtrlRead($gui_tab) = 0 Then; 1st tab
 			for $i=0 to 9
 				GUICtrlSetData($ctrl[$i][3], GUICtrlRead($gui_prefix))
 			Next
+		endif
+		if GUICtrlRead($gui_tab) = 3 Then; 4th tab
 			GUICtrlSetData($gui_restore_source_label, GUICtrlRead($gui_prefix))
 		endif
 	endif
