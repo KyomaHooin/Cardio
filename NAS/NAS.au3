@@ -56,8 +56,10 @@ global $buffer; Rsync global I/O buffer
 global $buffer_out; Rsync STDOUT
 global $buffer_err; Rsync STDERR
 
-global $backup=False
-global $test=False
+global $backup=False; restore state = 1
+global $test=False; restore state = 2
+global $restore=False; restore state = 3
+global $restore_test=False; restore state = 4
 global $terminate=False
 global $run=False
 
@@ -130,6 +132,10 @@ if not FileExists($ini) then
 		FileWriteLine($f, 'enable' & $i & '=' & '4'); default 4
 		FileWriteLine($f, 'state' & $i & '=' & '0'); default 0
 	next
+	FileWriteLine($f, 'restore_source=')
+	FileWriteLine($f, 'restore_target=')
+	FileWriteLine($f, 'restore_enable=4'); default 4
+	FileWriteLine($f, 'restore_state=0'); default 0
 	FileWriteLine($f, 'key=')
 	FileWriteLine($f, 'user=')
 	FileWriteLine($f, 'host=')
@@ -189,10 +195,11 @@ $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 605, 84)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 244, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
+GUICtrlSetState($gui_restore_box, conf_get_value('restore_enable'))
 $gui_restore_source_label = GUICtrlCreateLabel(conf_get_value('prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source = GUICtrlCreateInput('', 136, 44, 113, 21)
+$gui_restore_source = GUICtrlCreateInput(conf_get_value('restore_source'), 136, 44, 113, 21)
 $gui_group_restore_target = GUICtrlCreateGroup('Cíl', 260, 28, 358, 46)
-$gui_restore_target = GUICtrlCreateInput('', 268, 44, 263, 21)
+$gui_restore_target = GUICtrlCreateInput(conf_get_value('restore_target'), 268, 44, 263, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 605, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
@@ -202,11 +209,10 @@ $gui_button_test = GUICtrlCreateButton('Test', 394, 314, 75, 21)
 $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
-; update colors on restore
-if conf_get_value('restore') > 0 then
-	; update button
-	GuiCtrlSetData($gui_button_break, 'Pokračovat')
-	; update colors
+; update button
+if conf_get_value('restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
+; update colors
+if conf_get_value('restore') > 0 and conf_get_value('restore') < 3 then
 	for $i = 0 to 9
 		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $done then
 			GUICtrlSetBkColor($ctrl[$i][1], $green)
@@ -218,6 +224,19 @@ if conf_get_value('restore') > 0 then
 			GUICtrlSetBkColor($ctrl[$i][1], $red)
 		endif
 	next
+endif
+if conf_get_value('restore') > 2 then
+	if conf_get_value('restore_enable') = $GUI_CHECKED then
+		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $done then
+			GUICtrlSetBkColor($gui_restore_target, $green)
+		endif
+		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $paused then
+			GUICtrlSetBkColor($gui_restore_target, $orange)
+		endif
+		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $failed then
+			GUICtrlSetBkColor($gui_restore_target, $red)
+		endif
+	endif
 endif
 
 ; set default focus
@@ -238,6 +257,11 @@ while 1
 		$path = FileSelectFolder('NAS ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($ctrl[$browse][1], $path)
 	endif
+	; select restore target
+	if $event = $gui_button_restore_target then
+		$path = FileSelectFolder('NAS ' & $version & ' - Cílový adresář', @HomeDrive)
+		if not @error then GUICtrlSetData($gui_restore_target, $path)
+	endif
 	; select SSH key
 	if $event = $gui_button_key Then
 		$key_path = FileOpenDialog('NAS ' & $version & ' - Soukromý klíč', @HomeDrive, 'All (*.*)')
@@ -249,12 +273,16 @@ while 1
 			for $i=0 to 9
 				GUICtrlSetData($ctrl[$i][3], GUICtrlRead($gui_prefix))
 			Next
+			GUICtrlSetData($gui_restore_source_label, GUICtrlRead($gui_prefix))
 		endif
 	endif
 	; unset color on unchecked
 	$checkbox = _ArrayBinarySearch($ctrl, $event, Default, Default, 0); 0' column
 	if not @error then
 		if GUICtrlRead($ctrl[$checkbox][0]) = $GUI_UNCHECKED then GUICtrlSetBkColor($ctrl[$checkbox][1], $white)
+	endif
+	if $event = $gui_restore_box then
+		if GUICtrlRead($gui_restore_box) = $GUI_UNCHECKED then GUICtrlSetBkColor($gui_restore_target, $white)
 	endif
 	; backup
 	if $event = $gui_button_backup then
@@ -486,6 +514,10 @@ while 1
 			FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
 			FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
 		next
+		FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
+		FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
+		FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
+		FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
 		FileWriteLine($f, 'key=' & GUICtrlRead($gui_key))
 		FileWriteLine($f, 'user=' & GUICtrlRead($gui_user))
 		FileWriteLine($f, 'host=' & GUICtrlRead($gui_host))
@@ -542,6 +574,12 @@ func verify_setup()
 	if GUICtrlRead($gui_port) < 1 or GUICtrlRead($gui_port) > 65535 then return SetError(1, 0, 'Neplatné číslo portu.')
 	; empty prefix
 	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, 'Neplatný prefix.')
+	; backup with restore
+	for $i = 0 to 9
+		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
+			if GUICtrlRead($gui_restore_box) = $GUI_CHECKED then return SetError(1, 0, 'Nelze spustit zálohu i obnovu.')
+		endif
+	next
 endfunc
 
 func get_free()
