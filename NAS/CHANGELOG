@@ -4,8 +4,6 @@
 -NAS DSM HTTPS
 -NAS firewall
 
--Restore from NAS. 
-
 [SETUP]
 
 -Create drive/dir share:
@@ -25,6 +23,7 @@
 
 [General]
 
+-Restore.
 -Wait for terminate.
 -Library upgrade.
 -Diacritic limitation.

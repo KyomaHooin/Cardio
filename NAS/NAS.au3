@@ -293,8 +293,6 @@ while 1
 			logger($verify)
 			GUICtrlSetData($gui_error, $verify)
 		else
-			; set token
-			$backup=True
 			; option
 			$option=''
 			; clear buffer
@@ -302,17 +300,35 @@ while 1
 			; reset restore
 			conf_set_value('restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
-			; reset state and color
-			for $i = 0 to 9
-				$conf[$i*4+3][1] = $new
-				GUICtrlSetBkColor($ctrl[$i][1], $white)
-			next
+			; setup
+			if GuiCtrlRead($gui_restore_box) = $GUI_CHECKED then
+				; set token
+				$restore=True
+				; reset state and color
+				conf_set_value('restore_state', $new)
+				GUICtrlSetBkColor($gui_restore_target, $white)
+				; disable buttons
+				GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
+				GUICtrlSetState($gui_button_test, $GUI_DISABLE)
+				for $i = 0 to 9
+					GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
+				next
+			else
+				; set token
+				$backup=True
+				; reset state and color
+				for $i = 0 to 9
+					$conf[$i*4+3][1] = $new
+					GUICtrlSetBkColor($ctrl[$i][1], $white)
+				next
+			endif
 			; disable buttons
 			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
 			next
+			GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 		endif
 	endif
 	; test
@@ -322,8 +338,6 @@ while 1
 			logger($verify)
 			GUICtrlSetData($gui_error, $verify)
 		else
-			; set token
-			$test=True
 			; option
 			$option='-n'
 			; clear buffer
@@ -331,17 +345,29 @@ while 1
 			; reset restore
 			conf_set_value('restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
-			; reset state and color
-			for $i = 0 to 9
-				$conf[$i*4+3][1] = $new
-				GUICtrlSetBkColor($ctrl[$i][1], $white)
-			next
+			; setup
+			if GuiCtrlRead($gui_restore_box) = $GUI_CHECKED then
+				; set token
+				$restore_test=True
+				; reset state and color
+				conf_set_value('restore_state', $new)
+				GUICtrlSetBkColor($gui_restore_target, $white)
+			else	
+				; set token
+				$test=True
+				; reset state and color
+				for $i = 0 to 9
+					$conf[$i*4+3][1] = $new
+					GUICtrlSetBkColor($ctrl[$i][1], $white)
+				next
+			endif
 			; disable buttons
 			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
 			next
+			GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 		endif
 	endif
 	; terminate / resume
@@ -360,6 +386,8 @@ while 1
 				;set restore
 				if $backup then conf_set_value('restore', 1)
 				if $test then conf_set_value('restore', 2)
+				if $restore then conf_set_value('restore', 3)
+				if $restore_test then conf_set_value('restore', 4)
 				;update button
 				GuiCtrlSetData($gui_button_break, 'Pokračovat')
 			endif
@@ -381,6 +409,16 @@ while 1
 					$option='-n'
 					$test=True
 				endif
+				; restore restore
+				if conf_get_value('restore') = 3 then
+					$option=''
+					$restore=True
+				endif
+				; restore restore test
+				if conf_get_value('restore') = 4 then
+					$option='-n'
+					$restore_test=True
+				endif
 				; clear buffer
 				$buffer = ''
 				; reset restore
@@ -393,10 +431,118 @@ while 1
 				for $i = 0 to 9
 					GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
 				next
+				GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 			endif
 		endif
 	endif
-	; main
+	; restore & restore test
+	if $restore or $restore_test then
+		; logging
+		if $run and not ProcessExists($rsync) then
+			; update I/O
+			$buffer_out = StringReplace(StderrRead($rsync), @LF, @CRLF)
+			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
+			$buffer &= $buffer_out
+			$buffer &= $buffer_err
+			if not $terminate then $buffer &= @CRLF
+			; update output
+			GUICtrlSetData($gui_progress, BinaryToString(StringToBinary($buffer), $SB_UTF8))
+			; exit code
+			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync)
+			if @error then logger('CHYBA: WinAPI OpenProcess (limited)')
+			$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
+			if not @error then
+				if $exit_code[2] = 0 then
+					if not $terminate then
+						GUICtrlSetBkColor($gui_restore_target, $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					else
+						GUICtrlSetData($gui_error, 'Přerušeno.')
+					endif
+				else
+					$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
+					if not @error then
+						GUICtrlSetData($gui_error, $error_code[$code_index][1])
+						GUICtrlSetBkColor($gui_restore_target, $red)
+					else
+						logger("CHYBA: Neznámý kód " & $exit_code[2])
+					endif
+				endif
+				logger('rsync: Kód ukončení ' & $exit_code[2] & '.')
+			else
+				logger('CHYBA: GetExitCodeProcess')
+			endif
+			_WinAPI_CloseHandle($proc)
+			; error code
+			if $buffer_err <> '' then
+				$code = StringRegExp($buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+				if not @error then logger('rsync: Kód chyby ' & $code[0] & '.')
+			endif
+			; log I/O
+			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
+			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
+			; round
+			logger('[R] Zálohování dokončeno.')
+			; update state
+			if $terminate then
+				conf_set_value('restore_state', $paused)
+			elseif $exit_code[2] = 0 then
+				conf_set_value('restore_state', $done)
+			else
+				conf_set_value('restore_state', $failed)
+			endif
+			; reset token
+			$run = False
+		endif
+		; run
+		if not $run and not $terminate then
+			; empty source
+			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
+				; update state
+				conf_set_value('restore_state', $failed)
+				; update color
+				GUICtrlSetBkColor($gui_restore_target, $red)
+				; update output
+				GUICtrlSetData($gui_error, 'Cíloový adresář neexistuje.')
+				logger('[R] NAS: Zdrojový adresář neexistuje.')
+			 else
+				logger('[R] Obnovení zahájeno.')
+				; update color
+				GUICtrlSetBkColor($gui_restore_target, $orange)
+				; update output
+				if $restore then GUICtrlSetData($gui_error, 'Probíhá obnova..')
+				if $restore_test then GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
+				; rsync
+				$rsync = Run('"' & $rsync_binary & '"' _
+				& ' -avz -s -h ' & $option & ' -e ' & "'" _
+				& '"' & $ssh_binary & '"' _
+				& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
+				& ' -p ' & GUICtrlRead($gui_port) _
+				& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
+				& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
+				& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($gui_restore_source) & "' " _
+				& "'" & get_cygwin_path(GUICtrlRead($gui_restore_target)) & "'" _
+				, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
+				; update token
+				$run = True
+			endif
+		endif
+		; end
+		if not $run or $terminate Then
+			; enable buttons
+			GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
+			GUICtrlSetState($gui_button_test, $GUI_ENABLE)
+			for $i = 0 to 9
+				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
+			next
+			GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
+			; reset tokens
+			$restore=False
+			$restore_test=False
+			$terminate=False
+		endif
+	endif
+	; backup & backup test
 	if $backup or $test then
 		; logging
 		if $run and get_free() > -1 and not ProcessExists($rsync) then
@@ -500,6 +646,7 @@ while 1
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
 			next
+			GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
 			; reset tokens
 			$backup=False
 			$test=False
@@ -594,3 +741,4 @@ func get_free()
 	next
 	return -1
 endfunc
+
