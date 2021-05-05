@@ -286,7 +286,7 @@ while 1
 	if $event = $gui_restore_box then
 		if GUICtrlRead($gui_restore_box) = $GUI_UNCHECKED then GUICtrlSetBkColor($gui_restore_target, $white)
 	endif
-	; backup
+	; backup & restore
 	if $event = $gui_button_backup then
 		$verify = verify_setup()
 		if @error Then
@@ -331,7 +331,7 @@ while 1
 			GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 		endif
 	endif
-	; test
+	; backup test & restore test
 	if $event = $gui_button_test Then
 		$verify = verify_setup()
 		if @error Then
