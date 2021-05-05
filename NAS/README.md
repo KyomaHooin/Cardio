@@ -7,12 +7,12 @@ Secure Rsync NAS GUI for Win64-bit OS.
 
 FILE
 <pre>
+               bin/ - Cygwin lib/binary.
+
             NAS.au3 - Source code.
             NAS.ini - INI file.
             NAS.ico - ICON file.
             NAS.png - Application screen.
-
-               bin/ - Cygwin lib/binary.
 
           CHANGELOG - Changelog.
             LICENSE - GNU GLPv3 license.
