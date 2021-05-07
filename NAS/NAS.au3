@@ -307,12 +307,6 @@ while 1
 				; reset state and color
 				conf_set_value('restore_state', $new)
 				GUICtrlSetBkColor($gui_restore_target, $white)
-				; disable buttons
-				GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
-				GUICtrlSetState($gui_button_test, $GUI_DISABLE)
-				for $i = 0 to 9
-					GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
-				next
 			else
 				; set token
 				$backup=True
@@ -495,7 +489,7 @@ while 1
 			$run = False
 		endif
 		; run
-		if not $run and not $terminate then
+		if not $run and ( conf_get_value('restore_state') = 0 or conf_get_value('restore_state') = 3 ) and not $terminate then
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
