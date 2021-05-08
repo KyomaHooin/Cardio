@@ -204,7 +204,7 @@ $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 605, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
-$gui_button_backup = GUICtrlCreateButton('Spustit', 316, 314, 75, 21)
+$gui_button_run = GUICtrlCreateButton('Spustit', 316, 314, 75, 21)
 $gui_button_test = GUICtrlCreateButton('Test', 394, 314, 75, 21)
 $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
@@ -287,7 +287,7 @@ while 1
 		if GUICtrlRead($gui_restore_box) = $GUI_UNCHECKED then GUICtrlSetBkColor($gui_restore_target, $white)
 	endif
 	; backup & restore
-	if $event = $gui_button_backup then
+	if $event = $gui_button_run then
 		$verify = verify_setup()
 		if @error Then
 			logger($verify)
@@ -317,7 +317,7 @@ while 1
 				next
 			endif
 			; disable buttons
-			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
+			GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
@@ -356,7 +356,7 @@ while 1
 				next
 			endif
 			; disable buttons
-			GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
+			GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
@@ -420,7 +420,7 @@ while 1
 				; update button
 				GUICtrlSetData($gui_button_break, 'Přerušit')
 				; disable buttons
-				GUICtrlSetState($gui_button_backup, $GUI_DISABLE)
+				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 				GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 				for $i = 0 to 9
 					GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
@@ -524,7 +524,7 @@ while 1
 		; end
 		if not $run or $terminate Then
 			; enable buttons
-			GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
+			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
 			GUICtrlSetState($gui_button_test, $GUI_ENABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
@@ -635,7 +635,7 @@ while 1
 		; end
 		if ( not $run and get_free() < 0 ) or $terminate Then
 			; enable buttons
-			GUICtrlSetState($gui_button_backup, $GUI_ENABLE)
+			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
 			GUICtrlSetState($gui_button_test, $GUI_ENABLE)
 			for $i = 0 to 9
 				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
