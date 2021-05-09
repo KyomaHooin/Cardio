@@ -346,7 +346,7 @@ while 1
 				; reset state and color
 				conf_set_value('restore_state', $new)
 				GUICtrlSetBkColor($gui_restore_target, $white)
-			else	
+			else
 				; set token
 				$test=True
 				; reset state and color
@@ -432,7 +432,7 @@ while 1
 	; restore & restore test
 	if $restore or $restore_test then
 		; logging
-		if $run and not ProcessExists($rsync) then
+		if $run and get_free_restore() and not ProcessExists($rsync) then
 			; update I/O
 			$buffer_out = StringReplace(StderrRead($rsync), @LF, @CRLF)
 			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
@@ -489,7 +489,7 @@ while 1
 			$run = False
 		endif
 		; run
-		if not $run and ( conf_get_value('restore_state') = 0 or conf_get_value('restore_state') = 3 ) and not $terminate then
+		if not $run and get_free_restore() and not $terminate then
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
@@ -736,3 +736,10 @@ func get_free()
 	return -1
 endfunc
 
+func get_free_restore()
+	if GUICtrlRead($gui_restore_box) = $GUI_CHECKED then
+		if conf_get_value('restore_state') = $new then return True
+		if conf_get_value('restore_state') = $paused then return True
+	endif
+	return False
+endfunc
