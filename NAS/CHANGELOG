@@ -4,20 +4,20 @@
 -NAS DSM HTTPS
 -NAS firewall
 
+-Test no green(orange) "Probiha test..".
+-CHYBA WinAPI_OpenProcess (limited) <-
+-CHYBA: Neznamy kod 4294967295 (-1)
+-Prettfy 'vystup' -> ------ + cestina
+-Stdout/err flush on re-run.
+-test "will transfer" size ?
+-kill over break ?
+-revese delete ?
+
+
 [SETUP]
 
--Create drive/dir share:
-
-  Properties > Sharing > Advanced > NAME + PERM
-
--Move back to C:\ + exclude security.
-
--Remove inherit permssion.move back to C:\:
-
-  Propertines > Permission > Advanced [dole]
-  > Disable inherit perm. => ONLY USER FULL.
-
--Rewrite INI.
+-VPN cert inherit drop permissing.
+-VPN browser "Downloaded" drop.
 
 [1.6]
 
