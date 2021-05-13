@@ -3,6 +3,9 @@
 
 -NAS DSM HTTPS
 -NAS firewall
+-Drop VPN cert inherit permission.
+-Drop "Downloaded" files.
+-Remove shares.
 
 -Test no green(orange) "Probiha test..".
 -CHYBA WinAPI_OpenProcess (limited) <-
@@ -13,15 +16,11 @@
 -kill over break ?
 -revese delete ?
 
+[1.7]
 
-[SETUP]
 
--VPN cert inherit drop permissing.
--VPN browser "Downloaded" drop.
 
 [1.6]
-
-[General]
 
 -Restore.
 -Wait for terminate.
