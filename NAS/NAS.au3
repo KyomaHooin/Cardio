@@ -514,15 +514,13 @@ while 1
 				; update output
 				if $restore then
 					GUICtrlSetData($gui_error, 'Probíhá obnova..')
-					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
-						& '[R] PROBÍHÁ OBNOVA' & '---------------------------------------' & @CRLF _
-					)
+					$buffer &= @CRLF & '---------------------------------------' & '[R] PROBÍHÁ OBNOVA'_
+						& '---------------------------------------' & @CRLF
 				endif
 				if $restore_test then
 					GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
-					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
-						& '[R] PROBÍHÁ TEST OBNOVY' & '---------------------------------------' & @CRLF _
-					)
+					$buffer &= @CRLF & '---------------------------------------' & '[R] PROBÍHÁ TEST OBNOVY' _
+						& '---------------------------------------' & @CRLF
 				endif
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
@@ -639,17 +637,15 @@ while 1
 				; update output
 				if $backup then
 					GUICtrlSetData($gui_error, 'Probíhá záloha..')
-					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
-						& '[' & $index + 1 & '] PROBÍHÁ ZÁLOHA' _
-						& '---------------------------------------' & @CRLF _
-					)
+					$buffer &= @CRLF & '---------------------------------------' _
+						& '[' & $index + 1 & '] PROBÍHÁ ZÁLOHA' _ 
+						& '---------------------------------------' & @CRLF
 				endif
 				if $test then
 					GUICtrlSetData($gui_error, 'Probíhá test..')
-					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
+					$buffer &= @CRLF & '---------------------------------------' _
 						& '[' & $index + 1  &'] PROBÍHÁ TEST ZÁLOHY' _
-						& '---------------------------------------' & @CRLF _
-					)
+						& '---------------------------------------' & @CRLF
 				endif
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
