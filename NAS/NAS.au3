@@ -589,7 +589,7 @@ while 1
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
 			if @error then
 				logger('CHYBA: WinAPI OpenProcess (query limited info)')
-				; stderr error code
+				; error code
 				if $buffer_err <> '' then
 					$code = StringRegExp($buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 					if not @error then
