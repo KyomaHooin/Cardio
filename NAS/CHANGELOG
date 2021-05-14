@@ -7,8 +7,6 @@
 -Drop "Downloaded" files.
 -Remove shares.
 
--revese delete ?
-
 [1.7]
 
 -Error code fallback.

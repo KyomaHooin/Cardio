@@ -296,8 +296,7 @@ while 1
 		else
 			; option
 			$option=''
-			; clear buffer
-			$buffer = ''
+			; clear output
 			GUICtrlSetData($gui_progress, '')
 			; reset restore
 			conf_set_value('restore', 0)
@@ -335,9 +334,8 @@ while 1
 			GUICtrlSetData($gui_error, $verify)
 		else
 			; option
-			$option='-n --stats'
-			; clear buffer
-			$buffer = ''
+			$option='-n'
+			; clear output
 			GUICtrlSetData($gui_progress, '')
 			; reset restore
 			conf_set_value('restore', 0)
@@ -403,7 +401,7 @@ while 1
 				endif
 				; restore test
 				if conf_get_value('restore') = 2 then
-					$option='-n --stats'
+					$option='-n'
 					$test=True
 				endif
 				; restore restore
@@ -413,11 +411,10 @@ while 1
 				endif
 				; restore restore test
 				if conf_get_value('restore') = 4 then
-					$option='-n --stats'
+					$option='-n'
 					$restore_test=True
 				endif
-				; clear buffer
-				$buffer = ''
+				; clear output
 				GUICtrlSetData($gui_progress, '')
 				; reset restore
 				conf_set_value('restore', 0)
@@ -442,9 +439,8 @@ while 1
 			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
 			$buffer &= $buffer_out
 			$buffer &= $buffer_err
-			if not $terminate then $buffer &= @CRLF
 			; update output
-			GUICtrlSetData($gui_progress, BinaryToString(StringToBinary($buffer), $SB_UTF8))
+			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
 			if @error then
@@ -478,7 +474,7 @@ while 1
 				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 				if @error then
 					logger('CHYBA: GetExitCodeProcess')
-				else	
+				else
 					if $exit_code[2] = 0 then
 						if not $terminate then
 							GUICtrlSetBkColor($gui_restore_target, $green)
@@ -517,6 +513,9 @@ while 1
 		endif
 		; run
 		if not $run and get_free_restore() and not $terminate then
+			; update progress
+			if $restore then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> PROBÍHÁ OBNOVA << --' & @CRLF & @CRLF)
+			if $restore_test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> PROBÍHÁ TEST OBNOVY << --' & @CRLF & @CRLF)
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
@@ -525,22 +524,17 @@ while 1
 				GUICtrlSetBkColor($gui_restore_target, $red)
 				; update output
 				GUICtrlSetData($gui_error, 'Cíloový adresář neexistuje.')
+				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
 				logger('[R] NAS: Zdrojový adresář neexistuje.')
 			 else
 				logger('[R] Obnovení zahájeno.')
+				; clear buffer
+				$buffer = ''
 				; update color
 				GUICtrlSetBkColor($gui_restore_target, $orange)
 				; update output
-				if $restore then
-					GUICtrlSetData($gui_error, 'Probíhá obnova..')
-					$buffer &= @CRLF & '---------------------------------------' & '[R] PROBÍHÁ OBNOVA'_
-						& '---------------------------------------' & @CRLF
-				endif
-				if $restore_test then
-					GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
-					$buffer &= @CRLF & '---------------------------------------' & '[R] PROBÍHÁ TEST OBNOVY' _
-						& '---------------------------------------' & @CRLF
-				endif
+				if $restore then GUICtrlSetData($gui_error, 'Probíhá obnova..')
+				if $restore_test then GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
@@ -582,9 +576,8 @@ while 1
 			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
 			$buffer &= $buffer_out
 			$buffer &= $buffer_err
-			if not $terminate then $buffer &= @CRLF
 			; update output
-			GUICtrlSetData($gui_progress, BinaryToString(StringToBinary($buffer), $SB_UTF8))
+			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
 			if @error then
@@ -665,6 +658,9 @@ while 1
 		if not $run and get_free() > -1 and not $terminate then
 			; free
 			$index = get_free()
+			; update progress
+			if $backup then	GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
+			if $test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> TEST ZÁLOHY << --' & @CRLF & @CRLF)
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
@@ -673,24 +669,17 @@ while 1
 				GUICtrlSetBkColor($ctrl[$index][1], $red)
 				; update output
 				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
+				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
 				logger('[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
 			 else
 				logger('[' & $index + 1 & '] Zálohovaní zahájeno.')
+				; clear buffer
+				$buffer = ''
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $orange)
 				; update output
-				if $backup then
-					GUICtrlSetData($gui_error, 'Probíhá záloha..')
-					$buffer &= @CRLF & '---------------------------------------' _
-						& '[' & $index + 1 & '] PROBÍHÁ ZÁLOHA' _ 
-						& '---------------------------------------' & @CRLF
-				endif
-				if $test then
-					GUICtrlSetData($gui_error, 'Probíhá test..')
-					$buffer &= @CRLF & '---------------------------------------' _
-						& '[' & $index + 1  &'] PROBÍHÁ TEST ZÁLOHY' _
-						& '---------------------------------------' & @CRLF
-				endif
+				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha..')
+				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
