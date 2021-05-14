@@ -7,18 +7,16 @@
 -Drop "Downloaded" files.
 -Remove shares.
 
--Test no green(orange) "Probiha test..".
--CHYBA WinAPI_OpenProcess (limited) <-
--CHYBA: Neznamy kod 4294967295 (-1)
--Prettfy 'vystup' -> ------ + cestina
--Stdout/err flush on re-run.
--test "will transfer" size ?
--kill over break ?
 -revese delete ?
 
 [1.7]
 
-
+-Error code fallback.
+-Prevent exit on run.
+-Dry-run stats.
+-Verbose output.
+-Flush buffer on re-run.
+-Update exit code call.
 
 [1.6]
 
