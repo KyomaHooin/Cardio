@@ -512,8 +512,18 @@ while 1
 				; update color
 				GUICtrlSetBkColor($gui_restore_target, $orange)
 				; update output
-				if $restore then GUICtrlSetData($gui_error, 'Probíhá obnova..')
-				if $restore_test then GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
+				if $restore then
+					GUICtrlSetData($gui_error, 'Probíhá obnova..')
+					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
+						& '[R] PROBÍHÁ OBNOVA' & '---------------------------------------' & @CRLF _
+					)
+				endif
+				if $restore_test then
+					GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
+					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
+						& '[R] PROBÍHÁ TEST OBNOVY' & '---------------------------------------' & @CRLF _
+					)
+				endif
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
@@ -627,8 +637,20 @@ while 1
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $orange)
 				; update output
-				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha..')
-				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
+				if $backup then
+					GUICtrlSetData($gui_error, 'Probíhá záloha..')
+					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
+						& '[' & $index + 1 & '] PROBÍHÁ ZÁLOHA' _
+						& '---------------------------------------' & @CRLF _
+					)
+				endif
+				if $test then
+					GUICtrlSetData($gui_error, 'Probíhá test..')
+					GUICtrlSetData($gui_progress, @CRLF & '---------------------------------------' _
+						& '[' & $index + 1  &'] PROBÍHÁ TEST ZÁLOHY' _
+						& '---------------------------------------' & @CRLF _
+					)
+				endif
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
