@@ -12,6 +12,7 @@
 -Error code fallback.
 -Prevent exit on run.
 -Verbose output.
+-Dry-run stats.
 -Flush buffer on re-run.
 -Update exit code call.
 

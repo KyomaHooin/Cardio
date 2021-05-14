@@ -334,7 +334,7 @@ while 1
 			GUICtrlSetData($gui_error, $verify)
 		else
 			; option
-			$option='-n'
+			$option='-n --stats'
 			; clear output
 			GUICtrlSetData($gui_progress, '')
 			; reset restore
@@ -401,7 +401,7 @@ while 1
 				endif
 				; restore test
 				if conf_get_value('restore') = 2 then
-					$option='-n'
+					$option='-n --stats'
 					$test=True
 				endif
 				; restore restore
@@ -411,7 +411,7 @@ while 1
 				endif
 				; restore restore test
 				if conf_get_value('restore') = 4 then
-					$option='-n'
+					$option='-n --stats'
 					$restore_test=True
 				endif
 				; clear output
