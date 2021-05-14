@@ -514,8 +514,8 @@ while 1
 		; run
 		if not $run and get_free_restore() and not $terminate then
 			; update progress
-			if $restore then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> PROBÍHÁ OBNOVA << --' & @CRLF & @CRLF)
-			if $restore_test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> PROBÍHÁ TEST OBNOVY << --' & @CRLF & @CRLF)
+			if $restore then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> OBNOVA << --' & @CRLF & @CRLF)
+			if $restore_test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> TEST OBNOVY << --' & @CRLF & @CRLF)
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
