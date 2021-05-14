@@ -291,7 +291,7 @@ while 1
 	if $event = $gui_button_run then
 		$verify = verify_setup()
 		if @error Then
-			logger($verify)
+			logger('CHYBA: ' & $verify)
 			GUICtrlSetData($gui_error, $verify)
 		else
 			; option
@@ -330,7 +330,7 @@ while 1
 	if $event = $gui_button_test Then
 		$verify = verify_setup()
 		if @error Then
-			logger($verify)
+			logger('CHYBA: ' & $verify)
 			GUICtrlSetData($gui_error, $verify)
 		else
 			; option
@@ -371,7 +371,7 @@ while 1
 		if $run then
 			ProcessClose($rsync)
 			if @error then
-				logger("CHYBA: ProcessClose")
+				logger('CHYBA: ProcessClose')
 			else
 				while ProcessExists($rsync)
 					logger('rsync: Probíhá ukončení.')
@@ -391,7 +391,7 @@ while 1
 		if not $run and conf_get_value('restore') > 0 then
 			$verify = verify_setup()
 			if @error Then
-				logger($verify)
+				logger('CHYBA: ' & $verify)
 				GUICtrlSetData($gui_error, $verify)
 			else
 				; restore backup
@@ -714,7 +714,7 @@ while 1
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		; not running
 		if $run then
-			GUICtrlSetData($gui_error, 'Nelze přerušit probíhající operaci.')
+			GUICtrlSetData($gui_error, 'Nelze ukončit probíhající operaci.')
 		else
 			; write configuration
 			$f = FileOpen($ini, 2); overwrite

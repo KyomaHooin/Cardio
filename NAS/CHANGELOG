@@ -6,6 +6,7 @@
 -Drop VPN cert inherit permission.
 -Drop "Downloaded" files.
 -Remove shares.
+-Fix VPN config. 
 
 [1.7]
 
