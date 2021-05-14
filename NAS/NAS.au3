@@ -683,27 +683,32 @@ while 1
 	endif
 	; exit
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
-		; write configuration
-		$f = FileOpen($ini, 2); overwrite
-		for $i=0 to 9
-			FileWriteLine($f, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][1]))
-			FileWriteLine($f, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][4]))
-			FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
-			FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
-		next
-		FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
-		FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
-		FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
-		FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
-		FileWriteLine($f, 'key=' & GUICtrlRead($gui_key))
-		FileWriteLine($f, 'user=' & GUICtrlRead($gui_user))
-		FileWriteLine($f, 'host=' & GUICtrlRead($gui_host))
-		FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
-		FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
-		FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-		FileClose($f)
-		; exit
-		exitloop
+		; not running
+		if $run then
+			GUICtrlSetData($gui_error, 'Nelze přerušit probíhající operaci.')
+		else
+			; write configuration
+			$f = FileOpen($ini, 2); overwrite
+			for $i=0 to 9
+				FileWriteLine($f, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][1]))
+				FileWriteLine($f, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][4]))
+				FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
+				FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
+			next
+			FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
+			FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
+			FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
+			FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
+			FileWriteLine($f, 'key=' & GUICtrlRead($gui_key))
+			FileWriteLine($f, 'user=' & GUICtrlRead($gui_user))
+			FileWriteLine($f, 'host=' & GUICtrlRead($gui_host))
+			FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
+			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
+			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
+			FileClose($f)
+			; exit
+			exitloop
+		endif
 	endif
 wend
 
