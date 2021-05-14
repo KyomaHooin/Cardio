@@ -19,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.6
+#AutoIt3Wrapper_Res_ProductVersion=1.7
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -41,7 +41,7 @@
 ; VAR
 ; ---------------------------------------------------------
 
-global $version = '1.6'
+global $version = '1.7'
 global $ini = @ScriptDir & '\NAS.ini'
 global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
@@ -298,6 +298,7 @@ while 1
 			$option=''
 			; clear buffer
 			$buffer = ''
+			GUICtrlSetData($gui_progress, '')
 			; reset restore
 			conf_set_value('restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
@@ -337,6 +338,7 @@ while 1
 			$option='-n'
 			; clear buffer
 			$buffer = ''
+			GUICtrlSetData($gui_progress, '')
 			; reset restore
 			conf_set_value('restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
@@ -416,6 +418,7 @@ while 1
 				endif
 				; clear buffer
 				$buffer = ''
+				GUICtrlSetData($gui_progress, '')
 				; reset restore
 				conf_set_value('restore', 0)
 				; update button
