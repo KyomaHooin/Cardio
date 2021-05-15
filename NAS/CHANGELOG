@@ -12,6 +12,7 @@
 -Drop "Downloaded" files.
 -Remove shares.
 -Update VPN config. 
+-Print security PDF and store backup.
 
 -Error code fallback.
 -Prevent exit on run.
