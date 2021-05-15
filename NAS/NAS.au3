@@ -492,7 +492,6 @@ while 1
 							GUICtrlSetBkColor($gui_restore_target, $blue)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-							GUICtrlSetData($gui_error, 'Dokončeno.')
 							GUICtrlSetBkColor($gui_restore_target, $red)
 						endif
 					endif
@@ -634,7 +633,6 @@ while 1
 							GUICtrlSetBkColor($ctrl[$index][1], $blue)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-							GUICtrlSetData($gui_error, 'Dokončeno.')
 							GUICtrlSetBkColor($ctrl[$index][1], $red)
 						endif
 					endif
