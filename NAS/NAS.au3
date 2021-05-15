@@ -24,7 +24,6 @@
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
 #AutoIt3Wrapper_Icon=NAS.ico
-;#AutoIt3Wrapper_UseX64=y
 #NoTrayIcon
 
 ; ---------------------------------------------------------
@@ -537,8 +536,8 @@ while 1
 				; update color
 				GUICtrlSetBkColor($gui_restore_target, $orange)
 				; update output
-				if $restore then GUICtrlSetData($gui_error, 'Probíhá obnova..')
-				if $restore_test then GUICtrlSetData($gui_error, 'Probíhá test obnovy..')
+				if $restore then GUICtrlSetData($gui_error, 'Probíhá obnova.')
+				if $restore_test then GUICtrlSetData($gui_error, 'Probíhá test obnovy.')
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
@@ -674,14 +673,14 @@ while 1
 				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
 				logger(@CRLF & '[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
 			 else
-				logger(@CRLF & '[' & $index + 1 & '] Zálohovaní zahájeno.' & @CRLF & @CRLF)
+				logger(@CRLF & '[' & $index + 1 & '] Zálohování zahájeno.' & @CRLF & @CRLF)
 				; clear buffer
 				$buffer = ''
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $orange)
 				; update output
-				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha..')
-				if $test then GUICtrlSetData($gui_error, 'Probíhá test..')
+				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha.')
+				if $test then GUICtrlSetData($gui_error, 'Probíhá test.')
 				; rsync
 				$rsync = Run('"' & $rsync_binary & '"' _
 				& ' -avz -s -h ' & $option & ' -e ' & "'" _
