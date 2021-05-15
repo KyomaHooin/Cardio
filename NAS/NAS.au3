@@ -474,6 +474,8 @@ while 1
 				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 				if @error then
 					logger('CHYBA: GetExitCodeProcess')
+					GUICtrlSetBkColor($gui_restore_target, $blue)
+					GUICtrlSetData($gui_error, 'Dokončeno.')
 				else
 					if $exit_code[2] = 0 then
 						if not $terminate then
@@ -486,8 +488,11 @@ while 1
 						$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
 						if @error then
 							logger("CHYBA: Neznámý kód " & $exit_code[2])
+							GUICtrlSetData($gui_error, 'Dokončeno.')
+							GUICtrlSetBkColor($gui_restore_target, $blue)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
+							GUICtrlSetData($gui_error, 'Dokončeno.')
 							GUICtrlSetBkColor($gui_restore_target, $red)
 						endif
 					endif
@@ -499,7 +504,7 @@ while 1
 			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
 			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
 			; round
-			logger('[R] Zálohování dokončeno.')
+			logger(@CRLF & '[R] Obnovení dokončeno.')
 			; update state
 			if $terminate then
 				conf_set_value('restore_state', $paused)
@@ -523,11 +528,11 @@ while 1
 				; update color
 				GUICtrlSetBkColor($gui_restore_target, $red)
 				; update output
-				GUICtrlSetData($gui_error, 'Cíloový adresář neexistuje.')
-				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
-				logger('[R] NAS: Zdrojový adresář neexistuje.')
+				GUICtrlSetData($gui_error, 'Cílový adresář neexistuje.')
+				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Cílový adresář neexistuje.' & @CRLF)
+				logger(@CRLF & '[R] NAS: Cílový adresář neexistuje.')
 			 else
-				logger('[R] Obnovení zahájeno.')
+				logger(@CRLF & '[R] Obnovení zahájeno.' & @CRLF & @CRLF)
 				; clear buffer
 				$buffer = ''
 				; update color
@@ -596,10 +601,10 @@ while 1
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
 						; update color
-						GUICtrlSetBkColor($gui_restore_target, $red)
+						GUICtrlSetBkColor($ctrl[$index][1], $red)
 					else
 						logger('CHYBA: Žádný chybový kód.')
-						GUICtrlSetBkColor($gui_restore_target, $blue)
+						GUICtrlSetBkColor($ctrl[$index][1], $blue)
 						GUICtrlSetData($gui_error, 'Neznámá chyba.')
 					endif
 				else
@@ -611,7 +616,8 @@ while 1
 				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 				if @error then
 					logger('CHYBA: GetExitCodeProcess')
-
+					GUICtrlSetBkColor($ctrl[$index][1], $blue)
+					GUICtrlSetData($gui_error, 'Dokončeno.')
 				else
 					if $exit_code[2] = 0 then
 						if not $terminate then
@@ -624,8 +630,11 @@ while 1
 						$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
 						if @error then
 							logger("CHYBA: Neznámý kód " & $exit_code[2])
+							GUICtrlSetData($gui_error, 'Dokončeno.')
+							GUICtrlSetBkColor($ctrl[$index][1], $blue)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
+							GUICtrlSetData($gui_error, 'Dokončeno.')
 							GUICtrlSetBkColor($ctrl[$index][1], $red)
 						endif
 					endif
@@ -633,16 +642,11 @@ while 1
 			endif
 			; close handle
 			_WinAPI_CloseHandle($proc)
-			; stderr error code
-			if $buffer_err <> '' then
-				$code = StringRegExp($buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
-				if not @error then logger('rsync: Kód chyby ' & $code[0] & '.')
-			endif
 			; log I/O
 			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
 			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
 			; round
-			logger('[' & $index + 1 & '] Zálohování dokončeno.')
+			logger(@CRLF & '[' & $index + 1 & '] Zálohování dokončeno.')
 			; update state
 			if $terminate then
 				$conf[$index*4+3][1] = $paused
@@ -670,9 +674,9 @@ while 1
 				; update output
 				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
 				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
-				logger('[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
+				logger(@CRLF & '[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
 			 else
-				logger('[' & $index + 1 & '] Zálohovaní zahájeno.')
+				logger(@CRLF & '[' & $index + 1 & '] Zálohovaní zahájeno.' & @CRLF & @CRLF)
 				; clear buffer
 				$buffer = ''
 				; update color
