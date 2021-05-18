@@ -162,16 +162,16 @@ $gui = GUICreate('NAS ' & $version, 632, 340, Default, Default)
 $gui_tab = GUICtrlCreateTab(5, 5, 621, 302)
 
 $gui_tab_dir = GUICtrlCreateTabItem('Záloha')
-$gui_group_source = GUICtrlCreateGroup('Zdroj', 12, 28, 379, 270)
-$gui_group_target = GUICtrlCreateGroup('Cíl', 394, 28, 224, 270)
+$gui_group_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 270)
+$gui_group_target = GUICtrlCreateGroup('Cíl', 319, 28, 299, 270)
 
 for $i = 0 to 9
 	$ctrl[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
 	GUICtrlSetState($ctrl[$i][0], $conf[$i*4+2][1])
-	$ctrl[$i][1] = GUICtrlCreateInput($conf[$i*4][1], 40, 44 + $i * 25, 264, 21); source
-	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 308, 44 + $i * 25, 75, 21)
-	$ctrl[$i][3] = GUICtrlCreateLabel(conf_get_value('prefix'), 400, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-	$ctrl[$i][4] = GUICtrlCreateInput($conf[$i*4+1][1], 496, 44 + $i * 25, 113, 21); target
+	$ctrl[$i][1] = GUICtrlCreateInput($conf[$i*4][1], 40, 44 + $i * 25, 189, 21); source
+	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
+	$ctrl[$i][3] = GUICtrlCreateLabel(conf_get_value('prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
+	$ctrl[$i][4] = GUICtrlCreateInput($conf[$i*4+1][1], 421, 44 + $i * 25, 188, 21); target
 next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
@@ -192,16 +192,18 @@ $gui_group_nas = GUICtrlCreateGroup('NAS', 12, 168, 606, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Prefix:', 20 ,188, 30, 21)
 $gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
 $gui_group_fill = GUICtrlCreateGroup('', 12, 214, 606, 84)
+
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
-$gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 244, 46)
+$gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
 GUICtrlSetState($gui_restore_box, conf_get_value('restore_enable'))
 $gui_restore_source_label = GUICtrlCreateLabel(conf_get_value('prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source = GUICtrlCreateInput(conf_get_value('restore_source'), 136, 44, 113, 21)
-$gui_group_restore_target = GUICtrlCreateGroup('Cíl', 260, 28, 358, 46)
-$gui_restore_target = GUICtrlCreateInput(conf_get_value('restore_target'), 268, 44, 263, 21)
+$gui_restore_source = GUICtrlCreateInput(conf_get_value('restore_source'), 136, 44, 172, 21)
+$gui_group_restore_target = GUICtrlCreateGroup('Cíl', 320, 28, 298, 46)
+$gui_restore_target = GUICtrlCreateInput(conf_get_value('restore_target'), 328, 44, 203, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 606, 224)
+
 $gui_tab_end = GUICtrlCreateTabItem('')
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
 $gui_button_run = GUICtrlCreateButton('Spustit', 316, 314, 75, 21)
