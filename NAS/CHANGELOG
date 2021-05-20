@@ -1,9 +1,4 @@
 
-[TODO]
-
--NAS DSM HTTPS
--NAS Firewall
-
 [1.7]
 
 (setup)
@@ -11,9 +6,12 @@
 -Drop VPN cert inherit permission.
 -Drop "Downloaded" files.
 -Remove shares.
--Update VPN config. 
+-Update VPN config.
+-Update SSH port.
 -Print security PDF and store backup.
 
+-SSH port.
+-NAS Firewall
 -Error code fallback.
 -Prevent exit on run.
 -Verbose output.
