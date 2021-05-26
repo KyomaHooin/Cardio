@@ -1,4 +1,11 @@
 
+TODO
+
+-Fix compilation prog var.
+-Run stats.
+-Code 12(conn error) catch.
+-last runtime/size/duration stats.
+
 [1.7]
 
 (setup)
