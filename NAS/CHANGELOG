@@ -1,10 +1,14 @@
 
 TODO
 
--Fix compilation prog var.
--Run stats.
--Code 12(conn error) catch.
+-Better blue.
 -last runtime/size/duration stats.
+
+[1.8]
+
+-Catch error code from combined buffer.
+-Run stats.
+-Fix compilation prog var.
 
 [1.7]
 
