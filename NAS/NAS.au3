@@ -19,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.7
+#AutoIt3Wrapper_Res_ProductVersion=1.8
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -40,7 +40,7 @@
 ; VAR
 ; ---------------------------------------------------------
 
-global $version = '1.7'
+global $version = '1.8'
 global $ini = @ScriptDir & '\NAS.ini'
 global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
@@ -71,7 +71,6 @@ global $white = 0xffffff
 global $green = 0x77dd77
 global $orange = 0xffb347
 global $red = 0xff6961
-global $blue = 0xaec6cf
 
 global $error_code[25][2]=[ _
 	[0,'Dokončeno.'], _
@@ -464,19 +463,19 @@ while 1
 						GUICtrlSetBkColor($gui_restore_target, $red)
 					else
 						logger('CHYBA: Žádný chybový kód.')
-						GUICtrlSetBkColor($gui_restore_target, $blue)
+						GUICtrlSetBkColor($gui_restore_target, $green)
 						GUICtrlSetData($gui_error, 'Neznámá chyba.')
 					endif
 				else
 					logger('rsync: Žádný chybový kód.')
-					GUICtrlSetBkColor($gui_restore_target, $blue)
+					GUICtrlSetBkColor($gui_restore_target, $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				endif
 			else
 				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 				if @error then
 					logger('CHYBA: GetExitCodeProcess')
-					GUICtrlSetBkColor($gui_restore_target, $blue)
+					GUICtrlSetBkColor($gui_restore_target, $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				else
 					if $exit_code[2] = 0 then
@@ -491,7 +490,7 @@ while 1
 						if @error then
 							logger("CHYBA: Neznámý kód " & $exit_code[2])
 							GUICtrlSetData($gui_error, 'Dokončeno.')
-							GUICtrlSetBkColor($gui_restore_target, $blue)
+							GUICtrlSetBkColor($gui_restore_target, $green)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 							GUICtrlSetBkColor($gui_restore_target, $red)
@@ -607,19 +606,19 @@ while 1
 						GUICtrlSetBkColor($ctrl[$index][1], $red)
 					else
 						logger('CHYBA: Žádný chybový kód.')
-						GUICtrlSetBkColor($ctrl[$index][1], $blue)
+						GUICtrlSetBkColor($ctrl[$index][1], $green)
 						GUICtrlSetData($gui_error, 'Neznámá chyba.')
 					endif
 				else
 					logger('rsync: Žádný chybový kód.')
-					GUICtrlSetBkColor($ctrl[$index][1], $blue)
+					GUICtrlSetBkColor($ctrl[$index][1], $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				endif
 			else
 				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
 				if @error then
 					logger('CHYBA: GetExitCodeProcess')
-					GUICtrlSetBkColor($ctrl[$index][1], $blue)
+					GUICtrlSetBkColor($ctrl[$index][1], $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				else
 					if $exit_code[2] = 0 then
@@ -634,7 +633,7 @@ while 1
 						if @error then
 							logger("CHYBA: Neznámý kód " & $exit_code[2])
 							GUICtrlSetData($gui_error, 'Dokončeno.')
-							GUICtrlSetBkColor($ctrl[$index][1], $blue)
+							GUICtrlSetBkColor($ctrl[$index][1], $green)
 						else
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 							GUICtrlSetBkColor($ctrl[$index][1], $red)
