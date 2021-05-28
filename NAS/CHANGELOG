@@ -1,11 +1,11 @@
 
 TODO
 
--Better blue.
--last runtime/size/duration stats.
+-Last runtime/size/duration stats.
 
 [1.8]
 
+-Blue to green.
 -Catch error code from combined buffer.
 -Run stats.
 -Fix compilation prog var.
