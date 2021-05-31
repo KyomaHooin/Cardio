@@ -374,9 +374,8 @@ while 1
 			if @error then
 				logger('CHYBA: ProcessClose')
 			else
-				while ProcessExists($rsync)
-					logger('rsync: Probíhá ukončení.')
-				wend
+				logger('rsync: Probíhá ukončení.')
+				ProcessWaitClose($rsync)
 				; set token
 				$terminate=True
 				;set restore
