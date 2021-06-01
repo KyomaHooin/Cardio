@@ -46,6 +46,8 @@ global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
+global $debug = True
+
 global $conf[0][2]; INI configuration
 global $ctrl[10][5]; GUI handle map
 
@@ -55,12 +57,13 @@ global $buffer; Rsync global I/O buffer
 global $buffer_out; Rsync STDOUT
 global $buffer_err; Rsync STDERR
 
-global $backup=False; restore state = 1
-global $test=False; restore state = 2
-global $restore=False; restore state = 3
-global $restore_test=False; restore state = 4
-global $terminate=False
-global $run=False
+global $backup = False; restore state = 1
+global $test = False; restore state = 2
+global $restore = False; restore state = 3
+global $restore_test = False; restore state = 4
+global $terminate = False
+global $error = False
+global $run = False
 
 global $failed = 4
 global $paused = 3
@@ -72,7 +75,7 @@ global $green = 0x77dd77
 global $orange = 0xffb347
 global $red = 0xff6961
 
-global $error_code[25][2]=[ _
+global $error_code[26][2]=[ _
 	[0,'Dokončeno.'], _
 	[1,'Chyba syntaxe.'], _
 	[2,'Chyba kompatibility protokolu.'], _
@@ -97,7 +100,8 @@ global $error_code[25][2]=[ _
 	[125,'Příkaz ukončen signálem.'], _
 	[126,'Příkaz nelze spustit.'], _
 	[127,'Příkaz nebyl nalezen.'], _
-	[255,'Neočekávaná chyba.']]
+	[255,'Neočekávaná chyba.'], _
+	[259,'Stále aktivní.']]
 
 ; ---------------------------------------------------------
 ; CONTROL
@@ -443,25 +447,27 @@ while 1
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-			if @error then
-				logger('CHYBA: WinAPI OpenProcess (query limited info)')
+			if @error or $proc = -1 then
+				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
 				if $buffer <> '' then
 					$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 					if not @error then
+						; update errror
+						$error = True
 						; update output
 						$code_index = _ArrayBinarySearch($error_code, $code[0])
 						if @error then
-							logger('CHYBA: Neznámý chybový kód ' & $code[0])
+							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
 							GUICtrlSetData($gui_error, 'Neznámá chyba.')
 						else
-							logger('rsync: Kód chyby ' & $code[0] & '.')
+							if $debug then logger('rsync: Kód chyby ' & $code[0] & '.')
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
 						; update color
 						GUICtrlSetBkColor($gui_restore_target, $red)
 					else
-						logger('CHYBA: Žádný chybový kód.')
+						if $debug then logger('CHYBA: Žádný chybový kód.')
 						GUICtrlSetBkColor($gui_restore_target, $green)
 						GUICtrlSetData($gui_error, 'Neznámá chyba.')
 					endif
@@ -471,29 +477,26 @@ while 1
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				endif
 			else
-				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
-				if @error then
-					logger('CHYBA: GetExitCodeProcess')
-					GUICtrlSetBkColor($gui_restore_target, $green)
-					GUICtrlSetData($gui_error, 'Dokončeno.')
-				else
-					if $exit_code[2] = 0 then
-						if not $terminate then
-							GUICtrlSetBkColor($gui_restore_target, $green)
-							GUICtrlSetData($gui_error, 'Dokončeno.')
-						else
-							GUICtrlSetData($gui_error, 'Přerušeno.')
-						endif
+				$exit_code = _WinAPI_GetExitCodeProcess($proc)
+				if $exit_code = 0 then
+					if not $terminate then
+						GUICtrlSetBkColor($gui_restore_target, $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
-						$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
-						if @error then
-							logger("CHYBA: Neznámý kód " & $exit_code[2])
-							GUICtrlSetData($gui_error, 'Dokončeno.')
-							GUICtrlSetBkColor($gui_restore_target, $green)
-						else
-							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-							GUICtrlSetBkColor($gui_restore_target, $red)
-						endif
+						GUICtrlSetData($gui_error, 'Přerušeno.')
+					endif
+				else
+					; update error
+					$error = True
+					; update output
+					$code_index = _ArrayBinarySearch($error_code, $exit_code)
+					if @error then
+						logger("CHYBA: Neznámý kód " & $exit_code)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+						GUICtrlSetBkColor($gui_restore_target, $green)
+					else
+						GUICtrlSetData($gui_error, $error_code[$code_index][1])
+						GUICtrlSetBkColor($gui_restore_target, $red)
 					endif
 				endif
 			endif
@@ -507,16 +510,18 @@ while 1
 			; update state
 			if $terminate then
 				conf_set_value('restore_state', $paused)
-			elseif $exit_code[2] = 0 then
-				conf_set_value('restore_state', $done)
-			else
+			elseif $error then
 				conf_set_value('restore_state', $failed)
+			else
+				conf_set_value('restore_state', $done)
 			endif
 			; reset token
 			$run = False
 		endif
 		; run
 		if not $run and get_free_restore() and not $terminate then
+			; reset error
+			$error = False
 			; update progress
 			if $restore then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> OBNOVA << --' & @CRLF & @CRLF)
 			if $restore_test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> TEST OBNOVY << --' & @CRLF & @CRLF)
@@ -586,16 +591,18 @@ while 1
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-			if @error then
-				logger('CHYBA: WinAPI OpenProcess (query limited info)')
+			if @error or $proc = -1 then
+				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
 				if $buffer <> '' then
 					$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 					if not @error then
+						; update errror
+						$error = True
 						; update output
 						$code_index = _ArrayBinarySearch($error_code, $code[0])
 						if @error then
-							logger('CHYBA: Neznámý chybový kód ' & $code[0])
+							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
 							GUICtrlSetData($gui_error, 'Neznámá chyba.')
 						else
 							logger('rsync: Kód chyby ' & $code[0] & '.')
@@ -604,9 +611,9 @@ while 1
 						; update color
 						GUICtrlSetBkColor($ctrl[$index][1], $red)
 					else
-						logger('CHYBA: Žádný chybový kód.')
+						if $debug then logger('CHYBA: Žádný chybový kód.')
 						GUICtrlSetBkColor($ctrl[$index][1], $green)
-						GUICtrlSetData($gui_error, 'Neznámá chyba.')
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					endif
 				else
 					logger('rsync: Žádný chybový kód.')
@@ -614,30 +621,26 @@ while 1
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				endif
 			else
-				$exit_code = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "HANDLE", $proc, "dword*", -1)
-				if @error then
-					logger('CHYBA: GetExitCodeProcess')
-					GUICtrlSetBkColor($ctrl[$index][1], $green)
-					GUICtrlSetData($gui_error, 'Dokončeno.')
-				else
-					if $exit_code[2] = 0 then
-						if not $terminate then
-							GUICtrlSetBkColor($ctrl[$index][1], $green)
-							GUICtrlSetData($gui_error, 'Dokončeno.')
-						else
-							GUICtrlSetData($gui_error, 'Přerušeno.')
-						endif
+				$exit_code = _WinAPI_GetExitCodeProcess($proc)
+				if $exit_code = 0 then
+					if not $terminate then
+						GUICtrlSetBkColor($ctrl[$index][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
-						$code_index = _ArrayBinarySearch($error_code, $exit_code[2])
-						if @error then
-							logger("CHYBA: Neznámý kód " & $exit_code[2])
-							GUICtrlSetData($gui_error, 'Dokončeno.')
-							GUICtrlSetBkColor($ctrl[$index][1], $green)
-						else
-							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-							GUICtrlSetBkColor($ctrl[$index][1], $red)
-						endif
+						GUICtrlSetData($gui_error, 'Přerušeno.')
 					endif
+				else
+					; update errror
+					$error = True
+					; update output
+					$code_index = _ArrayBinarySearch($error_code, $exit_code)
+					if @error then
+						if $debug then logger("CHYBA: Neznámý kód " & $exit_code)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					else
+						GUICtrlSetData($gui_error, $error_code[$code_index][1])
+					endif
+					GUICtrlSetBkColor($ctrl[$index][1], $red)
 				endif
 			endif
 			; close handle
@@ -650,10 +653,10 @@ while 1
 			; update state
 			if $terminate then
 				$conf[$index*4+3][1] = $paused
-			elseif $exit_code[2] = 0 then
-				$conf[$index*4+3][1] = $done
-			else
+			elseif $error then
 				$conf[$index*4+3][1] = $failed
+			else
+				$conf[$index*4+3][1] = $done
 			endif
 			; reset token
 			$run = False
@@ -662,6 +665,8 @@ while 1
 		if not $run and get_free() > -1 and not $terminate then
 			; free
 			$index = get_free()
+			; reset error
+			$error = False
 			; update progress
 			if $backup then	GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
 			if $test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> TEST ZÁLOHY << --' & @CRLF & @CRLF)
