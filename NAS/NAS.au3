@@ -469,7 +469,7 @@ while 1
 					else
 						if $debug then logger('CHYBA: Žádný chybový kód.')
 						GUICtrlSetBkColor($gui_restore_target, $green)
-						GUICtrlSetData($gui_error, 'Neznámá chyba.')
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					endif
 				else
 					logger('rsync: Žádný chybový kód.')
@@ -480,8 +480,8 @@ while 1
 				$exit_code = _WinAPI_GetExitCodeProcess($proc)
 				if $exit_code = 0 then
 					if not $terminate then
-						GUICtrlSetBkColor($gui_restore_target, $green)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
+						GUICtrlSetBkColor($gui_restore_target, $green)
 					else
 						GUICtrlSetData($gui_error, 'Přerušeno.')
 					endif
@@ -491,13 +491,12 @@ while 1
 					; update output
 					$code_index = _ArrayBinarySearch($error_code, $exit_code)
 					if @error then
-						logger("CHYBA: Neznámý kód " & $exit_code)
+						if $debug then logger("CHYBA: Neznámý kód " & $exit_code)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
-						GUICtrlSetBkColor($gui_restore_target, $green)
 					else
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
-						GUICtrlSetBkColor($gui_restore_target, $red)
 					endif
+					GUICtrlSetBkColor($gui_restore_target, $red)
 				endif
 			endif
 			; close handle
@@ -624,8 +623,8 @@ while 1
 				$exit_code = _WinAPI_GetExitCodeProcess($proc)
 				if $exit_code = 0 then
 					if not $terminate then
-						GUICtrlSetBkColor($ctrl[$index][1], $green)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
+						GUICtrlSetBkColor($ctrl[$index][1], $green)
 					else
 						GUICtrlSetData($gui_error, 'Přerušeno.')
 					endif
