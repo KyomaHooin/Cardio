@@ -450,8 +450,8 @@ while 1
 			if @error or $proc = -1 then
 				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
-				if $buffer <> '' then
-					$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+				if $buffer_out <> '' or $buffer_err <> '' then
+					$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 					if not @error then
 						; update errror
 						$error = True
@@ -459,9 +459,11 @@ while 1
 						$code_index = _ArrayBinarySearch($error_code, $code[0])
 						if @error then
 							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
+							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý chybový kód' & $code[0] & '.' & @CRLF)
 							GUICtrlSetData($gui_error, 'Neznámá chyba.')
-						else
-							if $debug then logger('rsync: Kód chyby ' & $code[0] & '.')
+ 						else
+							logger('[' & $code[0] & '] ' & $error_code[$code_index][1])
+							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
 						; update color
@@ -480,8 +482,8 @@ while 1
 				$exit_code = _WinAPI_GetExitCodeProcess($proc)
 				if $exit_code = 0 then
 					if not $terminate then
-						GUICtrlSetData($gui_error, 'Dokončeno.')
 						GUICtrlSetBkColor($gui_restore_target, $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
 						GUICtrlSetData($gui_error, 'Přerušeno.')
 					endif
@@ -491,9 +493,12 @@ while 1
 					; update output
 					$code_index = _ArrayBinarySearch($error_code, $exit_code)
 					if @error then
-						if $debug then logger("CHYBA: Neznámý kód " & $exit_code)
+						if $debug then logger('CHYBA: Neznámý kód ' & $exit_code)
+						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý kód ' & $code[0] & '.' & @CRLF)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
+						logger('CHYBA: ' & $error_code[$code_index][1])
+						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
 					endif
 					GUICtrlSetBkColor($gui_restore_target, $red)
@@ -593,8 +598,8 @@ while 1
 			if @error or $proc = -1 then
 				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
-				if $buffer <> '' then
-					$code = StringRegExp($buffer, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+				if $buffer_out <> '' or $buffer_err <> '' then
+					$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
 					if not @error then
 						; update errror
 						$error = True
@@ -602,9 +607,11 @@ while 1
 						$code_index = _ArrayBinarySearch($error_code, $code[0])
 						if @error then
 							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
+							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý chybový kód ' & $code[0] & '.' & @CRLF)
 							GUICtrlSetData($gui_error, 'Neznámá chyba.')
 						else
 							logger('rsync: Kód chyby ' & $code[0] & '.')
+							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
 						; update color
@@ -634,9 +641,12 @@ while 1
 					; update output
 					$code_index = _ArrayBinarySearch($error_code, $exit_code)
 					if @error then
-						if $debug then logger("CHYBA: Neznámý kód " & $exit_code)
+						if $debug then logger('CHYBA: Neznámý kód ' & $exit_code)
+						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý kód ' & $exit_code & '.' & @CRLF)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
+						logger('CHYBA: ' & $error_code[$code_index][1])
+						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
 					endif
 					GUICtrlSetBkColor($ctrl[$index][1], $red)
