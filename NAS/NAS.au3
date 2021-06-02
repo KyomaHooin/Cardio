@@ -462,7 +462,7 @@ while 1
 							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý chybový kód' & $code[0] & '.' & @CRLF)
 							GUICtrlSetData($gui_error, 'Neznámá chyba.')
  						else
-							logger('[' & $code[0] & '] ' & $error_code[$code_index][1])
+							logger('CHYBA: ' & $error_code[$code_index][1])
 							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
@@ -630,8 +630,8 @@ while 1
 				$exit_code = _WinAPI_GetExitCodeProcess($proc)
 				if $exit_code = 0 then
 					if not $terminate then
-						GUICtrlSetData($gui_error, 'Dokončeno.')
 						GUICtrlSetBkColor($ctrl[$index][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
 						GUICtrlSetData($gui_error, 'Přerušeno.')
 					endif
