@@ -5,6 +5,8 @@ TODO
 
 [1.8]
 
+-Update error logging, output and debug.
+-Update error handling.
 -Blue to green.
 -Catch error code from combined buffer.
 -Run stats.

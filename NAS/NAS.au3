@@ -46,7 +46,7 @@ global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
-global $debug = True
+global $debug = False
 
 global $conf[0][2]; INI configuration
 global $ctrl[10][5]; GUI handle map
@@ -146,9 +146,9 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'prefix=')
 	FileWriteLine($f, 'restore=' & '0'); default 0
 	FileClose($f)
-	for $i=1 to 10
-		FileWriteLine($f, 'source' & $i & '_stat='); date|interval|size|duration
-	next
+	;for $i=1 to 10
+	;	FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
+	;next
 endif
 
 ; read configuration
@@ -529,8 +529,6 @@ while 1
 			; update progress
 			if $restore then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> OBNOVA << --' & @CRLF & @CRLF)
 			if $restore_test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- R -- >> TEST OBNOVY << --' & @CRLF & @CRLF)
-			; stats
-			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_estimate())
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
@@ -666,6 +664,8 @@ while 1
 				$conf[$index*4+3][1] = $failed
 			else
 				$conf[$index*4+3][1] = $done
+				; update stat
+				;update_stat($buffer, $index)
 			endif
 			; reset token
 			$run = False
@@ -680,7 +680,7 @@ while 1
 			if $backup then	GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
 			if $test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> TEST ZÁLOHY << --' & @CRLF & @CRLF)
 			; stats
-			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_estimate($index))
+			;GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
@@ -754,9 +754,9 @@ while 1
 			FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
 			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
 			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-			for $i=1 to 10
-				FileWriteLine($f, 'source' & $i & '_stat=' & get_curr_stat($i))
-			next
+			;for $i=0 to 9
+			;	FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value($i & '_stat'))
+			;next
 			FileClose($f)
 			; exit
 			exitloop
@@ -835,14 +835,21 @@ func get_free_restore()
 	return False
 endfunc
 
-func get_stat($buff)
-	return ''
-endfunc
+;func get_stat($index)
+;	local $data
+;	_FileReadToArray(conf_get_value($index), $data, 0, '|'); 0-based date||size|duration|interval
+;	if nor @error then
+;		;
+;	else
+;		return ''
+;	endif
+;endfunc
 
-func get_estimate($index = -1)
-		return ''
-endfunc
-
-func get_curr_stat($index = -1)
-	return ''
-endfunc
+;func update_stat($buff, $index)
+	;date||size|duration|interval
+	;Total transferred file size (KMGP)
+	;File list generation time: 0.001 seconds
+	;File list transfer time: 0.000 seconds
+;	conf_set_value($index + 1  & '_stat', '||||')
+;	return ''
+;endfunc
