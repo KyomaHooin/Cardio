@@ -31,6 +31,7 @@
 ; ---------------------------------------------------------
 
 #include <File.au3>
+#include <Date.au3>
 #Include <GuiEdit.au3>
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
@@ -146,9 +147,9 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'prefix=')
 	FileWriteLine($f, 'restore=' & '0'); default 0
 	FileClose($f)
-	;for $i=1 to 10
-	;	FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
-	;next
+;	for $i=1 to 10
+;		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
+;	next
 endif
 
 ; read configuration
@@ -664,8 +665,8 @@ while 1
 				$conf[$index*4+3][1] = $failed
 			else
 				$conf[$index*4+3][1] = $done
-				; update stat
-				;update_stat($buffer, $index)
+				; update stats
+				;if $backup then conf_set_value('source' & $index & '_stat',update_stat($buffer, $index))
 			endif
 			; reset token
 			$run = False
@@ -755,7 +756,7 @@ while 1
 			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
 			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
 			;for $i=0 to 9
-			;	FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value($i & '_stat'))
+			;	FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
 			;next
 			FileClose($f)
 			; exit
@@ -778,14 +779,16 @@ func logger($text)
 	FileWriteLine($log, $text)
 endfunc
 
-func conf_set_value($val, $data)
-	$index = _ArraySearch($conf, $val)
+func conf_set_value($value, $data)
+	local $index
+	$index = _ArraySearch($conf, $value)
 	if not @error then $conf[$index][1] = $data
 	return
 endfunc
 
-func conf_get_value($val)
-	$index = _ArraySearch($conf, $val)
+func conf_get_value($value)
+	local $index
+	$index = _ArraySearch($conf, $value)
 	if not @error then return $conf[$index][1]
 	return ''
 endfunc
@@ -836,20 +839,54 @@ func get_free_restore()
 endfunc
 
 ;func get_stat($index)
-;	local $data
-;	_FileReadToArray(conf_get_value($index), $data, 0, '|'); 0-based date||size|duration|interval
-;	if nor @error then
-;		;
-;	else
-;		return ''
+;	local $data, $output
+;	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
+;	if not @error then
+;		$output &= ' Poslední záloha' & @CRLF
+;		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
+;		if $data[1] then
+;				$output &= @CRLF & '  Velikost: ' & $data[1] & ' MB'
+;		endif
+;		if $data[2] then
+;			$output &= @CRLF & '   Interval: ' & $data[3] & ' dní'
+;		endif
+;		if $data[3] then
+;			$output &= @CRLF & '    Trvání: '  & Round($data[2]/60, 2) & ' minut'
+;		endif
+;		$output &= @CRLF & @CRLF
+;		$output &= ' Odhadovaná velikost: ' & @CRLF
+;		$output &= '        Odhadovaný čas: '
+;		$output &= @CRLF & @CRLF
 ;	endif
+;	return $output
 ;endfunc
 
 ;func update_stat($buff, $index)
-	;date||size|duration|interval
-	;Total transferred file size (KMGP)
-	;File list generation time: 0.001 seconds
-	;File list transfer time: 0.000 seconds
-;	conf_set_value($index + 1  & '_stat', '||||')
-;	return ''
+;	local $data, $date, $size, $duration, $interval
+;	; date
+;	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
+;	; size
+;	$size = StringRegExp($buff, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
+;	switch StringRegExpReplace($size, '.*(.)$', '$1')
+;		case 'K'
+;			$size *= 10000
+;		case 'G'
+;			$size /= 10000
+;		case 'T'
+;			$size /= 10000^2
+;		case 'P'
+;			$size /= 10000^3
+;	endswitch
+;	; time
+;	$time_generation = StringRegExp($buff, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+;	$time_transfer = StringRegExp($buff, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+;	$time = $time_generation + $time_transfer
+;	; interval
+;	_FileReadToArray(conf_get_value($index), $data, 0, '|'); date|size|duration|interval
+;	if not @error then
+;		$interval = _DateDiff('D', $data[3], $date)
+;	else
+;		$interval = ''
+;	endif
+;	conf_set_value($index + 1 & '_stat', $date & '|' & $size & '|' & $duration & '|' & $interval)
 ;endfunc
