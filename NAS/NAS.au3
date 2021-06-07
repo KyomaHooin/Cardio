@@ -54,7 +54,7 @@ global $ctrl[10][5]; GUI handle map
 
 global $rsync; Rsync PID
 global $option; Rsync option
-global $buffer; Rsync global I/O buffer
+global $buffer; Rsync combined buffer
 global $buffer_out; Rsync STDOUT
 global $buffer_err; Rsync STDERR
 
@@ -147,9 +147,9 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'prefix=')
 	FileWriteLine($f, 'restore=' & '0'); default 0
 	FileClose($f)
-;	for $i=1 to 10
-;		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
-;	next
+	for $i=1 to 10
+		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
+	next
 endif
 
 ; read configuration
@@ -666,7 +666,8 @@ while 1
 			else
 				$conf[$index*4+3][1] = $done
 				; update stats
-				;if $backup then conf_set_value('source' & $index & '_stat',update_stat($buffer, $index))
+				;if $backup then conf_set_value('source' & $index + 1 & '_stat',update_stat($buffer, $index))
+				conf_set_value('source' & $index + 1 & '_stat',update_stat($buffer, $index))
 			endif
 			; reset token
 			$run = False
@@ -681,7 +682,8 @@ while 1
 			if $backup then	GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
 			if $test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> TEST ZÁLOHY << --' & @CRLF & @CRLF)
 			; stats
-			;GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
+			;if $backup then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
+			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
@@ -755,9 +757,9 @@ while 1
 			FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
 			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
 			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-			;for $i=0 to 9
-			;	FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
-			;next
+			for $i=1 to 10
+				FileWriteLine($f, 'source' & $i & '_stat=' & conf_get_value('source' & $i & '_stat'))
+			next
 			FileClose($f)
 			; exit
 			exitloop
@@ -781,14 +783,14 @@ endfunc
 
 func conf_set_value($value, $data)
 	local $index
-	$index = _ArraySearch($conf, $value)
+	$index = _ArraySearch($conf, $value, 0, 0, 0, 0, 1, 0); 1st column
 	if not @error then $conf[$index][1] = $data
 	return
 endfunc
 
 func conf_get_value($value)
 	local $index
-	$index = _ArraySearch($conf, $value)
+	$index = _ArraySearch($conf, $value, 0, 0, 0, 0, 1, 0); 1st column
 	if not @error then return $conf[$index][1]
 	return ''
 endfunc
@@ -838,55 +840,55 @@ func get_free_restore()
 	return False
 endfunc
 
-;func get_stat($index)
-;	local $data, $output
-;	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
-;	if not @error then
-;		$output &= ' Poslední záloha' & @CRLF
-;		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
-;		if $data[1] then
-;				$output &= @CRLF & '  Velikost: ' & $data[1] & ' MB'
-;		endif
-;		if $data[2] then
-;			$output &= @CRLF & '   Interval: ' & $data[3] & ' dní'
-;		endif
-;		if $data[3] then
-;			$output &= @CRLF & '    Trvání: '  & Round($data[2]/60, 2) & ' minut'
-;		endif
-;		$output &= @CRLF & @CRLF
-;		$output &= ' Odhadovaná velikost: ' & @CRLF
-;		$output &= '        Odhadovaný čas: '
-;		$output &= @CRLF & @CRLF
-;	endif
-;	return $output
-;endfunc
+func get_stat($index)
+	local $data, $output
+	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
+	if not @error then
+		$output &= ' Poslední záloha' & @CRLF
+		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
+		if $data[1] then
+				$output &= @CRLF & '  Velikost: ' & $data[1] & ' MB'
+		endif
+		if $data[2] then
+			$output &= @CRLF & '   Interval: ' & $data[3] & ' dní'
+		endif
+		if $data[3] then
+			$output &= @CRLF & '    Trvání: '  & Round($data[2]/60, 2) & ' minut'
+		endif
+		$output &= @CRLF & @CRLF
+		$output &= ' Odhadovaná velikost: ' & @CRLF
+		$output &= '        Odhadovaný čas: '
+		$output &= @CRLF & @CRLF
+	endif
+	return $output
+endfunc
 
-;func update_stat($buff, $index)
-;	local $data, $date, $size, $duration, $interval
-;	; date
-;	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
-;	; size
-;	$size = StringRegExp($buff, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
-;	switch StringRegExpReplace($size, '.*(.)$', '$1')
-;		case 'K'
-;			$size *= 10000
-;		case 'G'
-;			$size /= 10000
-;		case 'T'
-;			$size /= 10000^2
-;		case 'P'
-;			$size /= 10000^3
-;	endswitch
-;	; time
-;	$time_generation = StringRegExp($buff, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-;	$time_transfer = StringRegExp($buff, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-;	$time = $time_generation + $time_transfer
-;	; interval
-;	_FileReadToArray(conf_get_value($index), $data, 0, '|'); date|size|duration|interval
-;	if not @error then
-;		$interval = _DateDiff('D', $data[3], $date)
-;	else
-;		$interval = ''
-;	endif
-;	conf_set_value($index + 1 & '_stat', $date & '|' & $size & '|' & $duration & '|' & $interval)
-;endfunc
+func update_stat($buff, $index)
+	local $data, $date, $size, $duration, $interval
+	; date
+	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
+	; size
+	$size = StringRegExp($buff, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
+	switch StringRegExpReplace($size, '.*(.)$', '$1')
+		case 'K'
+			$size *= 10000
+		case 'G'
+			$size /= 10000
+		case 'T'
+			$size /= 10000^2
+		case 'P'
+			$size /= 10000^3
+	endswitch
+	; duration
+	$time_generation = StringRegExp($buff, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+	$time_transfer = StringRegExp($buff, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+	$time = $time_generation + $time_transfer
+	; interval
+	_FileReadToArray(conf_get_value($index), $data, 0, '|'); date|size|duration|interval
+	if not @error then
+		$interval = _DateDiff('D', $data[3], $date)
+	else
+		$interval = ''
+	endif
+	conf_set_value($index + 1 & '_stat', $date & '|' & $size & '|' & $duration & '|' & $interval)
+endfunc
