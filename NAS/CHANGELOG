@@ -5,6 +5,7 @@ TODO
 
 [1.8]
 
+-Fix configuration retrieval.
 -Update error logging, output and debug.
 -Update error handling.
 -Blue to green.
