@@ -666,8 +666,7 @@ while 1
 			else
 				$conf[$index*4+3][1] = $done
 				; update stats
-				;if $backup then conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
-				conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
+				if $backup then conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
 			endif
 			; reset token
 			$run = False
@@ -840,7 +839,8 @@ func get_free_restore()
 endfunc
 
 func get_stat($index)
-	local $data, $output
+	local $data, $date, $size_estimate, $output
+	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
 	if not @error then
 		$output &= ' -- Poslední záznam' & @CRLF
@@ -849,9 +849,12 @@ func get_stat($index)
 		if $data[2] then $output &= @CRLF & '    Trvání: ' & Round($data[2]/60, 2) & ' minut'
 		if $data[3] then $output &= @CRLF & '    Interval: ' & $data[3] & ' dní'
 		$output &= @CRLF & @CRLF
-		$output &= '    Odhadovaná velikost: ' & @CRLF
-		$output &= '    Odhadovaný čas: '
-		$output &= @CRLF & @CRLF
+		if $data[0] and $data[1] and $data[2] and $data[3] then
+			$size_esitmate = _DateDiff('D', $data[0], $date) / $data[3] * $data[1]
+			$output &= '    Odhadovaná velikost: '& $size_esitmate & ' MB' & @CRLF
+			$output &= '    Odhadovaný čas: ' & Round( $size_esitmate / $data[1] * $data[2] / 60, 2) & ' minut'
+			$output &= @CRLF & @CRLF
+		endif
 	endif
 	return $output
 endfunc
@@ -881,7 +884,7 @@ func update_stat($buffer, $index)
 	; interval
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count date|size|duration|interval
 	if not @error then
-		if $data[3] then $interval = _DateDiff('D', $data[3], $date)
+		if $data[3] then $interval = _DateDiff('D', $data[0], $date)
 	endif
 	return $date & '|' & $size[0] & '|' & $duration & '|' & $interval
 endfunc
