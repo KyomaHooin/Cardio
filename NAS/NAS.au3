@@ -667,7 +667,7 @@ while 1
 				$conf[$index*4+3][1] = $done
 				; update stats
 				;if $backup then conf_set_value('source' & $index + 1 & '_stat',update_stat($buffer, $index))
-				conf_set_value('source' & $index + 1 & '_stat',update_stat($buffer, $index))
+				conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer, $index))
 			endif
 			; reset token
 			$run = False
@@ -682,7 +682,6 @@ while 1
 			if $backup then	GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
 			if $test then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> TEST ZÁLOHY << --' & @CRLF & @CRLF)
 			; stats
-			;if $backup then GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
@@ -844,51 +843,45 @@ func get_stat($index)
 	local $data, $output
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
 	if not @error then
-		$output &= ' Poslední záloha' & @CRLF
+		$output &= ' -- Poslední záznam' & @CRLF
 		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
-		if $data[1] then
-				$output &= @CRLF & '  Velikost: ' & $data[1] & ' MB'
-		endif
-		if $data[2] then
-			$output &= @CRLF & '   Interval: ' & $data[3] & ' dní'
-		endif
-		if $data[3] then
-			$output &= @CRLF & '    Trvání: '  & Round($data[2]/60, 2) & ' minut'
-		endif
+		if $data[1] then $output &= @CRLF & '    Velikost: ' & $data[1] & ' MB'
+		if $data[2] then $output &= @CRLF & '    Trvání: ' & Round($data[2]/60, 2) & ' minut'
+		if $data[3] then $output &= @CRLF & '    Interval: ' & $data[3] & ' dní'
 		$output &= @CRLF & @CRLF
-		$output &= ' Odhadovaná velikost: ' & @CRLF
-		$output &= '        Odhadovaný čas: '
+		$output &= '    Odhadovaná velikost: ' & @CRLF
+		$output &= '    Odhadovaný čas: '
 		$output &= @CRLF & @CRLF
 	endif
 	return $output
 endfunc
 
-func update_stat($buff, $index)
+func update_stat($buffer, $index)
 	local $data, $date, $size, $duration, $interval
 	; date
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	; size
-	$size = StringRegExp($buff, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
-	switch StringRegExpReplace($size, '.*(.)$', '$1')
+	$size = StringRegExp($buffer, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
+	switch StringRegExpReplace($size[0], '.*(.)$', '$1')
 		case 'K'
-			$size *= 10000
+			$size[0] *= 1000
+		case 'M'
+			$size[0] *= 1
 		case 'G'
-			$size /= 10000
+			$size[0] /= 1000
 		case 'T'
-			$size /= 10000^2
+			$size[0] /= 1000^2
 		case 'P'
-			$size /= 10000^3
+			$size[0] /= 1000^3
 	endswitch
 	; duration
-	$time_generation = StringRegExp($buff, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-	$time_transfer = StringRegExp($buff, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-	$time = $time_generation + $time_transfer
+	$time_generation = StringRegExp($buffer, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+	$time_transfer = StringRegExp($buffer, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+	$duration = $time_generation[0] + $time_transfer[0]
 	; interval
-	_FileReadToArray(conf_get_value($index), $data, 0, '|'); date|size|duration|interval
+	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count date|size|duration|interval
 	if not @error then
-		$interval = _DateDiff('D', $data[3], $date)
-	else
-		$interval = ''
+		if $data[3] then $interval = _DateDiff('D', $data[3], $date)
 	endif
-	conf_set_value($index + 1 & '_stat', $date & '|' & $size & '|' & $duration & '|' & $interval)
+	return $date & '|' & $size[0] & '|' & $duration & '|' & $interval
 endfunc
