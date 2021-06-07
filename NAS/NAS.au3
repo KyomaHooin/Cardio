@@ -666,8 +666,8 @@ while 1
 			else
 				$conf[$index*4+3][1] = $done
 				; update stats
-				;if $backup then conf_set_value('source' & $index + 1 & '_stat',update_stat($buffer, $index))
-				conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer, $index))
+				;if $backup then conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
+				conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
 			endif
 			; reset token
 			$run = False
