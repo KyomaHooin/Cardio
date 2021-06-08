@@ -839,7 +839,7 @@ func get_free_restore()
 endfunc
 
 func get_stat($index)
-	local $data, $date, $size_estimate, $output
+	local $data, $date, $output
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count
 	if not @error then
