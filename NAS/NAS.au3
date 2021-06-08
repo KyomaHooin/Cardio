@@ -146,10 +146,10 @@ if not FileExists($ini) then
 	FileWriteLine($f, 'port=')
 	FileWriteLine($f, 'prefix=')
 	FileWriteLine($f, 'restore=' & '0'); default 0
-	FileClose($f)
 	for $i=1 to 10
 		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
 	next
+	FileClose($f)
 endif
 
 ; read configuration
@@ -755,8 +755,8 @@ while 1
 			FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
 			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
 			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-			for $i=1 to 10
-				FileWriteLine($f, 'source' & $i & '_stat=' & conf_get_value('source' & $i & '_stat'))
+			for $i=0 to 9
+				FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
 			next
 			FileClose($f)
 			; exit
@@ -841,7 +841,7 @@ endfunc
 func get_stat($index)
 	local $data, $date, $size_estimate, $output
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
-	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count date||size|duration|interval
+	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count
 	if not @error then
 		$output &= ' -- Poslední záznam' & @CRLF
 		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
@@ -850,9 +850,8 @@ func get_stat($index)
 		if $data[3] then $output &= @CRLF & '    Interval: ' & $data[3] & ' dní'
 		$output &= @CRLF & @CRLF
 		if $data[0] and $data[1] and $data[2] and $data[3] then
-			$size_esitmate = _DateDiff('D', $data[0], $date) / $data[3] * $data[1]
-			$output &= '    Odhadovaná velikost: '& $size_esitmate & ' MB' & @CRLF
-			$output &= '    Odhadovaný čas: ' & Round( $size_esitmate / $data[1] * $data[2] / 60, 2) & ' minut'
+			$output &= '    Odhadovaná velikost: ' & _DateDiff('D', $data[0], $date) / $data[3] * $data[1] & ' MB' & @CRLF
+			$output &= '    Odhadovaný čas: ' & Round(_DateDiff('D', $data[0], $date) / $data[3] * $data[2] / 60, 2) & ' minut'
 			$output &= @CRLF & @CRLF
 		endif
 	endif
@@ -860,31 +859,37 @@ func get_stat($index)
 endfunc
 
 func update_stat($buffer, $index)
-	local $data, $date, $size, $duration, $interval
+	local $data, $date, $unit, $size, $time_generation, $time_transfer, $duration, $interval
 	; date
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	; size
-	$size = StringRegExp($buffer, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
-	switch StringRegExpReplace($size[0], '.*(.)$', '$1')
-		case 'K'
-			$size[0] *= 1000
-		case 'M'
-			$size[0] *= 1
-		case 'G'
-			$size[0] /= 1000
-		case 'T'
-			$size[0] /= 1000^2
-		case 'P'
-			$size[0] /= 1000^3
-	endswitch
+	$unit = StringRegExp($buffer, 'Total transferred file size: (.+) bytes', $STR_REGEXPARRAYMATCH)
+	if not @error then
+		switch StringRegExpReplace($unit[0], '.*(.)$', '$1')
+			case 'K'
+				$size = StringRegExpReplace($unit[0], '(.*).$', '$1') * 1000
+			case 'M'
+				$size = StringRegExpReplace($unit[0], '(.*).$', '$1') * 1
+			case 'G'
+				$size = StringRegExpReplace($unit[0], '(.*).$', '$1') / 1000
+			case 'T'
+				$size = StringRegExpReplace($unit[0], '(.*).$', '$1') / 1000^2
+			case 'P'
+				$size = StringRegExpReplace($unit[0], '(.*).$', '$1') / 1000^3
+		endswitch
+	endif
 	; duration
 	$time_generation = StringRegExp($buffer, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-	$time_transfer = StringRegExp($buffer, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-	$duration = $time_generation[0] + $time_transfer[0]
-	; interval
-	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count date|size|duration|interval
 	if not @error then
-		if $data[3] then $interval = _DateDiff('D', $data[0], $date)
+		$time_transfer = StringRegExp($buffer, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
+		if not @error then
+			$duration = $time_generation[0] + $time_transfer[0]
+		endif
 	endif
-	return $date & '|' & $size[0] & '|' & $duration & '|' & $interval
+	; interval
+	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count
+	if not @error then
+		if $data[0] then $interval = _DateDiff('D', $data[0], $date)
+	endif
+	return $date & '|' & $size & '|' & $duration & '|' & $interval
 endfunc
