@@ -851,7 +851,7 @@ func get_stat($index)
 		$output &= @CRLF & @CRLF
 		if $data[0] and $data[1] and $data[2] and $data[3] then
 			$output &= '    Odhadovaná velikost: ' & _DateDiff('D', $data[0], $date) / $data[3] * $data[1] & ' MB' & @CRLF
-			$output &= '    Odhadovaný čas: ' & Round(_DateDiff('D', $data[0], $date) / $data[3] * $data[2] / 60, 2) & ' minut'
+			$output &= '    Odhadovaný čas: ' & Round(_DateDiff('D', $data[0], $date) / $data[3] * $data[2] / 60) & ' minut'
 			$output &= @CRLF & @CRLF
 		endif
 	endif
@@ -891,5 +891,5 @@ func update_stat($buffer, $index)
 	if not @error then
 		if $data[0] then $interval = _DateDiff('D', $data[0], $date)
 	endif
-	return $date & '|' & $size & '|' & $duration & '|' & $interval
+	return $date & '|' & Round($size) & '|' & $duration & '|' & $interval
 endfunc
