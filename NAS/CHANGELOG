@@ -1,4 +1,12 @@
 
+TODO:
+
+-fix -1 <> 4294967295.
+-self timer duration
+-2nd connection + 2nd table.
+
+[1.9]
+
 [1.8]
 
 -Last runtime/size/duration stats.
