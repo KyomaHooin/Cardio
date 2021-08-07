@@ -47,7 +47,7 @@ global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
-global $debug = False
+global $debug = True
 
 global $conf[0][2]; INI configuration
 global $ctrl[10][5]; GUI handle map
@@ -75,6 +75,8 @@ global $white = 0xffffff
 global $green = 0x77dd77
 global $orange = 0xffb347
 global $red = 0xff6961
+
+global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
 
 global $error_code[26][2]=[ _
 	[0,'Dokončeno.'], _
@@ -448,7 +450,7 @@ while 1
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-			if @error or $proc = -1 then
+			if @error or $proc = $INVALID_HANDLE_VALUE then
 				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
 				if $buffer_out <> '' or $buffer_err <> '' then
@@ -582,7 +584,7 @@ while 1
 	; backup & backup test
 	if $backup or $test then
 		; logging
-		if $run and get_free() > -1 and not ProcessExists($rsync) then
+		if $run and get_free() >= 0 and not ProcessExists($rsync) then
 			; free
 			$index = get_free()
 			; update I/O
@@ -594,7 +596,7 @@ while 1
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
 			; exit code
 			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-			if @error or $proc = -1 then
+			if @error or $proc = $INVALID_HANDLE_VALUE then
 				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
 				; error code
 				if $buffer_out <> '' or $buffer_err <> '' then
@@ -672,7 +674,7 @@ while 1
 			$run = False
 		endif
 		; run
-		if not $run and get_free() > -1 and not $terminate then
+		if not $run and get_free() >= 0 and not $terminate then
 			; free
 			$index = get_free()
 			; reset error
