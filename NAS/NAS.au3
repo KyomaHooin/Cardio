@@ -19,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.8
+#AutoIt3Wrapper_Res_ProductVersion=1.9
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -41,13 +41,15 @@
 ; VAR
 ; ---------------------------------------------------------
 
-global $version = '1.8'
+global $version = '1.9'
 global $ini = @ScriptDir & '\NAS.ini'
 global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
-global $debug = True
+global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
+
+global $debug = False
 
 global $conf[0][2]; INI configuration
 global $ctrl[10][5]; GUI handle map
@@ -66,6 +68,8 @@ global $terminate = False
 global $error = False
 global $run = False
 
+global $transfer_start
+
 global $failed = 4
 global $paused = 3
 global $done = 1
@@ -75,8 +79,6 @@ global $white = 0xffffff
 global $green = 0x77dd77
 global $orange = 0xffb347
 global $red = 0xff6961
-
-global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
 
 global $error_code[26][2]=[ _
 	[0,'Dokončeno.'], _
@@ -698,6 +700,8 @@ while 1
 				logger(@CRLF & '[' & $index + 1 & '] Zálohování zahájeno.' & @CRLF & @CRLF)
 				; clear buffer
 				$buffer = ''
+				; update transfer start
+				$transfer_start = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $orange)
 				; update output
@@ -861,7 +865,7 @@ func get_stat($index)
 endfunc
 
 func update_stat($buffer, $index)
-	local $data, $date, $unit, $size, $time_generation, $time_transfer, $duration, $interval
+	local $date, $unit, $size, $time_generation, $duration, $data, $interval
 	; date
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	; size
@@ -883,10 +887,7 @@ func update_stat($buffer, $index)
 	; duration
 	$time_generation = StringRegExp($buffer, 'File list generation time: (.+) seconds', $STR_REGEXPARRAYMATCH)
 	if not @error then
-		$time_transfer = StringRegExp($buffer, 'File list transfer time: (.+) seconds', $STR_REGEXPARRAYMATCH)
-		if not @error then
-			$duration = $time_generation[0] + $time_transfer[0]
-		endif
+		$duration = _DateDiff('s', $transfer_start, $date) + int($time_generation[0])
 	endif
 	; interval
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count
