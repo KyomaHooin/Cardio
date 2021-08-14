@@ -36,6 +36,7 @@
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
 #include <WinAPIProc.au3>
+#include <CryptoNG.au3>
 
 ; ---------------------------------------------------------
 ; VAR
@@ -48,6 +49,8 @@ global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 
 global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
+
+global $login = '0x3BD1B351E7E2488CBA0DED73A0D1AD1D60509F6B1C9EBC6C4032C03BD5A42B4CAA134BB7039EBA70AE5D16B89F3AF055FA31339BB85F0BE97973AFB75B310F0B'
 
 global $debug = False
 
@@ -126,6 +129,12 @@ if @error then
 endif
 
 ; ---------------------------------------------------------
+; LOGIN
+; ---------------------------------------------------------
+
+login()
+
+; ---------------------------------------------------------
 ; INIT
 ; ---------------------------------------------------------
 
@@ -153,6 +162,7 @@ if not FileExists($ini) then
 	for $i=1 to 10
 		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
 	next
+	FileWriteLine($f, 'debug=' & '0'); default 0
 	FileClose($f)
 endif
 
@@ -202,7 +212,11 @@ $gui_button_key = GUICtrlCreateButton('Procházet', 334, 138, 75, 21)
 $gui_group_nas = GUICtrlCreateGroup('NAS', 12, 168, 606, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Prefix:', 20 ,188, 30, 21)
 $gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
-$gui_group_fill = GUICtrlCreateGroup('', 12, 214, 606, 84)
+$gui_group_setup = GUICtrlCreateGroup('Ostatní', 12, 214, 606, 84)
+$gui_debug_label = GUICtrlCreateLabel('Povolit ladění:', 20, 234, 80, 21)
+$gui_debug_check = GUICtrlCreateCheckbox('', 318, 228, 16, 21)
+$gui_pwd_old_label = GUICtrlCreateLabel('Nové heslo:', 20, 258, 150, 21)
+$gui_pwd_old = GUICtrlCreateInput('', 240, 254, 90, 21, 0x0020); ES_PASSWORD
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
@@ -220,6 +234,8 @@ $gui_button_test = GUICtrlCreateButton('Test', 394, 314, 75, 21)
 $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
+; update debug
+;if conf_get_value('debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
 ; update button
 if conf_get_value('restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
 ; update colors
@@ -262,6 +278,15 @@ GUISetState(@SW_SHOW)
 
 while 1
 	$event = GUIGetMsg()
+	; enable debugging
+;	if GUICtrlRead($gui_debug_check) = $GUI_CHECKED  then
+;		$debug = True
+;		conf_set_value('debug', 1)
+;	endif
+;	if GUICtrlRead($gui_debug_check) = $GUI_UNCHECKED  then
+;		$debug = False
+;		conf_set_value('debug', 0)
+;	endif
 	; select source
 	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
 	if not @error then
@@ -764,6 +789,7 @@ while 1
 			for $i=0 to 9
 				FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
 			next
+			FileWriteLine($f, 'debug=' & conf_get_value('debug'))
 			FileClose($f)
 			; exit
 			exitloop
@@ -896,3 +922,33 @@ func update_stat($buffer, $index)
 	endif
 	return $date & '|' & Round($size) & '|' & $duration & '|' & $interval
 endfunc
+
+func login()
+	$gui_login = GUICreate('NAS ' & $version & ' - přihlášení', 315, 58, Default, Default)
+	$gui_login_logo = GUICtrlCreateIcon('NAS.ico', 'NAS', 10, 8, 40, 40)
+	$gui_login_label = GUICtrlCreateLabel('Heslo:', 60, 20, 30, 21)
+	$gui_login_pwd = GUICtrlCreateInput('', 100, 16, 120, 21, 0x0020); ES_PASSWORD
+	$gui_login_button = GUICtrlCreateButton('Login', 230, 16, 75, 21)
+	$gui_login_error = GUICtrlCreateLabel('', 104, 40, 150, 21)
+
+	; set color
+	GUICtrlSetColor($gui_login_error, 0xff0000)
+	; set default focus
+	GUICtrlSetState($gui_login_pwd, $GUI_FOCUS)
+	;show
+	GUISetState(@SW_SHOW, $gui_login)
+
+	while 1
+		$event = GUIGetMsg()
+		if $event = $gui_login_button Then
+			if _CryptoNG_HashData($CNG_BCRYPT_SHA512_ALGORITHM , GUICtrlRead($gui_login_pwd)) = Binary($login) then
+				ExitLoop
+			else
+				GUICtrlSetData($gui_login_error, 'Neplatné heslo.')
+			endif
+		endif
+		if $event = $GUI_EVENT_CLOSE then exit
+	wend
+	GUIDelete($gui_login)
+	return
+EndFunc
