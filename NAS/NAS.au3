@@ -19,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=1.9
+#AutoIt3Wrapper_Res_ProductVersion=2.0
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -42,7 +42,7 @@
 ; VAR
 ; ---------------------------------------------------------
 
-global $version = '1.9'
+global $version = '2.0'
 global $ini = @ScriptDir & '\NAS.ini'
 global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
@@ -51,7 +51,9 @@ global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
 
 global $login = '0x3BD1B351E7E2488CBA0DED73A0D1AD1D60509F6B1C9EBC6C4032C03BD5A42B4CAA134BB7039EBA70AE5D16B89F3AF055FA31339BB85F0BE97973AFB75B310F0B'
+global $cfgkey = '$JX9#w5N,,c/),S_'
 
+global $admin = False
 global $debug = False
 
 global $conf[0][2]; INI configuration
@@ -127,12 +129,6 @@ if @error then
 	MsgBox(48, 'NAS ' & $version, 'Systém je připojen pouze pro čtení.')
 	exit
 endif
-
-; ---------------------------------------------------------
-; LOGIN
-; ---------------------------------------------------------
-
-login()
 
 ; ---------------------------------------------------------
 ; INIT
@@ -215,8 +211,9 @@ $gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
 $gui_group_setup = GUICtrlCreateGroup('Ostatní', 12, 214, 606, 84)
 $gui_debug_label = GUICtrlCreateLabel('Povolit ladění:', 20, 234, 80, 21)
 $gui_debug_check = GUICtrlCreateCheckbox('', 318, 228, 16, 21)
-$gui_pwd_old_label = GUICtrlCreateLabel('Nové heslo:', 20, 258, 150, 21)
-$gui_pwd_old = GUICtrlCreateInput('', 240, 254, 90, 21, 0x0020); ES_PASSWORD
+$gui_pwd_label = GUICtrlCreateLabel('Režim správce(vyžaduje heslo):', 20, 258, 150, 21)
+$gui_pwd = GUICtrlCreateInput('', 240, 254, 90, 21, BitOR(0x0020,0x0001)); ES_PASSWORD
+$gui_button_pwd = GUICtrlCreateButton('Povolit', 334, 254, 75, 21)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
@@ -235,7 +232,7 @@ $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; update debug
-;if conf_get_value('debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
+if conf_get_value('debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
 ; update button
 if conf_get_value('restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
 ; update colors
@@ -266,6 +263,9 @@ if conf_get_value('restore') > 2 then
 	endif
 endif
 
+; set default mode
+admin_mode($admin)
+
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
 
@@ -278,15 +278,30 @@ GUISetState(@SW_SHOW)
 
 while 1
 	$event = GUIGetMsg()
+	; admin mode
+	if $event = $gui_button_pwd Then
+		if _CryptoNG_HashData($CNG_BCRYPT_SHA512_ALGORITHM , GUICtrlRead($gui_pwd)) = Binary($login) then
+			if $admin = False Then
+				$admin = True
+				admin_mode($admin)
+				GUICtrlSetData($gui_pwd,'')
+				GUICtrlSetData($gui_button_pwd,'Zakázat')
+			else
+				$admin = False
+				admin_mode($admin)
+				GUICtrlSetData($gui_pwd,'')
+				GUICtrlSetData($gui_button_pwd,'Povolit')
+			endif
+		endif
+	endif
 	; enable debugging
-;	if GUICtrlRead($gui_debug_check) = $GUI_CHECKED  then
-;		$debug = True
-;		conf_set_value('debug', 1)
-;	endif
-;	if GUICtrlRead($gui_debug_check) = $GUI_UNCHECKED  then
-;		$debug = False
-;		conf_set_value('debug', 0)
-;	endif
+	if GUICtrlRead($gui_debug_check) = $GUI_CHECKED  then
+		$debug = True
+		conf_set_value('debug', 1)
+	else
+		$debug = False
+		conf_set_value('debug', 0)
+	endif
 	; select source
 	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
 	if not @error then
@@ -597,11 +612,13 @@ while 1
 		if not $run or $terminate Then
 			; enable buttons
 			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
-			GUICtrlSetState($gui_button_test, $GUI_ENABLE)
-			for $i = 0 to 9
-				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
-			next
-			GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
+			if $admin then
+				GUICtrlSetState($gui_button_test, $GUI_ENABLE)
+				for $i = 0 to 9
+					GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
+				next
+				GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
+			endif
 			; reset tokens
 			$restore=False
 			$restore_test=False
@@ -751,11 +768,13 @@ while 1
 		if ( not $run and get_free() < 0 ) or $terminate Then
 			; enable buttons
 			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
-			GUICtrlSetState($gui_button_test, $GUI_ENABLE)
-			for $i = 0 to 9
-				GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
-			next
-			GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
+			if $admin then
+				GUICtrlSetState($gui_button_test, $GUI_ENABLE)
+				for $i = 0 to 9
+					GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
+				next
+				GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
+			endif
 			; reset tokens
 			$backup=False
 			$test=False
@@ -875,7 +894,7 @@ func get_stat($index)
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
 	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count
 	if not @error then
-		$output &= ' -- Poslední záznam' & @CRLF
+		$output &= ' -- Poslední zápis' & @CRLF
 		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
 		if $data[1] then $output &= @CRLF & '    Velikost: ' & $data[1] & ' MB'
 		if $data[2] then $output &= @CRLF & '    Trvání: ' & Round($data[2]/60, 2) & ' minut'
@@ -923,32 +942,33 @@ func update_stat($buffer, $index)
 	return $date & '|' & Round($size) & '|' & $duration & '|' & $interval
 endfunc
 
-func login()
-	$gui_login = GUICreate('NAS ' & $version & ' - přihlášení', 315, 58, Default, Default)
-	$gui_login_logo = GUICtrlCreateIcon('NAS.ico', 'NAS', 10, 8, 40, 40)
-	$gui_login_label = GUICtrlCreateLabel('Heslo:', 60, 20, 30, 21)
-	$gui_login_pwd = GUICtrlCreateInput('', 100, 16, 120, 21, 0x0020); ES_PASSWORD
-	$gui_login_button = GUICtrlCreateButton('Login', 230, 16, 75, 21)
-	$gui_login_error = GUICtrlCreateLabel('', 104, 40, 150, 21)
-
-	; set color
-	GUICtrlSetColor($gui_login_error, 0xff0000)
-	; set default focus
-	GUICtrlSetState($gui_login_pwd, $GUI_FOCUS)
-	;show
-	GUISetState(@SW_SHOW, $gui_login)
-
-	while 1
-		$event = GUIGetMsg()
-		if $event = $gui_login_button Then
-			if _CryptoNG_HashData($CNG_BCRYPT_SHA512_ALGORITHM , GUICtrlRead($gui_login_pwd)) = Binary($login) then
-				ExitLoop
-			else
-				GUICtrlSetData($gui_login_error, 'Neplatné heslo.')
-			endif
-		endif
-		if $event = $GUI_EVENT_CLOSE then exit
-	wend
-	GUIDelete($gui_login)
-	return
-EndFunc
+func admin_mode($admin)
+	local $state, $style
+	if $admin = True then
+		$state = $GUI_ENABLE
+		$style = ''; READ_ONLY
+	else
+		$state = $GUI_DISABLE
+		$style = 0x800; READ_ONLY
+	endif
+	GUICtrlSetState($gui_button_test, $state)
+	GUICtrlSetStyle($gui_host, $style)
+	GUICtrlSetStyle($gui_port, $style)
+	GUICtrlSetStyle($gui_user, $style)
+	GUICtrlSetStyle($gui_key, $style)
+	GUICtrlSetState($gui_button_key, $state)
+	GUICtrlSetStyle($gui_prefix, $style)
+	GUICtrlSetState($gui_debug_check, $state)
+	GUICtrlSetState($gui_restore_box, $state)
+	GUICtrlSetStyle($gui_restore_source, $style)
+	GUICtrlSetStyle($gui_restore_target, $style)
+	GUICtrlSetState($gui_button_restore_target, $state)
+	for $i = 0 to 9
+		GUICtrlSetState($ctrl[$i][0], $state); checbox
+		GUICtrlSetStyle($ctrl[$i][1], $style); source
+		GUICtrlSetBkColor($ctrl[$i][1], $white)
+		GUICtrlSetState($ctrl[$i][2], $state); button
+		GUICtrlSetStyle($ctrl[$i][4], $style); target
+		GUICtrlSetBkColor($ctrl[$i][4], $white)
+	next
+endfunc

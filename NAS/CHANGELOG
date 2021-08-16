@@ -1,9 +1,8 @@
 
-TODO
+[2.0]
 
--Handle fix part 2.
--"Last write" typo.
--Pwd hash + greyout protection.
+-Admin mode.
+-Encrypted configuration.
 
 [1.9]
 
