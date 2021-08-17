@@ -37,13 +37,14 @@
 #include <WindowsConstants.au3>
 #include <WinAPIProc.au3>
 #include <CryptoNG.au3>
+#include <Json.au3>
 
 ; ---------------------------------------------------------
 ; VAR
 ; ---------------------------------------------------------
 
 global $version = '2.0'
-global $ini = @ScriptDir & '\NAS.ini'
+global $ini = @ScriptDir & '\NAS.dat'
 global $logfile = @ScriptDir & '\NAS.log'
 global $rsync_binary = @ScriptDir & '\bin\rsync.exe'
 global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
@@ -51,7 +52,6 @@ global $ssh_binary = @ScriptDir & '\bin\ssh.exe'
 global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
 
 global $login = '0x3BD1B351E7E2488CBA0DED73A0D1AD1D60509F6B1C9EBC6C4032C03BD5A42B4CAA134BB7039EBA70AE5D16B89F3AF055FA31339BB85F0BE97973AFB75B310F0B'
-global $cfgkey = '$JX9#w5N,,c/),S_'
 
 global $admin = False
 global $debug = False
@@ -113,6 +113,24 @@ global $error_code[26][2]=[ _
 	[255,'Neočekávaná chyba.'], _
 	[259,'Stále aktivní.']]
 
+; Default INI
+global $ini_template='{' _
+	& '"setup":{"key:"","user":"","host":"","port":"","prefix":"","restore":"","debug":""},' _
+	& '"restore":{"source":"","target":"","enable":4,"state":0},' _
+	& '"backup":{' _
+		& '"0":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"1":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"2":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"3":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"4":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"5":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"6":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"7":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"8":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
+		& '"9":{"source":"","target":"","enable":4,"state":0,"stat":""}' _
+	& '},' _
+& '}'
+
 ; ---------------------------------------------------------
 ; CONTROL
 ; ---------------------------------------------------------
@@ -136,34 +154,20 @@ endif
 
 logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 
-; default INI
+; load crypto
+$cfg_key = _CryptoNG_PBKDF2('$JX9#w5N,,c/),S_', 'kcK,rY*jLR2p#:7Y', 64, $CNG_KEY_BIT_LENGTH_AES_128, $CNG_BCRYPT_SHA1_ALGORITHM)
+
+; write default ini
 if not FileExists($ini) then
-	$f = FileOpen($ini, 1)
-	for $i=1 to 10
-		FileWriteLine($f, 'source' & $i & '=')
-		FileWriteLine($f, 'target' & $i & '=')
-		FileWriteLine($f, 'enable' & $i & '=' & '4'); default 4
-		FileWriteLine($f, 'state' & $i & '=' & '0'); default 0
-	next
-	FileWriteLine($f, 'restore_source=')
-	FileWriteLine($f, 'restore_target=')
-	FileWriteLine($f, 'restore_enable=4'); default 4
-	FileWriteLine($f, 'restore_state=0'); default 0
-	FileWriteLine($f, 'key=')
-	FileWriteLine($f, 'user=')
-	FileWriteLine($f, 'host=')
-	FileWriteLine($f, 'port=')
-	FileWriteLine($f, 'prefix=')
-	FileWriteLine($f, 'restore=' & '0'); default 0
-	for $i=1 to 10
-		FileWriteLine($f, 'source' & $i & '_stat='); date||size|duration|interval
-	next
-	FileWriteLine($f, 'debug=' & '0'); default 0
+	$f = FileOpen($ini, BitOR($FO_BINARY,$FO_OVERWRITE))
+	FileWrite($f, _CryptoNG_AES_CBC_EncryptData($ini_template, $cfg_key))
 	FileClose($f)
 endif
 
+MsgBox(0,"default", BinaryToString(_CryptoNG_AES_CBC_DecryptData($ini, $cfg_key)))
+
 ; read configuration
-_FileReadToArray($ini, $conf, 0, '='); 0-based
+$conf = Json_Decode(BinaryToString(_CryptoNG_AES_CBC_DecryptData($ini, $cfg_key)))
 if @error then
 	MsgBox(0, 'NAS ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
@@ -184,11 +188,11 @@ $gui_group_target = GUICtrlCreateGroup('Cíl', 319, 28, 299, 270)
 
 for $i = 0 to 9
 	$ctrl[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
-	GUICtrlSetState($ctrl[$i][0], $conf[$i*4+2][1])
-	$ctrl[$i][1] = GUICtrlCreateInput($conf[$i*4][1], 40, 44 + $i * 25, 189, 21); source
+	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
+	$ctrl[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
 	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
-	$ctrl[$i][3] = GUICtrlCreateLabel(conf_get_value('prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-	$ctrl[$i][4] = GUICtrlCreateInput($conf[$i*4+1][1], 421, 44 + $i * 25, 188, 21); target
+	$ctrl[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
+	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
 next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
@@ -196,18 +200,18 @@ $gui_progress = GUICtrlCreateEdit('', 15, 35, 600, 262, BitOR($ES_AUTOVSCROLL, $
 $gui_tab_setup = GUICtrlCreateTabItem('Nastavení')
 $gui_group_connection = GUICtrlCreateGroup('Připojení', 12, 28, 606, 94)
 $gui_host_label = GUICtrlCreateLabel('Host:', 20 ,48 , 60, 21)
-$gui_host = GUICtrlCreateInput(conf_get_value('host'), 240, 44, 90, 21)
+$gui_host = GUICtrlCreateInput(Json_ObjGet($conf, '.setup.host'), 240, 44, 90, 21)
 $gui_port_label = GUICtrlCreateLabel('Port:', 20 ,72 , 25, 21)
-$gui_port = GUICtrlCreateInput(conf_get_value('port'), 290, 68, 40, 21)
+$gui_port = GUICtrlCreateInput(Json_ObjGet($conf, '.setup.port'), 290, 68, 40, 21)
 $gui_user_label = GUICtrlCreateLabel('Uživatel:', 20 , 96, 40, 21)
-$gui_user = GUICtrlCreateInput(conf_get_value('user'), 240, 92, 90, 21)
+$gui_user = GUICtrlCreateInput(Json_ObjGet($conf, '.setup.user'), 240, 92, 90, 21)
 $gui_group_key = GUICtrlCreateGroup('SSH', 12, 122, 606, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Klíč:', 20 ,142, 90, 21)
-$gui_key = GUICtrlCreateInput(conf_get_value('key'), 48, 138, 282, 21)
+$gui_key = GUICtrlCreateInput(Json_ObjGet($conf, '.setup.key'), 48, 138, 282, 21)
 $gui_button_key = GUICtrlCreateButton('Procházet', 334, 138, 75, 21)
 $gui_group_nas = GUICtrlCreateGroup('NAS', 12, 168, 606, 46)
 $gui_prefix_label = GUICtrlCreateLabel('Prefix:', 20 ,188, 30, 21)
-$gui_prefix = GUICtrlCreateInput(conf_get_value('prefix'), 220, 184, 110, 21)
+$gui_prefix = GUICtrlCreateInput(Json_ObjGet($conf, '.setup.prefix'), 220, 184, 110, 21)
 $gui_group_setup = GUICtrlCreateGroup('Ostatní', 12, 214, 606, 84)
 $gui_debug_label = GUICtrlCreateLabel('Povolit ladění:', 20, 234, 80, 21)
 $gui_debug_check = GUICtrlCreateCheckbox('', 318, 228, 16, 21)
@@ -217,11 +221,11 @@ $gui_button_pwd = GUICtrlCreateButton('Povolit', 334, 254, 75, 21)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
-GUICtrlSetState($gui_restore_box, conf_get_value('restore_enable'))
-$gui_restore_source_label = GUICtrlCreateLabel(conf_get_value('prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source = GUICtrlCreateInput(conf_get_value('restore_source'), 136, 44, 172, 21)
+GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
+$gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
+$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
 $gui_group_restore_target = GUICtrlCreateGroup('Cíl', 320, 28, 298, 46)
-$gui_restore_target = GUICtrlCreateInput(conf_get_value('restore_target'), 328, 44, 203, 21)
+$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 606, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
@@ -232,11 +236,11 @@ $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; update debug
-if conf_get_value('debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
+if Json_ObjGet($conf, '.setup.debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
 ; update button
-if conf_get_value('restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
+if Json_ObjGet($conf, '.setup.restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
 ; update colors
-if conf_get_value('restore') > 0 and conf_get_value('restore') < 3 then
+if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.restore') < 3 then
 	for $i = 0 to 9
 		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $done then
 			GUICtrlSetBkColor($ctrl[$i][1], $green)
