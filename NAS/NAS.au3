@@ -160,14 +160,12 @@ $cfg_key = _CryptoNG_PBKDF2('$JX9#w5N,,c/),S_', 'kcK,rY*jLR2p#:7Y', 64, $CNG_KEY
 ; write default ini
 if not FileExists($ini) then
 	$f = FileOpen($ini, BitOR($FO_BINARY,$FO_OVERWRITE))
-	FileWrite($f, _CryptoNG_AES_CBC_EncryptData($ini_template, $cfg_key))
+	FileWrite($f, _CryptoNG_AES_CBC_EncryptData(Json_Encode($ini_template), $cfg_key))
 	FileClose($f)
 endif
 
-MsgBox(0,"default", BinaryToString(_CryptoNG_AES_CBC_DecryptData($ini, $cfg_key)))
-
 ; read configuration
-$conf = Json_Decode(BinaryToString(_CryptoNG_AES_CBC_DecryptData($ini, $cfg_key)))
+$conf = Json_Decode(_CryptoNG_AES_CBC_DecryptData(FileRead($ini), $cfg_key))
 if @error then
 	MsgBox(0, 'NAS ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
