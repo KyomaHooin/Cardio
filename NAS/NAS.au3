@@ -115,7 +115,7 @@ global $error_code[26][2]=[ _
 
 ; Default INI
 global $ini_template='{' _
-	& '"setup":{"key:"","user":"","host":"","port":"","prefix":"","restore":"","debug":""},' _
+	& '"setup":{"key:"","user":"","host":"","port":"","prefix":"","restore":"","debug":"0"},' _
 	& '"restore":{"source":"","target":"","enable":4,"state":0},' _
 	& '"backup":{' _
 		& '"0":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
@@ -128,7 +128,7 @@ global $ini_template='{' _
 		& '"7":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
 		& '"8":{"source":"","target":"","enable":4,"state":0,"stat":""},' _
 		& '"9":{"source":"","target":"","enable":4,"state":0,"stat":""}' _
-	& '},' _
+	& '}' _
 & '}'
 
 ; ---------------------------------------------------------
@@ -157,21 +157,26 @@ logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' 
 ; load crypto
 $cfg_key = _CryptoNG_PBKDF2('$JX9#w5N,,c/),S_', 'kcK,rY*jLR2p#:7Y', 64, $CNG_KEY_BIT_LENGTH_AES_128, $CNG_BCRYPT_SHA1_ALGORITHM)
 
+; conf
+$conf = Json_Decode($ini_template)
+
 ; write default ini
 if not FileExists($ini) then
 	$f = FileOpen($ini, BitOR($FO_BINARY,$FO_OVERWRITE))
-	FileWrite($f, _CryptoNG_AES_CBC_EncryptData(Json_Encode($ini_template), $cfg_key))
+	FileWrite($f, _CryptoNG_AES_CBC_EncryptData(Json_Encode($conf), $cfg_key))
 	FileClose($f)
 endif
 
 ; read configuration
-$conf = Json_Decode(_CryptoNG_AES_CBC_DecryptData(FileRead($ini), $cfg_key))
+$f = FileOpen($ini, BitOR($FO_BINARY,$FO_READ))
+$conf = Json_Decode(_CryptoNG_AES_CBC_DecryptData(FileRead($f), $cfg_key))
 if @error then
 	MsgBox(0, 'NAS ' & $version, 'Načtení konfiguračního INI souboru selhalo.')
 	exit
 else
 	logger('Konfigurační INI soubor byl načten.')
 endif
+FileClose($f)
 
 ; ---------------------------------------------------------
 ; GUI
@@ -186,11 +191,14 @@ $gui_group_target = GUICtrlCreateGroup('Cíl', 319, 28, 299, 270)
 
 for $i = 0 to 9
 	$ctrl[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
-	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
-	$ctrl[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
+;	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
+	$ctrl[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
+;	$ctrl[$i][1] = GUICtrlCreateInput('', 40, 44 + $i * 25, 189, 21); source
 	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
 	$ctrl[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
+	$ctrl[$i][3] = GUICtrlCreateLabel('', 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
+;	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
+	$ctrl[$i][4] = GUICtrlCreateInput('', 421, 44 + $i * 25, 188, 21); target
 next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
@@ -219,11 +227,14 @@ $gui_button_pwd = GUICtrlCreateButton('Povolit', 334, 254, 75, 21)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
-GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
-$gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
+;GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
+;$gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
+$gui_restore_source_label = GUICtrlCreateLabel('', 40, 48, 90, 21, 0x01); $SS_CENTER
+;$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
+$gui_restore_source = GUICtrlCreateInput('', 136, 44, 172, 21)
 $gui_group_restore_target = GUICtrlCreateGroup('Cíl', 320, 28, 298, 46)
-$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
+;$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
+$gui_restore_target = GUICtrlCreateInput('', 328, 44, 203, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 606, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
@@ -234,11 +245,14 @@ $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; update debug
-if Json_ObjGet($conf, '.setup.debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
+;if Json_ObjGet($conf, '.setup.debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
+if 1 = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
 ; update button
-if Json_ObjGet($conf, '.setup.restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
+;if Json_ObjGet($conf, '.setup.restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
+if 1 > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
 ; update colors
-if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.restore') < 3 then
+;if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.restore') < 3 then
+if 0 > 0 and 4 < 3 then
 	for $i = 0 to 9
 		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $done then
 			GUICtrlSetBkColor($ctrl[$i][1], $green)
@@ -790,27 +804,28 @@ while 1
 			GUICtrlSetData($gui_error, 'Nelze ukončit probíhající operaci.')
 		else
 			; write configuration
-			$f = FileOpen($ini, 2); overwrite
-			for $i=0 to 9
-				FileWriteLine($f, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][1]))
-				FileWriteLine($f, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][4]))
-				FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
-				FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
-			next
-			FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
-			FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
-			FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
-			FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
-			FileWriteLine($f, 'key=' & GUICtrlRead($gui_key))
-			FileWriteLine($f, 'user=' & GUICtrlRead($gui_user))
-			FileWriteLine($f, 'host=' & GUICtrlRead($gui_host))
-			FileWriteLine($f, 'port=' & GUICtrlRead($gui_port))
-			FileWriteLine($f, 'prefix=' & GUICtrlRead($gui_prefix))
-			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-			for $i=0 to 9
-				FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
-			next
-			FileWriteLine($f, 'debug=' & conf_get_value('debug'))
+;			for $i=0 to 9
+;				FileWriteLine($f, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][1]))
+;				FileWriteLine($f, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][4]))
+;				FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
+;				FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
+;			next
+;			FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
+;			FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
+;			FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
+;			FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
+			Json_Put($conf, '.setup.host', GUICtrlRead($gui_host))
+			Json_Put($conf, '.setup.port', GUICtrlRead($gui_port))
+			Json_Put($conf, '.setup.user', GUICtrlRead($gui_user))
+			Json_Put($conf, '.setup.key', GUICtrlRead($gui_key))
+			Json_Put($conf, '.setup.prefix', GUICtrlRead($gui_prefix))
+;			FileWriteLine($f, '.setup.debug' & GUICtrlRead($gui_prefix))
+;			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
+;			for $i=0 to 9
+;				FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
+;			next
+			$f = FileOpen($ini, BitOR($FO_BINARY,$FO_OVERWRITE))
+			FileWrite($f, _CryptoNG_AES_CBC_EncryptData(Json_Encode($conf), $cfg_key))
 			FileClose($f)
 			; exit
 			exitloop
