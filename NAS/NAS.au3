@@ -56,7 +56,7 @@ global $login = '0x3BD1B351E7E2488CBA0DED73A0D1AD1D60509F6B1C9EBC6C4032C03BD5A42
 global $admin = False
 global $debug = False
 
-global $ctrl[10][5]; GUI handle map
+global $control[10][5]; GUI handle map
 
 global $rsync; Rsync PID
 global $option; Rsync option
@@ -189,13 +189,13 @@ $gui_group_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 270)
 $gui_group_target = GUICtrlCreateGroup('Cíl', 319, 28, 299, 270)
 
 for $i = 0 to 9
-	$ctrl[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
-	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
-	$ctrl[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
-	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
-	$ctrl[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-	$ctrl[$i][3] = GUICtrlCreateLabel('', 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
+	$control[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
+	GUICtrlSetState($control[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
+	$control[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
+	$control[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
+	$control[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
+	$control[$i][3] = GUICtrlCreateLabel('', 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
+	$control[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
 next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
@@ -247,9 +247,9 @@ if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.resto
 	for $i = 0 to 9
 		if Json_ObjGet($conf, '.backup.' & $i & '.enable') = $GUI_CHECKED Then
 			if Json_ObjGet($conf, '.backup.' & $i & '.source') <> '' Then
-				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $done then GUICtrlSetBkColor($ctrl[$i][1], $green)
-				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $paused then GUICtrlSetBkColor($ctrl[$i][1], $orange)
-				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $failed then GUICtrlSetBkColor($ctrl[$i][1], $red)
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $done then GUICtrlSetBkColor($control[$i][1], $green)
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $paused then GUICtrlSetBkColor($control[$i][1], $orange)
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $failed then GUICtrlSetBkColor($control[$i][1], $red)
 			endif
 		endif
 	next
@@ -303,10 +303,10 @@ while 1
 		Json_Put($conf, '.setup.debug', 0)
 	endif
 	; select source
-	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
+	$browse = _ArrayBinarySearch($control, $event, Default, Default, 2); 2'nd column
 	if not @error then
 		$path = FileSelectFolder('NAS ' & $version & ' - Zdrojový adresář', @HomeDrive)
-		if not @error then GUICtrlSetData($ctrl[$browse][1], $path)
+		if not @error then GUICtrlSetData($control[$browse][1], $path)
 	endif
 	; select restore target
 	if $event = $gui_button_restore_target then
@@ -322,7 +322,7 @@ while 1
 	if $event = $gui_tab Then
 		if GUICtrlRead($gui_tab) = 0 Then; 1st tab
 			for $i=0 to 9
-				GUICtrlSetData($ctrl[$i][3], GUICtrlRead($gui_prefix))
+				GUICtrlSetData($control[$i][3], GUICtrlRead($gui_prefix))
 			Next
 		endif
 		if GUICtrlRead($gui_tab) = 3 Then; 4th tab
@@ -330,9 +330,9 @@ while 1
 		endif
 	endif
 	; unset color on unchecked
-	$checkbox = _ArrayBinarySearch($ctrl, $event, Default, Default, 0); 0' column
+	$checkbox = _ArrayBinarySearch($control, $event, Default, Default, 0); 0' column
 	if not @error then
-		if GUICtrlRead($ctrl[$checkbox][0]) = $GUI_UNCHECKED then GUICtrlSetBkColor($ctrl[$checkbox][1], $white)
+		if GUICtrlRead($control[$checkbox][0]) = $GUI_UNCHECKED then GUICtrlSetBkColor($control[$checkbox][1], $white)
 	endif
 	if $event = $gui_restore_box then
 		if GUICtrlRead($gui_restore_box) = $GUI_UNCHECKED then GUICtrlSetBkColor($gui_restore_target, $white)
@@ -364,14 +364,14 @@ while 1
 				; reset state and color
 				for $i = 0 to 9
 					Json_Put($conf, '.backup.' & $i & '.state', $new)
-					GUICtrlSetBkColor($ctrl[$i][1], $white)
+					GUICtrlSetBkColor($control[$i][1], $white)
 				next
 			endif
 			; disable buttons
 			GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
-				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
+				GUICtrlSetState($control[$i][0], $GUI_DISABLE)
 			next
 			GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 		endif
@@ -403,14 +403,14 @@ while 1
 				; reset state and color
 				for $i = 0 to 9
 					Json_Put($conf, '.backup.' & $i & '.state', $new)
-					GUICtrlSetBkColor($ctrl[$i][1], $white)
+					GUICtrlSetBkColor($control[$i][1], $white)
 				next
 			endif
 			; disable buttons
 			GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 			GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 			for $i = 0 to 9
-				GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
+				GUICtrlSetState($control[$i][0], $GUI_DISABLE)
 			next
 			GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 		endif
@@ -473,7 +473,7 @@ while 1
 				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
 				GUICtrlSetState($gui_button_test, $GUI_DISABLE)
 				for $i = 0 to 9
-					GUICtrlSetState($ctrl[$i][0], $GUI_DISABLE)
+					GUICtrlSetState($control[$i][0], $GUI_DISABLE)
 				next
 				GUICtrlSetState($gui_restore_box, $GUI_DISABLE)
 			endif
@@ -615,7 +615,7 @@ while 1
 			if $admin then
 				GUICtrlSetState($gui_button_test, $GUI_ENABLE)
 				for $i = 0 to 9
-					GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
+					GUICtrlSetState($control[$i][0], $GUI_ENABLE)
 				next
 				GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
 			endif
@@ -660,22 +660,22 @@ while 1
 							GUICtrlSetData($gui_error, $error_code[$code_index][1])
 						endif
 						; update color
-						GUICtrlSetBkColor($ctrl[$index][1], $red)
+						GUICtrlSetBkColor($control[$index][1], $red)
 					else
 						if $debug then logger('CHYBA: Žádný chybový kód.')
-						GUICtrlSetBkColor($ctrl[$index][1], $green)
+						GUICtrlSetBkColor($control[$index][1], $green)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
 					endif
 				else
 					logger('rsync: Žádný chybový kód.')
-					GUICtrlSetBkColor($ctrl[$index][1], $green)
+					GUICtrlSetBkColor($control[$index][1], $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
 				endif
 			else
 				$exit_code = _WinAPI_GetExitCodeProcess($proc)
 				if $exit_code = 0 then
 					if not $terminate then
-						GUICtrlSetBkColor($ctrl[$index][1], $green)
+						GUICtrlSetBkColor($control[$index][1], $green)
 						GUICtrlSetData($gui_error, 'Dokončeno.')
 					else
 						GUICtrlSetData($gui_error, 'Přerušeno.')
@@ -694,7 +694,7 @@ while 1
 						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
 					endif
-					GUICtrlSetBkColor($ctrl[$index][1], $red)
+					GUICtrlSetBkColor($control[$index][1], $red)
 				endif
 			endif
 			; close handle
@@ -729,11 +729,11 @@ while 1
 			; stats
 			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & get_stat($index))
 			; empty source
-			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
+			if GUICtrlRead($control[$index][1]) == '' or not FileExists(GUICtrlRead($control[$index][1])) then
 				; update state
 				Json_Put($conf, '.backup.' & $index & '.state', $failed)
 				; update color
-				GUICtrlSetBkColor($ctrl[$index][1], $red)
+				GUICtrlSetBkColor($control[$index][1], $red)
 				; update output
 				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
 				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
@@ -745,7 +745,7 @@ while 1
 				; update transfer start
 				$transfer_start = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
 				; update color
-				GUICtrlSetBkColor($ctrl[$index][1], $orange)
+				GUICtrlSetBkColor($control[$index][1], $orange)
 				; update output
 				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha.')
 				if $test then GUICtrlSetData($gui_error, 'Probíhá test.')
@@ -756,9 +756,9 @@ while 1
 				& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
 				& ' -p ' & GUICtrlRead($gui_port) _
 				& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
-				& "'" & get_cygwin_path(GUICtrlRead($ctrl[$index][1])) & "' " _
+				& "'" & get_cygwin_path(GUICtrlRead($control[$index][1])) & "' " _
 				& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
-				& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($ctrl[$index][4]) & "'" _
+				& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($control[$index][4]) & "'" _
 				, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
 				; update token
 				$run = True
@@ -771,7 +771,7 @@ while 1
 			if $admin then
 				GUICtrlSetState($gui_button_test, $GUI_ENABLE)
 				for $i = 0 to 9
-					GUICtrlSetState($ctrl[$i][0], $GUI_ENABLE)
+					GUICtrlSetState($control[$i][0], $GUI_ENABLE)
 				next
 				GUICtrlSetState($gui_restore_box, $GUI_ENABLE)
 			endif
@@ -789,9 +789,9 @@ while 1
 		else
 			; write configuration
 			for $i=0 to 9
-				Json_Put($conf, '.backup.' & $i & '.source', GUICtrlRead($ctrl[$i][1]))
-				Json_Put($conf, '.backup.' & $i & '.target', GUICtrlRead($ctrl[$i][4]))
-				Json_Put($conf, '.backup.' & $i & '.enable', GUICtrlRead($ctrl[$i][0]))
+				Json_Put($conf, '.backup.' & $i & '.source', GUICtrlRead($control[$i][1]))
+				Json_Put($conf, '.backup.' & $i & '.target', GUICtrlRead($control[$i][4]))
+				Json_Put($conf, '.backup.' & $i & '.enable', GUICtrlRead($control[$i][0]))
 			next
 			Json_Put($conf, '.restore.source', GUICtrlRead($gui_restore_source))
 			Json_Put($conf, '.restore.target', GUICtrlRead($gui_restore_target))
@@ -844,7 +844,7 @@ func verify_setup()
 	if GUICtrlRead($gui_prefix) == '' then return SetError(1, 0, 'Neplatný prefix.')
 	; backup with restore
 	for $i = 0 to 9
-		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
+		if GUICtrlRead($control[$i][0]) = $GUI_CHECKED then
 			if GUICtrlRead($gui_restore_box) = $GUI_CHECKED then return SetError(1, 0, 'Nelze spustit zálohu i obnovu.')
 		endif
 	next
@@ -852,7 +852,7 @@ endfunc
 
 func get_free()
 	for $i = 0 to 9
-		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
+		if GUICtrlRead($control[$i][0]) = $GUI_CHECKED then
 			if Json_ObjGet($conf, '.backup.' & $i & '.state') = $new or Json_ObjGet($conf, '.backup.' & $i & '.state') = $paused then
 				return $i
 			endif
@@ -944,11 +944,11 @@ func admin_mode($admin)
 	GUICtrlSetStyle($gui_restore_target, $style)
 	GUICtrlSetState($gui_button_restore_target, $state)
 	for $i = 0 to 9
-		GUICtrlSetState($ctrl[$i][0], $state); checbox
-		GUICtrlSetStyle($ctrl[$i][1], $style); source
-		GUICtrlSetBkColor($ctrl[$i][1], $white)
-		GUICtrlSetState($ctrl[$i][2], $state); button
-		GUICtrlSetStyle($ctrl[$i][4], $style); target
-		GUICtrlSetBkColor($ctrl[$i][4], $white)
+		GUICtrlSetState($control[$i][0], $state); checbox
+		GUICtrlSetStyle($control[$i][1], $style); source
+		GUICtrlSetBkColor($control[$i][1], $white)
+		GUICtrlSetState($control[$i][2], $state); button
+		GUICtrlSetStyle($control[$i][4], $style); target
+		GUICtrlSetBkColor($control[$i][4], $white)
 	next
 endfunc
