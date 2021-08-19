@@ -56,7 +56,6 @@ global $login = '0x3BD1B351E7E2488CBA0DED73A0D1AD1D60509F6B1C9EBC6C4032C03BD5A42
 global $admin = False
 global $debug = False
 
-global $conf[0][2]; INI configuration
 global $ctrl[10][5]; GUI handle map
 
 global $rsync; Rsync PID
@@ -131,6 +130,9 @@ global $ini_template='{' _
 	& '}' _
 & '}'
 
+; conf
+$conf = Json_Decode($ini_template)
+
 ; ---------------------------------------------------------
 ; CONTROL
 ; ---------------------------------------------------------
@@ -156,9 +158,6 @@ logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' 
 
 ; load crypto
 $cfg_key = _CryptoNG_PBKDF2('$JX9#w5N,,c/),S_', 'kcK,rY*jLR2p#:7Y', 64, $CNG_KEY_BIT_LENGTH_AES_128, $CNG_BCRYPT_SHA1_ALGORITHM)
-
-; conf
-$conf = Json_Decode($ini_template)
 
 ; write default ini
 if not FileExists($ini) then
@@ -191,14 +190,12 @@ $gui_group_target = GUICtrlCreateGroup('Cíl', 319, 28, 299, 270)
 
 for $i = 0 to 9
 	$ctrl[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i * 25, 16, 21)
-;	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
+	GUICtrlSetState($ctrl[$i][0], Json_ObjGet($conf, '.backup.' & $i & '.enable'))
 	$ctrl[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.backup.' & $i & '.source'), 40, 44 + $i * 25, 189, 21); source
-;	$ctrl[$i][1] = GUICtrlCreateInput('', 40, 44 + $i * 25, 189, 21); source
 	$ctrl[$i][2] = GUICtrlCreateButton('Procházet', 233, 44 + $i * 25, 75, 21)
 	$ctrl[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
 	$ctrl[$i][3] = GUICtrlCreateLabel('', 325, 48 + $i * 25, 90, 21, 0x01); $SS_CENTER
-;	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
-	$ctrl[$i][4] = GUICtrlCreateInput('', 421, 44 + $i * 25, 188, 21); target
+	$ctrl[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf,'.backup.' & $i & '.target'), 421, 44 + $i * 25, 188, 21); target
 next
 
 $gui_tab_progress = GUICtrlCreateTabItem('Výstup')
@@ -227,14 +224,11 @@ $gui_button_pwd = GUICtrlCreateButton('Povolit', 334, 254, 75, 21)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
-;GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
-;$gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source_label = GUICtrlCreateLabel('', 40, 48, 90, 21, 0x01); $SS_CENTER
-;$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
-$gui_restore_source = GUICtrlCreateInput('', 136, 44, 172, 21)
+GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
+$gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
+$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
 $gui_group_restore_target = GUICtrlCreateGroup('Cíl', 320, 28, 298, 46)
-;$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
-$gui_restore_target = GUICtrlCreateInput('', 328, 44, 203, 21)
+$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 606, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
@@ -245,36 +239,28 @@ $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Konec', 550, 314, 75, 21)
 
 ; update debug
-;if Json_ObjGet($conf, '.setup.debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
-if 1 = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
+if Json_ObjGet($conf, '.setup.debug') = 1 then GUICtrlSetState($gui_debug_check, $GUI_CHECKED)
 ; update button
-;if Json_ObjGet($conf, '.setup.restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
-if 1 > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
+if Json_ObjGet($conf, '.setup.restore') > 0 then GuiCtrlSetData($gui_button_break, 'Pokračovat')
 ; update colors
-;if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.restore') < 3 then
-if 0 > 0 and 4 < 3 then
+if Json_ObjGet($conf, '.setup.restore') > 0 and Json_ObjGet($conf, '.setup.restore') < 3 then; backup
 	for $i = 0 to 9
-		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $done then
-			GUICtrlSetBkColor($ctrl[$i][1], $green)
-		endif
-		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $paused then
-			GUICtrlSetBkColor($ctrl[$i][1], $orange)
-		endif
-		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED and $conf[$i*4][1] <> '' and $conf[$i*4+3][1] = $failed then
-			GUICtrlSetBkColor($ctrl[$i][1], $red)
+		if Json_ObjGet($conf, '.backup.' & $i & '.enable') = $GUI_CHECKED Then
+			if Json_ObjGet($conf, '.backup.' & $i & '.source') <> '' Then
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $done then GUICtrlSetBkColor($ctrl[$i][1], $green)
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $paused then GUICtrlSetBkColor($ctrl[$i][1], $orange)
+				if Json_ObjGet($conf, '.backup.' & $i & '.state') = $failed then GUICtrlSetBkColor($ctrl[$i][1], $red)
+			endif
 		endif
 	next
 endif
-if conf_get_value('restore') > 2 then
-	if conf_get_value('restore_enable') = $GUI_CHECKED then
-		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $done then
-			GUICtrlSetBkColor($gui_restore_target, $green)
-		endif
-		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $paused then
-			GUICtrlSetBkColor($gui_restore_target, $orange)
-		endif
-		if conf_get_value('restore_target') <> '' and conf_get_value('restore_state') = $failed then
-			GUICtrlSetBkColor($gui_restore_target, $red)
+
+if Json_ObjGet($conf, '.setup.restore') > 2 then; restore
+	if Json_ObjGet($conf, '.restore.enable') = $GUI_CHECKED then
+		if Json_ObjGet($conf, '.restore.target') <> '' then
+			if Json_ObjGet($conf, '.restore.state') = $done then GUICtrlSetBkColor($gui_restore_target, $green)
+			if Json_ObjGet($conf, '.restore.state') = $paused then GUICtrlSetBkColor($gui_restore_target, $orange)
+			if Json_ObjGet($conf, '.restore.state') = $failed then GUICtrlSetBkColor($gui_restore_target, $red)
 		endif
 	endif
 endif
@@ -299,24 +285,22 @@ while 1
 		if _CryptoNG_HashData($CNG_BCRYPT_SHA512_ALGORITHM , GUICtrlRead($gui_pwd)) = Binary($login) then
 			if $admin = False Then
 				$admin = True
-				admin_mode($admin)
-				GUICtrlSetData($gui_pwd,'')
 				GUICtrlSetData($gui_button_pwd,'Zakázat')
 			else
 				$admin = False
-				admin_mode($admin)
-				GUICtrlSetData($gui_pwd,'')
 				GUICtrlSetData($gui_button_pwd,'Povolit')
 			endif
+			admin_mode($admin)
+			GUICtrlSetData($gui_pwd, '')
 		endif
 	endif
 	; enable debugging
-	if GUICtrlRead($gui_debug_check) = $GUI_CHECKED  then
+	if GUICtrlRead($gui_debug_check) = $GUI_CHECKED then
 		$debug = True
-		conf_set_value('debug', 1)
+		Json_Put($conf, '.setup.debug', 1)
 	else
 		$debug = False
-		conf_set_value('debug', 0)
+		Json_Put($conf, '.setup.debug', 0)
 	endif
 	; select source
 	$browse = _ArrayBinarySearch($ctrl, $event, Default, Default, 2); 2'nd column
@@ -365,21 +349,21 @@ while 1
 			; clear output
 			GUICtrlSetData($gui_progress, '')
 			; reset restore
-			conf_set_value('restore', 0)
+			Json_Put($conf, '.setup.restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
 			; setup
 			if GuiCtrlRead($gui_restore_box) = $GUI_CHECKED then
 				; set token
 				$restore=True
 				; reset state and color
-				conf_set_value('restore_state', $new)
+				Json_Put($conf, '.restore.state', $new)
 				GUICtrlSetBkColor($gui_restore_target, $white)
 			else
 				; set token
 				$backup=True
 				; reset state and color
 				for $i = 0 to 9
-					$conf[$i*4+3][1] = $new
+					Json_Put($conf, '.backup.' & $i & '.state', $new)
 					GUICtrlSetBkColor($ctrl[$i][1], $white)
 				next
 			endif
@@ -404,21 +388,21 @@ while 1
 			; clear output
 			GUICtrlSetData($gui_progress, '')
 			; reset restore
-			conf_set_value('restore', 0)
+			Json_Put($conf, '.setup.restore', 0)
 			GUICtrlSetData($gui_button_break, 'Přerušit')
 			; setup
 			if GuiCtrlRead($gui_restore_box) = $GUI_CHECKED then
 				; set token
 				$restore_test=True
 				; reset state and color
-				conf_set_value('restore_state', $new)
+				Json_Put($conf, '.restore.state', $new)
 				GUICtrlSetBkColor($gui_restore_target, $white)
 			else
 				; set token
 				$test=True
 				; reset state and color
 				for $i = 0 to 9
-					$conf[$i*4+3][1] = $new
+					Json_Put($conf, '.backup.' & $i & '.state', $new)
 					GUICtrlSetBkColor($ctrl[$i][1], $white)
 				next
 			endif
@@ -444,45 +428,45 @@ while 1
 				; set token
 				$terminate=True
 				;set restore
-				if $backup then conf_set_value('restore', 1)
-				if $test then conf_set_value('restore', 2)
-				if $restore then conf_set_value('restore', 3)
-				if $restore_test then conf_set_value('restore', 4)
+				if $backup then Json_Put($conf, '.setup.restore', 1)
+				if $test then Json_Put($conf, '.setup.restore', 2)
+				if $restore then Json_Put($conf, '.setup.restore', 3)
+				if $restore_test then Json_Put($conf, '.setup.restore', 4)
 				;update button
 				GuiCtrlSetData($gui_button_break, 'Pokračovat')
 			endif
 		endif
 		; resume
-		if not $run and conf_get_value('restore') > 0 then
+		if not $run and Json_ObjGet($conf, '.setup.restore') > 0 then
 			$verify = verify_setup()
 			if @error Then
 				logger('CHYBA: ' & $verify)
 				GUICtrlSetData($gui_error, $verify)
 			else
 				; restore backup
-				if conf_get_value('restore') = 1 then
+				if Json_ObjGet($conf, '.setup.restore') = 1 then
 					$option=''
 					$backup=True
 				endif
 				; restore test
-				if conf_get_value('restore') = 2 then
+				if Json_ObjGet($conf, '.setup.restore') = 2 then
 					$option='-n'
 					$test=True
 				endif
 				; restore restore
-				if conf_get_value('restore') = 3 then
+				if Json_ObjGet($conf, '.setup.restore') = 3 then
 					$option=''
 					$restore=True
 				endif
 				; restore restore test
-				if conf_get_value('restore') = 4 then
+				if Json_ObjGet($conf, '.setup.restore') = 4 then
 					$option='-n'
 					$restore_test=True
 				endif
 				; clear output
 				GUICtrlSetData($gui_progress, '')
 				; reset restore
-				conf_set_value('restore', 0)
+				Json_Put($conf, '.setup.restore', 0)
 				; update button
 				GUICtrlSetData($gui_button_break, 'Přerušit')
 				; disable buttons
@@ -574,11 +558,11 @@ while 1
 			logger(@CRLF & '[R] Obnovení dokončeno.')
 			; update state
 			if $terminate then
-				conf_set_value('restore_state', $paused)
+				Json_Put($conf, '.restore.state', $paused)
 			elseif $error then
-				conf_set_value('restore_state', $failed)
+				Json_Put($conf, '.restore.state', $failed)
 			else
-				conf_set_value('restore_state', $done)
+				Json_Put($conf, '.restore.state', $done)
 			endif
 			; reset token
 			$run = False
@@ -593,7 +577,7 @@ while 1
 			; empty source
 			if GUICtrlRead($gui_restore_target) == '' or not FileExists(GUICtrlRead($gui_restore_target)) then
 				; update state
-				conf_set_value('restore_state', $failed)
+				Json_Put($conf, '.restore.state', $failed)
 				; update color
 				GUICtrlSetBkColor($gui_restore_target, $red)
 				; update output
@@ -722,13 +706,13 @@ while 1
 			logger(@CRLF & '[' & $index + 1 & '] Zálohování dokončeno.')
 			; update state
 			if $terminate then
-				$conf[$index*4+3][1] = $paused
+				Json_Put($conf, '.backup.' & $index & '.state', $paused)
 			elseif $error then
-				$conf[$index*4+3][1] = $failed
+				Json_Put($conf, '.backup.' & $index & '.state', $failed)
 			else
-				$conf[$index*4+3][1] = $done
+				Json_Put($conf, '.backup.' & $index & '.state', $done)
 				; update stats
-				if $backup then conf_set_value('source' & $index + 1 & '_stat', update_stat($buffer_out & $buffer_err, $index))
+				if $backup then Json_Put($conf, '.backup.' & $index & '.stat', update_stat($buffer_out & $buffer_err, $index))
 			endif
 			; reset token
 			$run = False
@@ -747,7 +731,7 @@ while 1
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
-				$conf[$index*4+3][1] = $failed
+				Json_Put($conf, '.backup.' & $i & '.state', $failed)
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $red)
 				; update output
@@ -804,26 +788,19 @@ while 1
 			GUICtrlSetData($gui_error, 'Nelze ukončit probíhající operaci.')
 		else
 			; write configuration
-;			for $i=0 to 9
-;				FileWriteLine($f, 'source' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][1]))
-;				FileWriteLine($f, 'target' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][4]))
-;				FileWriteLine($f, 'enable' & $i + 1 & '=' & GUICtrlRead($ctrl[$i][0]))
-;				FileWriteLine($f, 'state' & $i + 1 & '=' & $conf[$i*4 + 3][1])
-;			next
-;			FileWriteLine($f, 'restore_source=' & GUICtrlRead($gui_restore_source))
-;			FileWriteLine($f, 'restore_target='& GUICtrlRead($gui_restore_target))
-;			FileWriteLine($f, 'restore_enable=' & GUICtrlRead($gui_restore_box))
-;			FileWriteLine($f, 'restore_state=' & conf_get_value('restore_state'))
+			for $i=0 to 9
+				Json_Put($conf, '.backup.' & $i & '.source', GUICtrlRead($ctrl[$i][1]))
+				Json_Put($conf, '.backup.' & $i & '.target', GUICtrlRead($ctrl[$i][4]))
+				Json_Put($conf, '.backup.' & $i & '.enable', GUICtrlRead($ctrl[$i][0]))
+			next
+			Json_Put($conf, '.restore.source', GUICtrlRead($gui_restore_source))
+			Json_Put($conf, '.restore.target', GUICtrlRead($gui_restore_target))
+			Json_Put($conf, '.restore.enable', GUICtrlRead($gui_restore_box))
 			Json_Put($conf, '.setup.host', GUICtrlRead($gui_host))
 			Json_Put($conf, '.setup.port', GUICtrlRead($gui_port))
 			Json_Put($conf, '.setup.user', GUICtrlRead($gui_user))
 			Json_Put($conf, '.setup.key', GUICtrlRead($gui_key))
 			Json_Put($conf, '.setup.prefix', GUICtrlRead($gui_prefix))
-;			FileWriteLine($f, '.setup.debug' & GUICtrlRead($gui_prefix))
-;			FileWriteLine($f, 'restore=' & conf_get_value('restore'))
-;			for $i=0 to 9
-;				FileWriteLine($f, 'source' & $i + 1 & '_stat=' & conf_get_value('source' & $i + 1 & '_stat'))
-;			next
 			$f = FileOpen($ini, BitOR($FO_BINARY,$FO_OVERWRITE))
 			FileWrite($f, _CryptoNG_AES_CBC_EncryptData(Json_Encode($conf), $cfg_key))
 			FileClose($f)
@@ -845,20 +822,6 @@ exit
 
 func logger($text)
 	FileWriteLine($log, $text)
-endfunc
-
-func conf_set_value($value, $data)
-	local $index
-	$index = _ArraySearch($conf, $value, 0, 0, 0, 0, 1, 0); 1st column
-	if not @error then $conf[$index][1] = $data
-	return
-endfunc
-
-func conf_get_value($value)
-	local $index
-	$index = _ArraySearch($conf, $value, 0, 0, 0, 0, 1, 0); 1st column
-	if not @error then return $conf[$index][1]
-	return ''
 endfunc
 
 func get_cygwin_path($path)
@@ -890,7 +853,7 @@ endfunc
 func get_free()
 	for $i = 0 to 9
 		if GUICtrlRead($ctrl[$i][0]) = $GUI_CHECKED then
-			if $conf[$i*4+3][1] = $new or $conf[$i*4+3][1] = $paused then
+			if Json_ObjGet($conf, '.backup.' & $i & '.state') = $new or Json_ObjGet($conf, '.backup.' & $i & '.state') = $paused then
 				return $i
 			endif
 		endif
@@ -900,8 +863,8 @@ endfunc
 
 func get_free_restore()
 	if GUICtrlRead($gui_restore_box) = $GUI_CHECKED then
-		if conf_get_value('restore_state') = $new then return True
-		if conf_get_value('restore_state') = $paused then return True
+		if Json_ObjGet($conf, '.restore.state') = $new then return True
+		if Json_ObjGet($conf, '.restore.state') = $paused then return True
 	endif
 	return False
 endfunc
@@ -909,7 +872,7 @@ endfunc
 func get_stat($index)
 	local $data, $date, $output
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
-	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); 2-no count
+	$data = StringSplit(Json_ObjGet($conf, '.backup.' & $index + 1 & '.stat'), '|', 2); 2-no count
 	if not @error then
 		$output &= ' -- Poslední zápis' & @CRLF
 		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
@@ -952,7 +915,7 @@ func update_stat($buffer, $index)
 		$duration = _DateDiff('s', $transfer_start, $date) + int($time_generation[0])
 	endif
 	; interval
-	$data = StringSplit(conf_get_value('source' & $index + 1 & '_stat'), '|', 2); no-count
+	$data = StringSplit(Json_ObjGet($conf, '.backup.' & $index & '.stat'), '|', 2); no-count
 	if not @error then
 		if $data[0] then $interval = _DateDiff('D', $data[0], $date)
 	endif
