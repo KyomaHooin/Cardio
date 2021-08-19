@@ -157,7 +157,7 @@ endif
 logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 
 ; load crypto
-$cfg_key = _CryptoNG_PBKDF2('$JX9#w5N,,c/),S_', 'kcK,rY*jLR2p#:7Y', 64, $CNG_KEY_BIT_LENGTH_AES_128, $CNG_BCRYPT_SHA1_ALGORITHM)
+$cfg_key = _CryptoNG_PBKDF2('', '', 64, $CNG_KEY_BIT_LENGTH_AES_128, $CNG_BCRYPT_SHA1_ALGORITHM)
 
 ; write default ini
 if not FileExists($ini) then
@@ -224,11 +224,11 @@ $gui_button_pwd = GUICtrlCreateButton('Povolit', 334, 254, 75, 21)
 $gui_tab_dir = GUICtrlCreateTabItem('Obnova')
 $gui_group_restore_source = GUICtrlCreateGroup('Zdroj', 12, 28, 304, 46)
 $gui_restore_box = GUICtrlCreateCheckbox('', 20, 43, 16, 21)
-GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.' & $i & '.enable'))
+GUICtrlSetState($gui_restore_box, Json_ObjGet($conf, '.restore.enable'))
 $gui_restore_source_label = GUICtrlCreateLabel(Json_ObjGet($conf, '.setup.prefix'), 40, 48, 90, 21, 0x01); $SS_CENTER
-$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.source'), 136, 44, 172, 21)
+$gui_restore_source = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.source'), 136, 44, 172, 21)
 $gui_group_restore_target = GUICtrlCreateGroup('Cíl', 320, 28, 298, 46)
-$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.' & $i & '.target'), 328, 44, 203, 21)
+$gui_restore_target = GUICtrlCreateInput(Json_ObjGet($conf, '.restore.target'), 328, 44, 203, 21)
 $gui_button_restore_target = GUICtrlCreateButton('Procházet', 536, 44, 75, 21)
 $gui_group_restore_fill = GUICtrlCreateGroup('', 12, 74, 606, 224)
 $gui_tab_end = GUICtrlCreateTabItem('')
@@ -731,7 +731,7 @@ while 1
 			; empty source
 			if GUICtrlRead($ctrl[$index][1]) == '' or not FileExists(GUICtrlRead($ctrl[$index][1])) then
 				; update state
-				Json_Put($conf, '.backup.' & $i & '.state', $failed)
+				Json_Put($conf, '.backup.' & $index & '.state', $failed)
 				; update color
 				GUICtrlSetBkColor($ctrl[$index][1], $red)
 				; update output
@@ -872,7 +872,7 @@ endfunc
 func get_stat($index)
 	local $data, $date, $output
 	$date = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' &  @SEC
-	$data = StringSplit(Json_ObjGet($conf, '.backup.' & $index + 1 & '.stat'), '|', 2); 2-no count
+	$data = StringSplit(Json_ObjGet($conf, '.backup.' & $index & '.stat'), '|', 2); 2-no count
 	if not @error then
 		$output &= ' -- Poslední zápis' & @CRLF
 		if $data[0] then $output &= @CRLF & '    Datum: ' & StringReplace($data[0], '/', '.')
@@ -926,7 +926,7 @@ func admin_mode($admin)
 	local $state, $style
 	if $admin = True then
 		$state = $GUI_ENABLE
-		$style = ''; READ_ONLY
+		$style = ''; default
 	else
 		$state = $GUI_DISABLE
 		$style = 0x800; READ_ONLY
