@@ -72,7 +72,8 @@ global const $result_template[2]=[ _
 global const $user_template='{' _
 	& '"5":"Jan Škoda",' _
 	& '"6":"Jiří Procházka",' _
-	& '"8":"Tomáš Březák"' _
+	& '"8":"Tomáš Březák",' _
+	& '"9":"Zuzana Rücklová"' _
 & '}'
 
 ; 5 to 4 column map template

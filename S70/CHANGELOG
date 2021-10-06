@@ -9,6 +9,8 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
+-S70.ini + IniRead()
+-userid.exe [icon, GUI]
 -Export: 'Ao Diam', 'SV Vmax' dup.
 -Patch: Update structure.
 
