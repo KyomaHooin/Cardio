@@ -22,6 +22,7 @@ FILE
    BinaryCall.au3 - JSON binary wrapper.
         LZNT1.au3 - LZNT1 de-compression library by "trancexx".
         patch.au3 - Update archived files machine code.
+       userid.au3 - Get Medicus user ID.
 
         print.dll - Printing DLL.
           S70.ini - Program configuration file.    
