@@ -56,8 +56,11 @@ global $age = Number(IniRead($config_file, 'setup', 'history', 30)); default sto
 global $export_path = IniRead($config_file, 'setup', 'export', @ScriptDir & '\' & 'input')
 global $archive_path = IniRead($config_file, 'setup', 'archiv', @ScriptDir & '\' & 'archive')
 
-global $export_path = @ScriptDir & '\' & 'input'
-global $archive_path = @ScriptDir & '\' & 'archive'
+; strip path trailng slash
+$export_path = StringRegExpReplace($export_path, '\\$', '')
+$archive_path = StringRegExpReplace($archive_path, '\\$', '')
+
+; update history path
 global $history_path = $archive_path & '\' & 'history'
 
 global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC
@@ -543,10 +546,6 @@ endif
 ; logging
 logger('Program spuštěn: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC & ' [' & $cmdline[2] & ']')
 
-; strip path trailng slash
-$export_path = StringRegExpReplace($export_path, '\\$', '')
-$archive_path = StringRegExpReplace($archive_path, '\\$', '')
-
 ; default configuration
 if not FileExists($config_file) then
 	$c = FileOpen($config_file, 2 + 256); empty UTF8 / NOBOM overwrite
@@ -554,9 +553,6 @@ if not FileExists($config_file) then
 	IniWriteSection($config_file, 'setup', 'export=' & @ScriptDir & '\' & 'input' & @LF & 'archiv=' & @ScriptDir & '\' & 'archive' & @LF & 'history=30')
 	IniWriteSection($config_file, 'medicus', 'Medicus ID=Jméno Příjmení')
 endif
-
-; update history path
-$history_path = $archive_path & '\' & 'history'
 
 ; create archive / history directory
 DirCreate($archive_path)
