@@ -20,7 +20,7 @@
 
 #AutoIt3Wrapper_Res_Description=GE Vivid S70 Medicus 3 integration
 #AutoIt3Wrapper_Res_ProductName=S70
-#AutoIt3Wrapper_Res_ProductVersion=2.4
+#AutoIt3Wrapper_Res_ProductVersion=2.5
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -47,11 +47,14 @@
 ; VAR
 ; -------------------------------------------------------------------------------------------
 
-global const $VERSION = '2.4'
-global $AGE = 30; default stored data age in days
+global const $VERSION = '2.5'
 
 global $log_file = @ScriptDir & '\' & 'S70.log'
 global $config_file = @ScriptDir & '\' & 'S70.ini'
+
+global $age = Number(IniRead($config_file, 'setup', 'history', 30)); default stored data age in days
+global $export_path = IniRead($config_file, 'setup', 'export', @ScriptDir & '\' & 'input')
+global $archive_path = IniRead($config_file, 'setup', 'archiv', @ScriptDir & '\' & 'archive')
 
 global $export_path = @ScriptDir & '\' & 'input'
 global $archive_path = @ScriptDir & '\' & 'archive'
@@ -62,19 +65,14 @@ global const $runtime = @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @
 ; message interception hook list
 global $hook_text_map[0], $hook_data_map[0][2]
 
+; medicus user list
+global $user = IniReadSection($config_file, 'medicus')
+
 ; default result template
 global const $result_template[2]=[ _
 	"Srdeční oddíly nedilatované, normální systolická funkce obou komor, chlopně bez významnější valvulopatie, bez známek zvýšené tenze v plicnici.", _
 	"Dobrá systolická funkce obou nedilat. komor, chlopenní aparát bez významnější valvulopatie, nejsou známky zvýšené tenze v plicnici." _
 ]
-
-; Medicus user ID to name
-global const $user_template='{' _
-	& '"5":"Jan Škoda",' _
-	& '"6":"Jiří Procházka",' _
-	& '"8":"Tomáš Březák",' _
-	& '"9":"Zuzana Rücklová"' _
-& '}'
 
 ; 5 to 4 column map template
 global const $map_template='{' _
@@ -262,7 +260,6 @@ global const $data_template='{' _
 global $history = Json_Decode($data_template)
 global $buffer = Json_Decode($data_template)
 global $order = Json_Decode($data_template)
-global $user = Json_Decode($user_template)
 global $note = Json_Decode($note_template)
 global $map = Json_Decode($map_template)
 
@@ -546,14 +543,16 @@ endif
 ; logging
 logger('Program spuštěn: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & ':' & @MIN & ':' & @SEC & ' [' & $cmdline[2] & ']')
 
-; read configuration
-if FileExists($config_file) then
-	read_config_file($config_file)
-	if @error then logger('Načtení konfiguračního souboru selhalo.')
-Else
-	$c = FileOpen($config_file, 2 + 256); UTF8 / NOBOM overwrite
-	FileWrite($c, 'export=' & @CRLF & 'archive=' & @CRLF & 'history=')
+; strip path trailng slash
+$export_path = StringRegExpReplace($export_path, '\\$', '')
+$archive_path = StringRegExpReplace($archive_path, '\\$', '')
+
+; default configuration
+if not FileExists($config_file) then
+	$c = FileOpen($config_file, 2 + 256); empty UTF8 / NOBOM overwrite
 	FileClose($c)
+	IniWriteSection($config_file, 'setup', 'export=' & @ScriptDir & '\' & 'input' & @LF & 'archiv=' & @ScriptDir & '\' & 'archive' & @LF & 'history=30')
+	IniWriteSection($config_file, 'medicus', 'Medicus ID=Jméno Příjmení')
 endif
 
 ; update history path
@@ -780,7 +779,7 @@ While 1
 	; load history data
 	if $msg = $button_history Then
 		if FileExists($archive_file) then
-			if _DateDiff('D', Json_Get($history,'.date'), $runtime) < $AGE then
+			if _DateDiff('D', Json_Get($history,'.date'), $runtime) < $age then
 				if msgbox(4, 'S70 Echo ' & $VERSION, 'Načíst poslední naměřené hodnoty?') = 6 then
 					; update basic
 					GUICtrlSetData($input_height, Json_ObjGet($history, '.height'))
@@ -803,7 +802,7 @@ While 1
 					next
 				endif
 			else
-				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načíst historii starší ' & $AGE & ' dnů.')
+				msgbox(48, 'S70 Echo ' & $VERSION, 'Nelze načíst historii starší ' & $age & ' dnů.')
 			endif
 		else
 			MsgBox(48, 'S70 Echo ' & $VERSION, 'Žádná historie není dostupná.')
@@ -876,6 +875,14 @@ func logger($text)
 	FileWriteLine($log_file, $text)
 endfunc
 
+;get Medicus user name
+func get_user($id)
+	local $index
+	if IsArray($user) then $index = _ArraySearch($user, $id)
+	if $index > 0 then return $user[$index][1]
+	return ''
+endfunc
+
 ; get name from control id
 func get_control($id)
 	if $id = $input_height then return 'height'
@@ -930,18 +937,6 @@ func gui_enable($visible)
 	GUICtrlSetState($button_store, $state)
 	GUICtrlSetState($button_exit, $state)
 EndFunc
-
-; read configuration file
-func read_config_file($file)
-	local $cfg
-	_FileReadToArray($file, $cfg, 0, "=")
-	if @error then return SetError(1)
-	for $i = 0 to UBound($cfg) - 1
-		if $cfg[$i][0] == 'export' then $export_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'archive' then $archive_path = StringRegExpReplace($cfg[$i][1], '\\$', ''); strip trailing backslash
-		if $cfg[$i][0] == 'history' then $AGE = Number($cfg[$i][1])
-	next
-endfunc
 
 ; find export file
 func get_export_file($export_path, $rc)
@@ -1494,7 +1489,7 @@ func dekurz()
 	; footer
 	$book.Activesheet.Range('A' & $row_index & ':E' & $row_index).Font.Size = 10
 	_Excel_RangeWrite($book, $book.Activesheet, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 'A' & $row_index)
-	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]), 'D' & $row_index)
+	_Excel_RangeWrite($book, $book.Activesheet, 'MUDr. ' & get_user($cmdline[1]), 'D' & $row_index)
 	; clip
 	_Excel_RangeCopyPaste($book.ActiveSheet, 'A1:E' & $row_index + 1); data + one empty line..
 	if @error then
@@ -1687,7 +1682,7 @@ func print(); 2100 x 2970
 	; date
 	_PrintText($printer, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 50, $top_offset)
 	; singnature
-	_PrintText($printer, 'MUDr. ' & Json_ObjGet($user, '.' & $cmdline[1]) , 1250, $top_offset)
+	_PrintText($printer, 'MUDr. ' & get_user($cmdline[1]) , 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
 	if @error Then

@@ -9,14 +9,18 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
--S70.ini + IniRead()
--userid.exe [icon, GUI]
 -Export: 'Ao Diam', 'SV Vmax' dup.
 -Patch: Update structure.
 
-[2.4]
+[2.5]
 
 General:
+
+-Medicus ID from INI.
+
+[2.4]
+
+GUI:
 
 -Fix multiline clip paste.
 
@@ -162,7 +166,7 @@ General:
 - Decimal digits round update(calc only).
 - Max/mean calc() fix.
 - LAVi-1D,  DDZins calc fix.
-- E/Em formula. 
+- E/Em formula.
 - FAS% = EDA / 100 * ESA formula.
 - RWT, LWd index(/BSA), LVs index(/BSA) formula.
 - BSA two decimal digit round.
@@ -176,7 +180,7 @@ GUI:
 - ESA/EDA units.
 - LVD index -> LVd index typo.
 - Ao VTI, LVOT-VTI units.
-- Catch decimal comma separator. 
+- Catch decimal comma separator.
 - DDZinsp/DZexp -> DDZ insp / DDZ expt typo.
 - MVAi-DHT units.
 
