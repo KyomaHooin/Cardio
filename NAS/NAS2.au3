@@ -58,6 +58,35 @@ global $remote[8][5]; checkbox | source | button | prefix | target
 global $local[10][5]; checkbox | source | button | target | button
 global $network[2][11]; label | host | label | port | label | user | label | key | button | label | prefix
 
+global $default = '{' _
+	& '"remote":[' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""}],' _
+	& '"local":[' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""},' _
+	& '{"state":4,"enable":0,"source":"","target":""}],' _
+	& '"network":[' _
+	& '{"host":"","port":"","user":"","key":"","prefix":""},' _
+	& '{"host":"","port":"","user":"","key":"","prefix":""}],' _
+	& '"setup":{"debug":0}' _
+	& '}'
+
+global $conf = JsonDecode($default)
+
 ; ---------------------------------------------------------
 ; CONTROL
 ; ---------------------------------------------------------
@@ -81,6 +110,19 @@ endif
 
 logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' & @MON & '.' & @YEAR)
 
+; default ini
+if not FileExists($ini) then
+	FileWrite($ini, Json_Encode($conf))
+endif
+
+;read configuration
+$conf = JsonDecode(FileRead($ini))
+if $error then
+	MsgBox(48, 'NAS ' & $version, 'Read config failed.')
+	exit
+else
+	logger("Read configuration.")
+
 ; ---------------------------------------------------------
 ; GUI
 ; ---------------------------------------------------------
@@ -93,15 +135,17 @@ $gui_group_remote_nas1 = GUICtrlCreateGroup('Lokalita A', 12, 28, 606, 135)
 $gui_group_remote_nas2 = GUICtrlCreateGroup('Lokalita B', 12, 163, 606, 135)
 for $i = 0 to 3
 	$remote[$i][0] = GUICtrlCreateCheckbox('', 20, 48 + $i*26, 16, 21)
-	$remote[$i][1] = GUICtrlCreateInput('', 40, 49 + $i*26, 189, 21)
+	GUICtrlSetState($remote[$i][0], Json_ObjGet($conf, '.remote.[' & $i & '].enable'))
+	$remote[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.remote.[' & $i & '].source'), 40, 49 + $i*26, 189, 21)
 	$remote[$i][2] = GUICtrlCreateButton('Procházet', 233, 49 + $i*26, 75, 21)
-	$remote[$i][3] = GUICtrlCreateLabel('', 325, 52 + $i*26, 90, 21, 0x01); $SS_CENTER
-	$remote[$i][4] = GUICtrlCreateInput('', 421, 49 + $i*26, 188, 21)
+	$remote[$i][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.network.[0].prefix'), 325, 52 + $i*26, 90, 21, 0x01); $SS_CENTER
+	$remote[$i][4] = GUICtrlCreateInput(Json_ObjGet($conf, '.remote.[' & $i & '].target'), 421, 49 + $i*26, 188, 21)
 	$remote[$i+4][0] = GUICtrlCreateCheckbox('', 20, 185 + $i*26, 16, 21)
-	$remote[$i+4][1] = GUICtrlCreateInput('', 40, 185 + $i*26, 189, 21)
+	GUICtrlSetState($remote[$i+4][0], Json_ObjGet($conf, '.remote.[' & $i+4 & '].enable'))
+	$remote[$i+4][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.remote.[' & $i+4 & '].source'), 40, 185 + $i*26, 189, 21)
 	$remote[$i+4][2] = GUICtrlCreateButton('Procházet', 233, 185 + $i*26, 75, 21)
-	$remote[$i+4][3] = GUICtrlCreateLabel('', 325, 188 + $i*26, 90, 21, 0x01); $SS_CENTER
-	$remote[$i+4][4] = GUICtrlCreateInput('', 421, 185 + $i*26, 188, 21)
+	$remote[$i+4][3] = GUICtrlCreateLabel(Json_ObjGet($conf, '.network.[1].prefix'), 325, 188 + $i*26, 90, 21, 0x01); $SS_CENTER
+	$remote[$i+4][4] = GUICtrlCreateInput(Json_ObjGet($conf, '.remote.[' & $i+4 & '].target'), 421, 185 + $i*26, 188, 21)
 next
 ; GUI - LOCAL
 $gui_tab_local = GUICtrlCreateTabItem('Lokální')
@@ -109,9 +153,10 @@ $gui_group_local_source = GUICtrlCreateGroup('Zdroj', 12, 28, 312, 270)
 $gui_group_local_target = GUICtrlCreateGroup('Cíl', 327, 28, 291, 270)
 for $i = 0 to 9
 	$local[$i][0] = GUICtrlCreateCheckbox('', 20, 43 + $i*25, 16, 21)
-	$local[$i][1] = GUICtrlCreateInput('', 40, 44 + $i*25, 196, 21)
+	GUICtrlSetState($local[$i][0], Json_ObjGet($conf, '.local.[' & $i & '].enable'))
+	$local[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.local.[' & $i & '].source'), 40, 44 + $i*25, 196, 21)
 	$local[$i][2] = GUICtrlCreateButton('Procházet', 241, 44 + $i*25, 75, 21)
-	$local[$i][3] = GUICtrlCreateInput('', 335, 44 + $i*25, 195, 21)
+	$local[$i][3] = GUICtrlCreateInput(Json_ObjGet($conf, '.local.[' & $i & '].target'), 335, 44 + $i*25, 195, 21)
 	$local[$i][4] = GUICtrlCreateButton('Procházet', 535, 44 + $i*25, 75, 21)
 next
 ; GUI - OUTPUT
@@ -123,16 +168,16 @@ $gui_group_connection_nas1 = GUICtrlCreateGroup('Lokalita A', 12, 28, 606, 135)
 $gui_group_connection_nas2 = GUICtrlCreateGroup('Lokalita B', 12, 163, 606, 135)
 for $i = 0 to 1
 	$network[$i][0] = GUICtrlCreateLabel('Host:', 20 ,46 + $i*135, 60, 21)
-	$network[$i][1] = GUICtrlCreateInput('', 240, 40 + $i*135, 90, 21)
+	$network[$i][1] = GUICtrlCreateInput(Json_ObjGet($conf, '.network.[' & $i & '].host'), 240, 40 + $i*135, 90, 21)
 	$network[$i][2] = GUICtrlCreateLabel('Port:',20 , 68 + $i*135, 25, 21)
-	$network[$i][3] = GUICtrlCreateInput('', 290, 64 + $i*135, 40, 21)
+	$network[$i][3] = GUICtrlCreateInput(Json_ObjGet($conf, '.network.[' & $i & '].port'), 290, 64 + $i*135, 40, 21)
 	$network[$i][4] = GUICtrlCreateLabel('Uživatel:',20 , 92 + $i*135, 40, 21)
-	$network[$i][5] = GUICtrlCreateInput('', 240, 88 + $i*135, 90, 21)
+	$network[$i][5] = GUICtrlCreateInput(Json_ObjGet($conf, '.network.[' & $i & '].user'), 240, 88 + $i*135, 90, 21)
 	$network[$i][6] = GUICtrlCreateLabel('SSH klíč:', 20, 116 + $i*135, 90, 21)
-	$network[$i][7] = GUICtrlCreateInput('', 68, 112 + $i*135, 262, 21)
+	$network[$i][7] = GUICtrlCreateInput(Json_ObjGet($conf, '.network.[' & $i & '].key'), 68, 112 + $i*135, 262, 21)
 	$network[$i][8] = GUICtrlCreateButton('Procházet', 334, 112 + $i*135, 75, 21)
 	$network[$i][9] = GUICtrlCreateLabel('NAS prefix:', 20, 140 + $i*135, 60, 21)
-	$network[$i][10] = GUICtrlCreateInput('', 220, 136 + $i*135, 110, 21)
+	$network[$i][10] = GUICtrlCreateInput(Json_ObjGet($conf, '.network.[' & $i & '].prefix'), 220, 136 + $i*135, 110, 21)
 next
 ; GUI - SETUP
 $gui_tab_setup = GUICtrlCreateTabItem('Nastavení')
@@ -140,6 +185,7 @@ $gui_group_setup = GUICtrlCreateGroup('', 12, 28, 606, 66)
 $gui_group_setup_blank = GUICtrlCreateGroup('', 12, 94, 606, 204)
 $gui_setup_debug_label = GUICtrlCreateLabel('Režim ladění:', 20, 46, 80, 21)
 $gui_setup_debug_check = GUICtrlCreateCheckbox('', 240, 40, 16, 21)
+GUICtrlSetState($gui_setup_debug_check, Json_ObjGet($conf, '.setup.debug'))
 $gui_setup_pwd_label = GUICtrlCreateLabel('Režim správce:', 20, 68, 150, 21)
 $gui_setup_pwd = GUICtrlCreateInput('', 240, 64, 90, 21, BitOR(0x0020,0x0001)); ES_PASSWORD
 $gui_setup_button_pwd = GUICtrlCreateButton('Povolit', 334, 64, 75, 21)
@@ -179,7 +225,7 @@ while 1
 			GUICtrlSetData($gui_setup_pwd, '')
 		endif
 	endif
-	; debug
+	; debug mode
 	if GUICtrlRead($gui_setup_debug_check) = $GUI_CHECKED then
 		$debug = True
 	else
