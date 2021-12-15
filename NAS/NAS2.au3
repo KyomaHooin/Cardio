@@ -33,6 +33,7 @@
 #Include <GuiEdit.au3>
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
+#include <WinAPIProc.au3>
 #include <CryptoNG.au3>
 #include <Json.au3>
 
@@ -69,7 +70,6 @@ global $buffer_err; rsync STDERR
 global $token_remote = False
 global $token_local = False
 global $token_terminate = False
-global $token_error = False
 global $token_run = False
 
 global $color_white = 0xffffff
@@ -208,7 +208,7 @@ for $i = 0 to 9
 next
 ; GUI - OUTPUT
 $gui_tab_output = GUICtrlCreateTabItem('Výstup')
-$gui_output_input = GUICtrlCreateEdit('', 15, 35, 600, 262, BitOR($ES_AUTOVSCROLL, $ES_READONLY, $ES_WANTRETURN, $WS_VSCROLL))
+$gui_output = GUICtrlCreateEdit('', 15, 35, 600, 262, BitOR($ES_AUTOVSCROLL, $ES_READONLY, $ES_WANTRETURN, $WS_VSCROLL))
 ; GUI - CONNECTION
 $gui_tab_connection = GUICtrlCreateTabItem('Připojení')
 $gui_group_connection_nas1 = GUICtrlCreateGroup('Lokalita A', 12, 28, 606, 135)
@@ -324,257 +324,280 @@ while 1
 		if GUICtrlRead($local[$checkbox][0]) = $GUI_UNCHECKED then GUICtrlSetBkColor($local[$checkbox][1], $white)
 	endif
 	; init
-;	if $event = $gui_button_run then
-;		if GuiCtrlRead($gui_tab) = 0 then
-;			$verify = verify_remote_setup()
-;			if @error Then
-;				logger('CHYBA: ' & $verify)
-;				GUICtrlSetData($gui_error, $verify)
-;			else
-;				; option
-;				$option=''
-;				; clear output
-;				GUICtrlSetData($gui_output_input, '')
-;				; setup
-;				if GuiCtrlRead($gui_tab) = 0 then
-;					; set token
-;					$token_remote=True
-;					; reset color
-;					for $i = 0 to 3
-;						GUICtrlSetBkColor($remote[$i][1], $white)
-;						GUICtrlSetBkColor($remote[$i+4][1], $white)
-;					next
-;			endif
-;		endif
-;		if GuiCtrlRead($gui_tab) = 1 then
-;			; option
-;			$option=''
-;			; clear output
-;			GUICtrlSetData($gui_output_input, '')
-;			; setup
-;			if GuiCtrlRead($gui_tab) = 0 then
-;				; set token
-;				$token_remote=True
-;				; reset color
-;				for $i = 0 to 3
-;					GUICtrlSetBkColor($remote[$i][1], $white)
-;					GUICtrlSetBkColor($remote[$i+4][1], $white)
-;				next
-;			else
-;				; set token
-;				$token_local=True
-;				; reset color
-;				for $i = 0 to 9
-;					GUICtrlSetBkColor($local[$i][1], $white)
-;				next
-;			endif
-;				; disable buttons
-;				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
-;				if $admin then
-;					for $i = 0 to 3
-;						GUICtrlSetState($remote[$i][0], $GUI_DISABLE)
-;						GUICtrlSetState($remote[$i+4][0], $GUI_DISABLE)
-;					next
-;					for $i = 0 to 9
-;						GUICtrlSetState($local[$i][0], $GUI_DISABLE)
-;					next
-;				endif
-;			endif
-;		endif
-;	endif
-;	; terminate
-;	if $event = $gui_button_break then
-;		; terminate
-;		if $token_run then
-;			ProcessClose($rsync)
-;			if @error then
-;				logger('CHYBA: ProcessClose')
-;			else
-;				logger('rsync: Probíhá ukončení.')
-;				ProcessWaitClose($rsync)
-;				; set token
-;				$token_terminate=True
-;			endif
-;		endif
-;	endif
-;	; backup
-;	if $backup then
-;		; logging
-;		if $run and get_free() >= 0 and not ProcessExists($rsync) then
-;			; free
-;			$index = get_free()
-;			; update I/O
-;			$buffer_out = StringReplace(StderrRead($rsync), @LF, @CRLF)
-;			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
-;			$buffer &= $buffer_out
-;			$buffer &= $buffer_err
-;			; update output
-;			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
-;			; exit code
-;			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-;			if @error or $proc = $INVALID_HANDLE_VALUE then
-;				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
-;				; error code
-;				if $buffer_out <> '' or $buffer_err <> '' then
-;					$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
-;					if not @error then
-;						; update errror
-;						$error = True
-;						; update output
-;						$code_index = _ArrayBinarySearch($error_code, $code[0])
-;						if @error then
-;							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
-;							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý chybový kód ' & $code[0] & '.' & @CRLF)
-;							GUICtrlSetData($gui_error, 'Neznámá chyba.')
-;						else
-;							logger('rsync: Kód chyby ' & $code[0] & '.')
-;							GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
-;							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-;						endif
-;						; update color
-;						GUICtrlSetBkColor($remote[$index][1], $red)
-;					else
-;						if $debug then logger('CHYBA: Žádný chybový kód.')
-;						GUICtrlSetBkColor($remote[$index][1], $green)
-;						GUICtrlSetData($gui_error, 'Dokončeno.')
-;					endif
-;				else
-;					logger('rsync: Žádný chybový kód.')
-;					GUICtrlSetBkColor($remote[$index][1], $green)
-;					GUICtrlSetData($gui_error, 'Dokončeno.')
-;				endif
-;			else
-;				$exit_code = _WinAPI_GetExitCodeProcess($proc)
-;				if $exit_code = 0 then
-;					if not $terminate then
-;						GUICtrlSetBkColor($remote[$index][1], $green)
-;						GUICtrlSetData($gui_error, 'Dokončeno.')
-;					else
-;						GUICtrlSetData($gui_error, 'Přerušeno.')
-;					endif
-;				else
-;					; update errror
-;					$error = True
-;					; update output
-;					$code_index = _ArrayBinarySearch($error_code, $exit_code)
-;					if @error then
-;						if $debug then logger('CHYBA: Neznámý kód ' & $exit_code)
-;						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: Neznámý kód ' & $exit_code & '.' & @CRLF)
-;						GUICtrlSetData($gui_error, 'Dokončeno.')
-;					else
-;						logger('CHYBA: ' & $error_code[$code_index][1])
-;						GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
-;						GUICtrlSetData($gui_error, $error_code[$code_index][1])
-;					endif
-;					GUICtrlSetBkColor($remote[$index][1], $red)
-;				endif
-;			endif
-;			; close handle
-;			_WinAPI_CloseHandle($proc)
-;			; log I/O
-;			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
-;			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
-;			; round
-;			logger(@CRLF & '[' & $index + 1 & '] Zálohování dokončeno.')
-;			; update state
-;			if $terminate then
-;				Json_Put($conf, '.backup.' & $index & '.state', $paused)
-;			elseif $error then
-;				Json_Put($conf, '.backup.' & $index & '.state', $failed)
-;			else
-;				Json_Put($conf, '.backup.' & $index & '.state', $done)
-;			endif
-;			; reset token
-;			$run = False
-;		endif
-;		; run
-;		if not $token_run and get_free() >= 0 and not $terminate then
-;			; free
-;			$index = get_free()
-;			; reset error
-;			$error = False
-;			; update progress
-;			GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
-;			; empty source
-;			if GUICtrlRead($remote[$index][1]) == '' or not FileExists(GUICtrlRead($remote[$index][1])) then
-;				; update color
-;				GUICtrlSetBkColor($remote[$index][1], $red)
-;				; update output
-;				GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
-;				GUICtrlSetData($gui_progress, GUICtrlRead($gui_progress) & 'Zdrojový adresář neexistuje.' & @CRLF)
-;				logger(@CRLF & '[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
-;			 else
-;				logger(@CRLF & '[' & $index + 1 & '] Zálohování zahájeno.' & @CRLF & @CRLF)
-;				; clear buffer
-;				$buffer = ''
-;				; update color
-;				GUICtrlSetBkColor($remote[$index][1], $orange)
-;				; update output
-;				if $backup then GUICtrlSetData($gui_error, 'Probíhá záloha.')
-;				; rsync
-;				$rsync = Run('"' & $rsync_binary & '"' _
-;				& ' -avz -s -h ' & $option & ' --stats -e ' & "'" _
-;				& '"' & $ssh_binary & '"' _
-;				& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
-;				& ' -p ' & GUICtrlRead($gui_port) _
-;				& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
-;				& "'" & get_cygwin_path(GUICtrlRead($remote[$index][1])) & "' " _
-;				& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
-;				& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($remote[$index][4]) & "'" _
-;				, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
-;				; update token
-;				$token_run = True
-;			endif
-;		endif
-;		; end
-;		if ( not $run and get_free() < 0 ) or $terminate Then
-;			; enable buttons
-;			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
-;			if $admin then
-;				for $i = 0 to 4
-;					GUICtrlSetState($remote[$i][0], $GUI_ENABLE)
-;					GUICtrlSetState($remote[$i+4][0], $GUI_ENABLE)
-;				next
-;				for $i = 0 to 9
-;					GUICtrlSetState($local[$i][0], $GUI_ENABLE)
-;				next
-;			endif
-;			; reset tokens
-;			$token_remote=False
-;			$token_terminate=False
-;		endif
-;	endif
+	if $event = $gui_button_run then
+		if GuiCtrlRead($gui_tab) = 0 then
+			$verify = verify_remote_setup()
+			if @error Then
+				logger('CHYBA: ' & $verify)
+				GUICtrlSetData($gui_error, $verify)
+			else
+				; option
+				$option=''
+				; clear output
+				GUICtrlSetData($gui_output, '')
+				; set token
+				$token_remote=True
+				; reset color
+				for $i = 0 to 3
+					GUICtrlSetBkColor($remote[$i][1], $white)
+					GUICtrlSetBkColor($remote[$i+4][1], $white)
+				next
+				; disable GUI
+				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
+				if $admin then
+					for $i = 0 to 3
+						GUICtrlSetState($remote[$i][0], $GUI_DISABLE)
+						GUICtrlSetState($remote[$i+4][0], $GUI_DISABLE)
+					next
+				endif
+			endif
+		endif
+		if GuiCtrlRead($gui_tab) = 1 then
+			; option
+			$option=''
+			; clear output
+			GUICtrlSetData($gui_output, '')
+			; set token
+			$token_local=True
+			; reset color
+			for $i = 0 to 9
+				GUICtrlSetBkColor($local[$i][1], $white)
+			next
+			; disable GUI
+			GUICtrlSetState($gui_button_run, $GUI_DISABLE)
+			if $admin then
+				for $i = 0 to 9
+					GUICtrlSetState($local[$i][0], $GUI_DISABLE)
+				next
+			endif
+		endif
+	endif
+	; terminate
+	if $event = $gui_button_break then
+		if $token_run then
+			ProcessClose($rsync)
+			if @error then
+				logger('CHYBA: ProcessClose')
+			else
+				logger('rsync: Probíhá ukončení.')
+				ProcessWaitClose($rsync)
+			endif
+			; set token
+			$token_terminate=True
+		endif
+	endif
+	; backup
+	if $token_remote or $token_local then
+		; post-run
+		if $token_run and not ProcessExists($rsync) then
+			; update I/O
+			$buffer_out = StringReplace(StderrRead($rsync), @LF, @CRLF)
+			$buffer_err = StringReplace(StdoutRead($rsync), @LF, @CRLF)
+			$buffer &= $buffer_out
+			$buffer &= $buffer_err
+			; update output
+			GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
+			; exit code
+			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
+			if @error or $proc = $INVALID_HANDLE_VALUE then
+				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
+				; error code
+				if $buffer_out <> '' or $buffer_err <> '' then
+					$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+					if not @error then
+						; update output
+						$code_index = _ArrayBinarySearch($error_code, $code[0])
+						if @error then
+							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
+							GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: Neznámý chybový kód ' & $code[0] & '.' & @CRLF)
+							GUICtrlSetData($gui_error, 'Neznámá chyba.')
+						else
+							logger('rsync: Kód chyby ' & $code[0] & '.')
+							GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
+							GUICtrlSetData($gui_error, $error_code[$code_index][1])
+						endif
+						; update color
+						if $token_remote then GUICtrlSetBkColor($remote[$index][1], $red)
+						if $token_local then GUICtrlSetBkColor($local[$index][1], $red)
+					else
+						if $debug then logger('CHYBA: Žádný chybový kód.')
+						if $token_remote then GUICtrlSetBkColor($remote[$index][1], $green)
+						if $token_local then GUICtrlSetBkColor($local[$index][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					endif
+				else
+					logger('rsync: Žádný chybový vystup.')
+					if $token_remote then GUICtrlSetBkColor($remote[$index][1], $green)
+					if $token_local then GUICtrlSetBkColor($local[$index][1], $green)
+					GUICtrlSetData($gui_error, 'Dokončeno.')
+				endif
+			else
+				$exit_code = _WinAPI_GetExitCodeProcess($proc)
+				if $exit_code = 0 then
+					if $token_terminate then
+						GUICtrlSetData($gui_error, 'Přerušeno.')
+					else
+						if $token_remote then GUICtrlSetBkColor($remote[$index][1], $green)
+						if $token_local then GUICtrlSetBkColor($local[$index][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					endif
+				else
+					; update output
+					$code_index = _ArrayBinarySearch($error_code, $exit_code)
+					if @error then
+						if $debug then logger('CHYBA: Neznámý kód ' & $exit_code)
+						GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: Neznámý kód ' & $exit_code & '.' & @CRLF)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					else
+						logger('CHYBA: ' & $error_code[$code_index][1])
+						GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
+						GUICtrlSetData($gui_error, $error_code[$code_index][1])
+					endif
+					if $token_remote then GUICtrlSetBkColor($remote[$index][1], $red)
+					if $token_local then GUICtrlSetBkColor($local[$index][1], $red)
+				endif
+			endif
+			; close handle
+			_WinAPI_CloseHandle($proc)
+			; log I/O
+			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
+			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
+			; round
+			logger(@CRLF & '[' & $index + 1 & '] Zálohování dokončeno.')
+			; reset token
+			$token_run = False
+		endif
+		; run
+		if not ( $token_run or $token_terminate ) then
+			; index
+			$index = get_free()
+			; update output
+			GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & ' -- ' & $index + 1 & ' -- >> ZÁLOHA << --' & @CRLF & @CRLF)
+			if $token_remote then
+				if GUICtrlRead($remote[$index][1]) == '' or not FileExists(GUICtrlRead($remote[$index][1])) then
+					; update color
+					GUICtrlSetBkColor($remote[$index][1], $red)
+					; update output
+					GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
+					GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & 'Zdrojový adresář neexistuje.' & @CRLF)
+					logger(@CRLF & '[' & $index + 1 & '] NAS: Zdrojový adresář neexistuje.')
+				 else
+					logger(@CRLF & '[' & $index + 1 & '] Zálohování zahájeno.' & @CRLF & @CRLF)
+					; clear current I/O buffer
+					$buffer = ''
+					; update color
+					GUICtrlSetBkColor($remote[$index][1], $orange)
+					; update output
+					GUICtrlSetData($gui_error, 'Probíhá záloha.')
+					; rsync
+					$rsync = Run('"' & $rsync_binary & '"' _
+					& ' -avz -s -h ' & $option & ' --stats -e ' & "'" _
+					& '"' & $ssh_binary & '"' _
+					& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
+					& ' -p ' & GUICtrlRead($gui_port) _
+					& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
+					& "'" & get_cygwin_path(GUICtrlRead($remote[$index][1])) & "' " _
+					& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
+					& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($remote[$index][4]) & "'" _
+					, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
+					; update token
+					$token_run = True
+				endif
+			endif
+			if $token_local then
+				; Fileexists('') ??
+				if GUICtrlRead($remote[$index][1]) == '' or not FileExists(GUICtrlRead($remote[$index][1])) then
+					; update color
+					GUICtrlSetBkColor($remote[$index][1], $red)
+					; update output
+					GUICtrlSetData($gui_error, 'Zdrojový adresář neexistuje.')
+					GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & 'Zdrojový adresář neexistuje.' & @CRLF)
+					logger(@CRLF & '[' & $index + 1 & ']:  Zdrojový adresář neexistuje.')
+				elseif GUICtrlRead($local[$index][3]) == '' or not FileExists(GUICtrlRead($local[$index][3])) then
+					; update color
+					GUICtrlSetBkColor($remote[$index][1], $red)
+					; update output
+					GUICtrlSetData($gui_error, 'Cilovy adresář neexistuje.')
+					GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & 'Cilovy adresář neexistuje.' & @CRLF)
+					logger(@CRLF & '[' & $index + 1 & '] :  Cilovy adresář neexistuje.')
+				else
+					logger(@CRLF & '[' & $index + 1 & '] Zálohování zahájeno.' & @CRLF & @CRLF)
+					; clear current I/O buffer
+					$buffer = ''
+					; update color
+					GUICtrlSetBkColor($local[$index][1], $orange)
+					; update output
+					GUICtrlSetData($gui_error, 'Probíhá záloha.')
+					; rsync
+					$rsync = Run('"' & $rsync_binary & '"' _
+					& ' -avz -s -h ' & $option & ' --stats -e ' & "'" _
+					& '"' & $ssh_binary & '"' _
+					& ' -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null"' _
+					& ' -p ' & GUICtrlRead($gui_port) _
+					& ' -i "' & GUICtrlRead($gui_key) & '"' & "' " _
+					& "'" & get_cygwin_path(GUICtrlRead($remote[$index][1])) & "' " _
+					& GUICtrlRead($gui_user) & '@' & GUICtrlRead($gui_host) _
+					& ':' & "'" & GUICtrlRead($gui_prefix) & GUICtrlRead($remote[$index][4]) & "'" _
+					, @ScriptDir, @SW_HIDE, BitOR($STDERR_CHILD, $STDOUT_CHILD))
+					; update token
+					$token_run = True
+				endif
+			endif
+		endif
+		; end
+		if $token_terminate then
+			; enable buttons
+			GUICtrlSetState($gui_button_run, $GUI_ENABLE)
+			if $admin then
+				for $i = 0 to 3
+					GUICtrlSetState($remote[$i][0], $GUI_ENABLE)
+					GUICtrlSetState($remote[$i+4][0], $GUI_ENABLE)
+				next
+				for $i = 0 to 9
+					GUICtrlSetState($local[$i][0], $GUI_ENABLE)
+				next
+			endif
+			; reset tokens
+			$token_remote=False
+			$token_local=False
+			$token_terminate=False
+		endif
+	endif
 	; exit
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
-		; update config
-		for $i = 0 to 3; remote
-			Json_Put($conf, '.remote[' & $i & '].enable', GuiCtrlRead($remote[$i][0]), True)
-			Json_Put($conf, '.remote[' & $i+4 & '].enable', GuiCtrlRead($remote[$i+4][0]), True)
-			Json_Put($conf, '.remote[' & $i & '].source', GuiCtrlRead($remote[$i][1]), True)
-			Json_Put($conf, '.remote[' & $i+4 & '].source', GuiCtrlRead($remote[$i+4][1]), True)
-			Json_Put($conf, '.remote[' & $i & '].target', GuiCtrlRead($remote[$i][4]), True)
-			Json_Put($conf, '.remote[' & $i+4 & '].target', GuiCtrlRead($remote[$i+4][4]), True)
-		next
-		for $i = 0 to 9; local
-			Json_Put($conf, '.local[' & $i & '].enable', GuiCtrlRead($local[$i][0]), True)
-			Json_Put($conf, '.local[' & $i & '].source', GuiCtrlRead($local[$i][1]), True)
-			Json_Put($conf, '.local[' & $i & '].target', GuiCtrlRead($local[$i][3]), True)
-		next
-		for $i = 0 to 1; network
-			Json_Put($conf, '.network[' & $i & '].host', GuiCtrlRead($network[$i][1]), True)
-			Json_Put($conf, '.network[' & $i & '].port', GuiCtrlRead($network[$i][3]), True)
-			Json_Put($conf, '.network[' & $i & '].user', GuiCtrlRead($network[$i][5]), True)
-			Json_Put($conf, '.network[' & $i & '].key', GuiCtrlRead($network[$i][7]), True)
-			Json_Put($conf, '.network[' & $i & '].prefix', GuiCtrlRead($network[$i][10]), True)
-		next
-		Json_Put($conf, '.setup.debug', GuiCtrlRead($gui_setup_debug_check))
-		; write config
-		$out = FileOpen($ini, 2 + 256); UTF8 / NOBOM overwrite
-		FileWrite($out, Json_Encode($conf))
-		if @error then logger('Zápis nastavení selhal.')
-		FileClose($out)
-		; exit
-		exitloop
+		if $token_run then
+			GUICtrlSetData($gui_error, 'Nelze ukoncit probihajici operaci.')
+		else
+			; update config
+			for $i = 0 to 3; remote
+				Json_Put($conf, '.remote[' & $i & '].enable', GuiCtrlRead($remote[$i][0]), True)
+				Json_Put($conf, '.remote[' & $i+4 & '].enable', GuiCtrlRead($remote[$i+4][0]), True)
+				Json_Put($conf, '.remote[' & $i & '].source', GuiCtrlRead($remote[$i][1]), True)
+				Json_Put($conf, '.remote[' & $i+4 & '].source', GuiCtrlRead($remote[$i+4][1]), True)
+				Json_Put($conf, '.remote[' & $i & '].target', GuiCtrlRead($remote[$i][4]), True)
+				Json_Put($conf, '.remote[' & $i+4 & '].target', GuiCtrlRead($remote[$i+4][4]), True)
+			next
+			for $i = 0 to 9; local
+				Json_Put($conf, '.local[' & $i & '].enable', GuiCtrlRead($local[$i][0]), True)
+				Json_Put($conf, '.local[' & $i & '].source', GuiCtrlRead($local[$i][1]), True)
+				Json_Put($conf, '.local[' & $i & '].target', GuiCtrlRead($local[$i][3]), True)
+			next
+			for $i = 0 to 1; network
+				Json_Put($conf, '.network[' & $i & '].host', GuiCtrlRead($network[$i][1]), True)
+				Json_Put($conf, '.network[' & $i & '].port', GuiCtrlRead($network[$i][3]), True)
+				Json_Put($conf, '.network[' & $i & '].user', GuiCtrlRead($network[$i][5]), True)
+				Json_Put($conf, '.network[' & $i & '].key', GuiCtrlRead($network[$i][7]), True)
+				Json_Put($conf, '.network[' & $i & '].prefix', GuiCtrlRead($network[$i][10]), True)
+			next
+			Json_Put($conf, '.setup.debug', GuiCtrlRead($gui_setup_debug_check))
+			; write config
+			$out = FileOpen($ini, 2 + 256); UTF8 / NOBOM overwrite
+			FileWrite($out, Json_Encode($conf))
+			if @error then logger('Zápis nastavení selhal.')
+			FileClose($out)
+			; exit
+			exitloop
+		endif
 	endif
 wend
 
