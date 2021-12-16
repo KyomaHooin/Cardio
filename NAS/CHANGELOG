@@ -1,15 +1,9 @@
 
-TODO
-
--2nd connection tab/setting.
--Local backup.
--IniRead()
--Drop encryption. 
-
 [2.0]
 
 -Admin mode.
--Encrypted JSON configuration.
+-Multiple site connection.
+-Local backup.
 
 [1.9]
 
