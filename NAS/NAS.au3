@@ -110,7 +110,6 @@ global $error_code[26][2]=[ _
 	[255,'Neočekávaná chyba.'], _
 	[259,'Stále aktivní.']]
 
-
 global $default = '{' _
 	& '"remote":[' _
 	& '{"enable":4,"source":"","target":""},' _
@@ -224,7 +223,7 @@ for $i = 0 to 1
 	$network[$i][4] = GUICtrlCreateLabel('Uživatel:',20 , 92 + $i*135, 40, 21)
 	$network[$i][5] = GUICtrlCreateInput(Json_Get($conf, '.network[' & $i & '].user'), 240, 88 + $i*135, 90, 21)
 	$network[$i][6] = GUICtrlCreateLabel('SSH klíč:', 20, 116 + $i*135, 90, 21)
-	$network[$i][7] = GUICtrlCreateInput(Json_Get($conf, '.network[' & $i & '].key'), 68, 112 + $i*135, 262, 21)
+	$network[$i][7] = GUICtrlCreateInput(Json_Get($conf, '.network[' & $i & '].key'), 76, 112 + $i*135, 254, 21)
 	$network[$i][8] = GUICtrlCreateButton('Procházet', 334, 112 + $i*135, 75, 21)
 	$network[$i][9] = GUICtrlCreateLabel('NAS prefix:', 20, 140 + $i*135, 60, 21)
 	$network[$i][10] = GUICtrlCreateInput(Json_Get($conf, '.network[' & $i & '].prefix'), 220, 136 + $i*135, 110, 21)
@@ -239,15 +238,15 @@ GUICtrlSetState($gui_setup_debug_check, Json_Get($conf, '.setup.debug'))
 $gui_setup_pwd_label = GUICtrlCreateLabel('Režim správce:', 20, 68, 150, 21)
 $gui_setup_pwd = GUICtrlCreateInput('', 240, 64, 90, 21, BitOR(0x0020,0x0001)); ES_PASSWORD
 $gui_setup_button_pwd = GUICtrlCreateButton('Povolit', 334, 64, 75, 21)
+$gui_tab_end = GUICtrlCreateTabItem(''); tab end
 ; GUI - MAIN
-$gui_tab_end = GUICtrlCreateTabItem('')
 $gui_error = GUICtrlCreateLabel('', 10, 318, 298, 21)
 $gui_button_run = GUICtrlCreateButton('Spustit', 394, 314, 75, 21)
 $gui_button_break = GUICtrlCreateButton('Přerušit', 472, 314, 75, 21)
 $gui_button_exit = GUICtrlCreateButton('Storno', 550, 314, 75, 21)
 
-; set default mode
-admin_mode($admin)
+; set mode
+admin_mode()
 
 ; set default focus
 GUICtrlSetState($gui_button_exit, $GUI_FOCUS)
@@ -282,7 +281,7 @@ while 1
 		$debug = False
 	endif
 	; remote source
-	$browse = _ArrayBinarySearch($remote, $event, Default, Default, 2); 3'rd column
+	$browse = _ArraySearch($remote, $event, Default, Default, Default, Default, Default, 2); 3'rd column
 	if not @error then
 		$path = FileSelectFolder('NAS ' & $version & ' - Zdrojový adresář', @HomeDrive)
 		if not @error then GUICtrlSetData($remote[$browse][1], $path)
@@ -434,7 +433,7 @@ while 1
 						GUICtrlSetData($gui_error, 'Dokončeno.')
 					endif
 				else
-					logger('rsync: Žádný chybový vystup.')
+					logger('rsync: Žádný chybový výstup.')
 					if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $green)
 					if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $green)
 					GUICtrlSetData($gui_error, 'Dokončeno.')
@@ -531,9 +530,9 @@ while 1
 					; update color
 					GUICtrlSetBkColor($local[$index[0]][1], $red)
 					; update output
-					GUICtrlSetData($gui_error, 'Cilovy adresář neexistuje.')
-					GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & 'Cilovy adresář neexistuje.' & @CRLF)
-					logger(@CRLF & 'Cilovy adresář neexistuje.')
+					GUICtrlSetData($gui_error, 'Cilový adresář neexistuje.')
+					GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & 'Cilový adresář neexistuje.' & @CRLF)
+					logger(@CRLF & 'Cilový adresář neexistuje.')
 					; pop index
 					_ArrayDelete($index, 0)
 				else
@@ -576,7 +575,7 @@ while 1
 	; exit
 	if $event = $GUI_EVENT_CLOSE or $event = $gui_button_exit then
 		if $token_run then
-			GUICtrlSetData($gui_error, 'Nelze ukoncit probihajici operaci.')
+			GUICtrlSetData($gui_error, 'Nelze ukončit probíhající operaci.')
 		else
 			; update config
 			for $i = 0 to 3; remote
@@ -691,3 +690,4 @@ func admin_mode($admin=False)
 	next
 	GUICtrlSetState($gui_setup_debug_check, $state); debug
 endfunc
+
