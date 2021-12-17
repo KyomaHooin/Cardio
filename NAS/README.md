@@ -10,7 +10,9 @@ FILE
                bin/ - Cygwin lib/binary.
 
             NAS.au3 - Source code.
-       CryptoNG.au3 - Cryptography library.
+       CryptoNG.au3 - Cryptography NG library by "TheXMan".
+           Json.au3 - JSON library by "Ward".
+     BinaryCall.au3 - JSON binary wrapper.
             NAS.ico - ICON file.
             NAS.png - Application screen.
 
