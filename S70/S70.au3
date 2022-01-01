@@ -54,7 +54,7 @@ global $config_file = @ScriptDir & '\' & 'S70.ini'
 
 global $age = Number(IniRead($config_file, 'setup', 'history', 30)); default stored data age in days
 global $export_path = IniRead($config_file, 'setup', 'export', @ScriptDir & '\' & 'input')
-global $archive_path = IniRead($config_file, 'setup', 'archiv', @ScriptDir & '\' & 'archive')
+global $archive_path = IniRead($config_file, 'setup', 'archive', @ScriptDir & '\' & 'archive')
 
 ; strip path trailng slash
 $export_path = StringRegExpReplace($export_path, '\\$', '')
@@ -550,7 +550,7 @@ logger('Program spuštěn: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & 
 if not FileExists($config_file) then
 	$c = FileOpen($config_file, 2 + 256); empty UTF8 / NOBOM overwrite
 	FileClose($c)
-	IniWriteSection($config_file, 'setup', 'export=' & @ScriptDir & '\' & 'input' & @LF & 'archiv=' & @ScriptDir & '\' & 'archive' & @LF & 'history=30')
+	IniWriteSection($config_file, 'setup', 'export=' & @ScriptDir & '\' & 'input' & @LF & 'archive=' & @ScriptDir & '\' & 'archive' & @LF & 'history=30')
 	IniWriteSection($config_file, 'medicus', 'Medicus ID=Jméno Příjmení')
 endif
 
