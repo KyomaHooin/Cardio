@@ -561,7 +561,7 @@ DirCreate($history_path & '\' & $cmdline[2])
 ; archive file full path
 global $archive_file = $archive_path & '\' & $cmdline[2] & '.dat'
 
-; export  file full path
+; export file full path
 global $export_file = get_export_file($export_path, $cmdline[2])
 if @error or not $export_file then logger('Export: Soubor exportu nebyl nalezen. ' & $cmdline[2])
 
