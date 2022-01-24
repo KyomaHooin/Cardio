@@ -1,4 +1,10 @@
 
+[TODO]
+
+-Fix config stoting.
+-Restore rsync -r --list-only user@remote:/dir + [o]'TreeView'
+-Gray-out "Run" if not Remote/Local tab.
+
 [2.0]
 
 -Second location.
