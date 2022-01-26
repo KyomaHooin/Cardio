@@ -162,7 +162,10 @@ logger('Start programu: ' & @HOUR & ':' & @MIN & ':' & @SEC & ' ' & @MDAY & '.' 
 
 ; default ini
 if not FileExists($ini) then
-	FileWrite($ini, Json_Encode($conf))
+	$out = FileOpen($ini, 2 + 256); UTF8 / NOBOM overwrite
+	FileWrite($out, Json_Encode(Json_Decode($default)))
+	if @error then logger('Zápis výchozího nastavení selhal.')
+	FileClose($out)
 endif
 
 ;read configuration
@@ -271,8 +274,8 @@ while 1
 				GUICtrlSetData($gui_setup_button_pwd,'Povolit')
 			endif
 			admin_mode($admin)
-			GUICtrlSetData($gui_setup_pwd, '')
 		endif
+		GUICtrlSetData($gui_setup_pwd, '')
 	endif
 	; debug mode
 	if GUICtrlRead($gui_setup_debug_check) = $GUI_CHECKED then
@@ -314,6 +317,18 @@ while 1
 				GUICtrlSetData($remote[$i][3], GUICtrlRead($network[0][10]))
 				GUICtrlSetData($remote[$i+4][3], GUICtrlRead($network[1][10]))
 			Next
+		endif
+	endif
+	; limit run / brak tab
+	if $event = $gui_tab Then
+		if GUICtrlRead($gui_tab) > 1 Then; 2nd+ tab
+			if GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_ENABLE) or GUICtrlGetState($gui_button_break) = BitOR($GUI_SHOW, $GUI_ENABLE) Then
+				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
+				GUICtrlSetState($gui_button_break, $GUI_DISABLE)
+			endif
+		elseif GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_DISABLE) or GUICtrlGetState($gui_button_break) = BitOR($GUI_SHOW, $GUI_DISABLE) Then
+				GUICtrlSetState($gui_button_run, $GUI_ENABLE)
+				GUICtrlSetState($gui_button_break, $GUI_ENABLE)
 		endif
 	endif
 	; unset color on disable
@@ -598,7 +613,7 @@ while 1
 				Json_Put($conf, '.network[' & $i & '].key', GuiCtrlRead($network[$i][7]), True)
 				Json_Put($conf, '.network[' & $i & '].prefix', GuiCtrlRead($network[$i][10]), True)
 			next
-			Json_Put($conf, '.setup.debug', GuiCtrlRead($gui_setup_debug_check))
+			Json_Put($conf, '.setup.debug', GuiCtrlRead($gui_setup_debug_check), True)
 			; write config
 			$out = FileOpen($ini, 2 + 256); UTF8 / NOBOM overwrite
 			FileWrite($out, Json_Encode($conf))
