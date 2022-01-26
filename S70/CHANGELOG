@@ -9,17 +9,21 @@ WD Blue SSD 1TB, WDS100T2B0A
 
 http://wddashboarddownloads.wdc.com/wdDashboard/WesternDigitalSSDDashboardSetup.exe
 
--Button font
--[Dekurz] -> [Dekurz (s ulozenim)] + store()
--[Storno] -> Storno (bez ulozeni zmen)
--[x] -> remove / disable
 -Export: 'Ao Diam', 'SV Vmax' dup.
 -Patch: Update structure.
 
 [2.5]
 
+GUI:
+
+-Disable close button.
+-Dekurz -> [Dekurz [ s uložením ]
+-Storno -> Storno [ bez uložení ]
+
 General:
 
+-Store on dekurz.
+-Disable GUI_EVENT_CLOSE.
 -Medicus ID from INI.
 
 [2.4]

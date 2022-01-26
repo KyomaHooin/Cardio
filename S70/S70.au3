@@ -707,15 +707,19 @@ $label_datetime = GUICtrlCreateLabel($runtime, 8, $gui_group_top_offset + 87, 10
 $label_error = GUICtrlCreateLabel('', 120, $gui_group_top_offset + 87, 40, 17)
 
 ; button
-$button_history = GUICtrlCreateButton('Historie', 486, $gui_group_top_offset + 83, 75, 21)
-$button_tisk = GUICtrlCreateButton('Tisk', 564, $gui_group_top_offset + 83, 75, 21)
-$button_dekurz = GUICtrlCreateButton('Dekurz', 642, $gui_group_top_offset + 83, 75, 21)
-$button_store = GUICtrlCreateButton('Uložit a zavřít', 720, $gui_group_top_offset + 83, 85, 21)
-$button_exit = GUICtrlCreateButton('Storno', 808, $gui_group_top_offset + 83, 75, 21)
+$button_history = GUICtrlCreateButton('Historie', 393, $gui_group_top_offset + 83, 75, 21)
+$button_tisk = GUICtrlCreateButton('Tisk', 471, $gui_group_top_offset + 83, 75, 21)
+$button_dekurz = GUICtrlCreateButton('Dekurz [ s uložením ]', 549, $gui_group_top_offset + 83, 120, 21)
+$button_store = GUICtrlCreateButton('Uložit a zavřít', 672, $gui_group_top_offset + 83, 85, 21)
+$button_exit = GUICtrlCreateButton('Storno [ bez uložení ]', 760, $gui_group_top_offset + 83, 120, 21)
 
 ; GUI tune
 GUICtrlSetColor($label_error, 0xff0000)
 GUICtrlSetState($button_exit, $GUI_FOCUS)
+
+; disable close button
+$menu = DllCall("user32.dll", "hwnd", "GetSystemMenu", "hwnd", $gui, "int", False)
+DllCall("user32.dll", "bool", "EnableMenuItem", "handle", $menu[0], "uint", 0xF060, "uint", 0x2); SC_CLOSE / MF_DISABLED
 
 ; message handler response dummy control
 $dummy = GUICtrlCreateDummy()
@@ -753,6 +757,36 @@ While 1
 		sleep(200)
 		gui_enable(True)
 		GUICtrlSetData($label_error, 'Hotovo.')
+		; update result
+		Json_Put($buffer, '.result', GuiCtrlRead($edit_dekurz), True)
+		; update height / weight
+		Json_Put($buffer, '.height', Number(StringReplace(GuiCtrlRead($input_height), ',', '.')), True)
+		Json_Put($buffer, '.weight', Number(StringReplace(GuiCtrlRead($input_weight), ',', '.')), True)
+		; update data buffer
+		for $group in Json_ObjGet($order, '.group')
+			; update note
+			Json_Put($buffer, '.group.' & $group & '.note', GuiCtrlRead(Json_Get($buffer, '.group.' & $group & '.id')), True)
+			; update data
+			for $member in Json_ObjGet($order, '.data.' & $group)
+				if not GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')) then
+					Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Null, True)
+				else
+					$double = StringSplit(StringReplace(GuiCtrlRead(Json_Get($buffer, '.data.'  & $group & '."' & $member & '".id')), ',', '.'), '/', 2); no count
+					if @error then
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', Number($double[0]), True)
+					else
+						Json_Put($buffer, '.data.'  & $group & '."' & $member & '".value', $double[0] & '/' & $double[1], True)
+					endif
+				endif
+			next
+		next
+		; update timestamp
+		Json_Put($buffer, '.date', $runtime, True)
+		; write data buffer to archive
+		$out = FileOpen($archive_file, 2 + 256); UTF8 / NOBOM overwrite
+		FileWrite($out, Json_Encode($buffer))
+		if @error then logger('Program: Zápis dekurz historie selhal. ' & $cmdline[2] & '.dat')
+		FileClose($out)
 	endif
 	; print data
 	if $msg = $button_tisk Then
@@ -845,8 +879,8 @@ While 1
 		; exit
 		exitloop
 	endif
-	; storno & default exit
-	if $msg = $GUI_EVENT_CLOSE or $msg = $button_exit then
+	; storno
+	if $msg = $button_exit then
 		; close dekurz
 		_Excel_BookClose($book)
 		_Excel_Close($excel)
@@ -1678,7 +1712,7 @@ func print(); 2100 x 2970
 	; date
 	_PrintText($printer, 'Dne: ' & @MDAY & '.' & @MON & '.' & @YEAR, 50, $top_offset)
 	; singnature
-	_PrintText($printer, 'MUDr. ' & get_user($cmdline[1]) , 1250, $top_offset)
+	_PrintText($printer, 'MUDr. ' & get_user($cmdline[1]), 1250, $top_offset)
 	; print
 	_PrintEndPrint($printer)
 	if @error Then
