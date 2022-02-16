@@ -548,7 +548,7 @@ logger('Program spuštěn: ' & @YEAR & '/' & @MON & '/' & @MDAY & ' ' & @HOUR & 
 
 ; default configuration
 if not FileExists($config_file) then
-	$c = FileOpen($config_file, 2 + 256); empty UTF8 / NOBOM overwrite
+	$c = FileOpen($config_file, $FO_ANSI); ANSI RW
 	FileClose($c)
 	IniWriteSection($config_file, 'setup', 'export=' & @ScriptDir & '\' & 'input' & @LF & 'archive=' & @ScriptDir & '\' & 'archive' & @LF & 'history=30')
 	IniWriteSection($config_file, 'medicus', 'Medicus ID=Jméno Příjmení')
