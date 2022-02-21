@@ -1,6 +1,7 @@
 
 [TODO]
 
+-threaded parallel backup 
 -restore rsync -r --list -only user@remote:/dir TreeView
 
 [2.0]

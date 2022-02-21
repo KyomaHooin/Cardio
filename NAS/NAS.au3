@@ -74,7 +74,7 @@ global $token_local = False
 global $token_run = False
 global $token_terminate = False
 
-global $index[0]; enabled remote / local
+global $index[0]; enabled remote/local
 global $conf; configuration struct
 
 global $color_white = 0xffffff
@@ -319,16 +319,16 @@ while 1
 			Next
 		endif
 	endif
-	; limit run / brak tab
+	; limit run / terminate tab
 	if $event = $gui_tab Then
 		if GUICtrlRead($gui_tab) > 1 Then; 2nd+ tab
-			if GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_ENABLE) or GUICtrlGetState($gui_button_break) = BitOR($GUI_SHOW, $GUI_ENABLE) Then
+			if GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_ENABLE) Then
 				GUICtrlSetState($gui_button_run, $GUI_DISABLE)
-				GUICtrlSetState($gui_button_break, $GUI_DISABLE)
 			endif
-		elseif GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_DISABLE) or GUICtrlGetState($gui_button_break) = BitOR($GUI_SHOW, $GUI_DISABLE) Then
+		elseif GUICtrlGetState($gui_button_run) = BitOR($GUI_SHOW, $GUI_DISABLE) Then
+			if not ($token_remote or $token_local) then
 				GUICtrlSetState($gui_button_run, $GUI_ENABLE)
-				GUICtrlSetState($gui_button_break, $GUI_ENABLE)
+			endif
 		endif
 	endif
 	; unset color on disable
@@ -354,8 +354,9 @@ while 1
 				GUICtrlSetData($gui_output, '')
 				; set token
 				$token_remote=True
+				; update index
+				global $index[0]; flush
 				for $i = 0 to 3
-					; update index
 					if GUICtrlRead($remote[$i][0]) = $GUI_CHECKED then _ArrayAdd($index, $i)
 					if GUICtrlRead($remote[$i+4][0]) = $GUI_CHECKED then _ArrayAdd($index, $i+4)
 					; reset color
@@ -379,8 +380,9 @@ while 1
 			GUICtrlSetData($gui_output, '')
 			; set token
 			$token_local=True
+			; update index
+			global $index[0]; flush
 			for $i = 0 to 9
-				; update index
 				if GUICtrlRead($local[$i][0]) = $GUI_CHECKED then _ArrayAdd($index, $i)
 				; reset color
 				GUICtrlSetBkColor($local[$i][1], $white)
@@ -506,16 +508,16 @@ while 1
 					; pop index
 					_ArrayDelete($index, 0)
 				 else
-					logger(@CRLF & 'Zálohování zahájeno.' & @CRLF & @CRLF)
+					logger(@CRLF & 'Vzdálené zálohování zahájeno.' & @CRLF & @CRLF)
 					;localtion
 					$site = 0
 					if $index[0] > 3 then $site = 1
 					; clear current I/O buffer
 					$buffer = ''
-					; update color[
+					; update color
 					GUICtrlSetBkColor($remote[$index[0]][1], $orange)
 					; update output
-					GUICtrlSetData($gui_error, 'Probíhá záloha.')
+					GUICtrlSetData($gui_error, 'Probíhá vzdálená záloha.')
 					; rsync
 					$rsync = Run('"' & $rsync_binary & '"' _
 					& ' -avz -s -h ' & $option & ' --stats -e ' & "'" _
@@ -551,13 +553,13 @@ while 1
 					; pop index
 					_ArrayDelete($index, 0)
 				else
-					logger(@CRLF & 'Zálohování zahájeno.' & @CRLF & @CRLF)
+					logger(@CRLF & 'Lokální zálohování zahájeno.' & @CRLF & @CRLF)
 					; clear current I/O buffer
 					$buffer = ''
 					; update color
 					GUICtrlSetBkColor($local[$index[0]][1], $orange)
 					; update output
-					GUICtrlSetData($gui_error, 'Probíhá záloha.')
+					GUICtrlSetData($gui_error, 'Probíhá lokální záloha.')
 					; rsync
 					$rsync = Run('"' & $rsync_binary & '" -avz -s -h --stats ' _
 					& "'" & get_cygwin_path(GUICtrlRead($local[$index[0]][1])) & "' " _
@@ -705,4 +707,3 @@ func admin_mode($admin=False)
 	next
 	GUICtrlSetState($gui_setup_debug_check, $state); debug
 endfunc
-
