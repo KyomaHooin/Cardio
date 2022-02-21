@@ -343,7 +343,8 @@ while 1
 	; init
 	if $event = $gui_button_run then
 		if GuiCtrlRead($gui_tab) = 0 then
-			$verify = verify_remote_setup()
+			; validate network configuration
+			$verify = verify_network()
 			if @error Then
 				logger('CHYBA: ' & $verify)
 				GUICtrlSetData($gui_error, $verify)
@@ -648,19 +649,34 @@ func get_cygwin_path($path)
 	return $cygwin_path
 endfunc
 
-func verify_remote_setup()
-	for $i = 0 to 1; network
-		; invalid IP address
-		if not StringRegExp(GUICtrlRead($network[$i][1]), '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, 'Neplatný host.')
-		; invalid port number
-		if GUICtrlRead($network[$i][3]) < 1 or GUICtrlRead($network[$i][3]) > 65535 then return SetError(1, 0, 'Neplatné číslo portu.')
-		; empty user
-		if GUICtrlRead($network[$i][5]) == '' then return SetError(1, 0, 'Neplatný uživatel.')
-		; invalid key file
-		if not FileExists(GUICtrlRead($network[$i][7])) then return SetError(1, 0, 'Neplatný klíč.')
-		; empty prefix
-		if GUICtrlRead($network[$i][10]) == '' then return SetError(1, 0, 'Neplatný prefix.')
+func verify_network()
+	for $i = 0 to 3; site A
+		if GUICtrlRead($remote[$i][0]) = $GUI_CHECKED then
+			$vs = verify_site(0)
+			if @error then return SetError(1, 0, 'A: ' & $vs)
+			ExitLoop
+		endif
 	next
+	for $i = 0 to 3; site B
+		if GUICtrlRead($remote[$i+4][0]) = $GUI_CHECKED then
+			$vs = verify_site(1)
+			if @error then return SetError(1, 0, 'B: ' & $vs)
+			ExitLoop
+		endif
+	next
+EndFunc
+
+func verify_site($n)
+		; invalid IP address
+		if not StringRegExp(GUICtrlRead($network[$n][1]), '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$') then return SetError(1, 0, 'Neplatný host.')
+		; invalid port number
+		if GUICtrlRead($network[$n][3]) < 1 or GUICtrlRead($network[$n][3]) > 65535 then return SetError(1, 0, 'Neplatné číslo portu.')
+		; empty user
+		if GUICtrlRead($network[$n][5]) == '' then return SetError(1, 0, 'Neplatný uživatel.')
+		; invalid key file
+		if not FileExists(GUICtrlRead($network[$n][7])) then return SetError(1, 0, 'Neplatný klíč.')
+		; empty prefix
+		if GUICtrlRead($network[$n][10]) == '' then return SetError(1, 0, 'Neplatný prefix.')
 endfunc
 
 func admin_mode($admin=False)
