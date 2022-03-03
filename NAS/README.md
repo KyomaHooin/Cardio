@@ -13,6 +13,7 @@ FILE
        CryptoNG.au3 - Cryptography NG library by "TheXMan".
            Json.au3 - JSON library by "Ward".
      BinaryCall.au3 - JSON binary wrapper.
+            NAS.ini - Configuration file(JSON UTF-8 encoding).
             NAS.ico - ICON file.
             NAS.png - Application screen.
 

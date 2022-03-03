@@ -25,7 +25,7 @@ FILE
        userid.au3 - Get Medicus user ID.
 
         print.dll - Printing DLL.
-          S70.ini - Program configuration file.    
+          S70.ini - Program configuration file(ANSI encoding).  
           LICENSE - License & disclaimer.
         CHANGELOG - Changelog.
 
