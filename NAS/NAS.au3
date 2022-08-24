@@ -19,7 +19,7 @@
 
 #AutoIt3Wrapper_Res_Description=Secure Rsync NAS GUI
 #AutoIt3Wrapper_Res_ProductName=NAS
-#AutoIt3Wrapper_Res_ProductVersion=2.0
+#AutoIt3Wrapper_Res_ProductVersion=2.1
 #AutoIt3Wrapper_Res_CompanyName=Kyouma Houin
 #AutoIt3Wrapper_Res_LegalCopyright=GNU GPL v3
 #AutoIt3Wrapper_Res_Language=1029
@@ -41,7 +41,7 @@
 ; VAR
 ; ---------------------------------------------------------
 
-global $version = '2.0'
+global $version = '2.1'
 
 global $ini = @ScriptDir & '\NAS.ini'
 global $logfile = @ScriptDir & '\NAS.log'
@@ -60,8 +60,6 @@ global $red = 0xff6961
 global $remote[8][5]; GUI handle map: checkbox | source | button | prefix | target
 global $local[10][5]; GUI handle map: checkbox | source | button | target | button
 global $network[2][11]; GUI handle map: label | host | label | port | label | user | label | key | button | label | prefix
-
-global $INVALID_HANDLE_VALUE = ptr(0xffffffff)
 
 global $rsync; rsync PID
 global $option; rsync option
@@ -422,68 +420,38 @@ while 1
 			$buffer &= $buffer_err
 			; update output
 			GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & BinaryToString(StringToBinary($buffer), $SB_UTF8))
-			; exit code
-			$proc = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $rsync, True)
-			if @error or $proc = $INVALID_HANDLE_VALUE then
-				if $debug then logger('CHYBA: WinAPI OpenProcess (query limited info)')
-				; error code
-				if $buffer_out <> '' or $buffer_err <> '' then
-					$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
-					if not @error then
-						; update output
-						$code_index = _ArrayBinarySearch($error_code, $code[0])
-						if @error then
-							if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
-							GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: Neznámý chybový kód ' & $code[0] & '.' & @CRLF)
-							GUICtrlSetData($gui_error, 'Neznámá chyba.')
-						else
-							logger('rsync: Kód chyby ' & $code[0] & '.')
-							GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
-							GUICtrlSetData($gui_error, $error_code[$code_index][1])
-						endif
-						; update color
-						if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $red)
-						if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $red)
-					else
-						if $debug then logger('CHYBA: Žádný chybový kód.')
-						if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $green)
-						if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $green)
-						GUICtrlSetData($gui_error, 'Dokončeno.')
-					endif
-				else
-					logger('rsync: Žádný chybový výstup.')
-					if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $green)
-					if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $green)
-					GUICtrlSetData($gui_error, 'Dokončeno.')
-				endif
-			else
-				$exit_code = _WinAPI_GetExitCodeProcess($proc)
-				if $exit_code = 0 then
-					if $token_terminate then
-						GUICtrlSetData($gui_error, 'Přerušeno.')
-					else
-						if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $green)
-						if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $green)
-						GUICtrlSetData($gui_error, 'Dokončeno.')
-					endif
-				else
+			; error code
+			if $buffer_out <> '' or $buffer_err <> '' then
+				$code = StringRegExp($buffer_out & $buffer_err, '\(code (\d+)\)', $STR_REGEXPARRAYMATCH)
+				if not @error then
 					; update output
-					$code_index = _ArrayBinarySearch($error_code, $exit_code)
+					$code_index = _ArrayBinarySearch($error_code, $code[0])
 					if @error then
-						if $debug then logger('CHYBA: Neznámý kód ' & $exit_code)
-						GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: Neznámý kód ' & $exit_code & '.' & @CRLF)
-						GUICtrlSetData($gui_error, 'Dokončeno.')
+						if $debug then logger('CHYBA: Neznámý chybový kód ' & $code[0])
+						GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: Neznámý chybový kód ' & $code[0] & '.' & @CRLF)
+						GUICtrlSetData($gui_error, 'Neznámá chyba.')
 					else
-						logger('CHYBA: ' & $error_code[$code_index][1])
+						logger('rsync: Kód chyby ' & $code[0] & '.')
 						GUICtrlSetData($gui_output, GUICtrlRead($gui_output) & @CRLF & 'CHYBA: ' & $error_code[$code_index][1] & @CRLF)
 						GUICtrlSetData($gui_error, $error_code[$code_index][1])
 					endif
+					; update color
 					if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $red)
 					if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $red)
+				else
+					; verify transfer
+					if StringRegExp($buffer_out & $buffer_err, 'bytes sent') and StringRegExp($buffer_out & $buffer_err, 'bytes received') then
+						if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $green)
+						if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $green)
+						GUICtrlSetData($gui_error, 'Dokončeno.')
+					endif
 				endif
+			else
+				if $debug then logger('CHYBA: Žádný výstup.')
+				if $token_remote then GUICtrlSetBkColor($remote[$index[0]][1], $red)
+				if $token_local then GUICtrlSetBkColor($local[$index[0]][1], $red)
+				GUICtrlSetData($gui_error, 'Dokončeno.')
 			endif
-			; close handle
-			_WinAPI_CloseHandle($proc)
 			; log I/O
 			if $buffer_out <> '' then logger(BinaryToString(StringToBinary($buffer_out), $SB_UTF8))
 			if $buffer_err <> '' then logger(BinaryToString(StringToBinary($buffer_err), $SB_UTF8))
