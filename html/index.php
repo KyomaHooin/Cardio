@@ -137,7 +137,7 @@ if (isset($_SESSION['error'])) {
 </div>
 
 <div class="d-grid col-4 mx-auto my-4">
-	<button type="submit" name="submit" class="btn btn-primary">Odeslat</button>
+	<button type="submit" name="submit" class="btn btn-primary" style="background-color: #0e5f91;">Odeslat</button>
 </div>
 </form>
 
