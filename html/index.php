@@ -2,6 +2,28 @@
 
 session_start();
 
+$id = uniqid();
+
+$error = '';
+
+if(!empty($_POST)) {
+
+	$db = new SQLite3('cardio.db');
+
+	if (!$db) {
+		$error = 'Chyba čtení databáze.';
+	} else {
+		$query = $db->exec("INSERT INTO cardio (timestamp,firstname,surname,year,prescription) VALUES ('"
+			. $id . "','"
+			. str_replace("'", '_', $_POST['firstname']) . "','"
+			. str_replace("'", '_', $_POST['surname']) . "','"
+			. str_replace("'", '_', $_POST['year']) . "','"
+			. serialize($_POST['prescription']) . "');"
+		);
+		if (!$query) { $error = 'Chyba zápisu do databáze.'; }
+	}
+	$db->close();
+}
 ?>
 
 <!doctype html>
@@ -22,7 +44,7 @@ session_start();
 
 <body class="bg-light">
 
-<div class="container-md">
+<div class="container">
 
 <main>
 <div class="row py-4 justify-content-center">
@@ -30,13 +52,11 @@ session_start();
 
 <?php
 
-if (isset($_POST['code'])) {
+if (isset($_POST['submit'])) {
         if ($error) {
 		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">' . $error . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        } elseif ($valid) {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Hotovo. Děkujeme!<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Neplatný kontrolní kód.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádost uložena.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
 }
 
@@ -52,55 +72,55 @@ if (isset($_POST['code'])) {
 <form method="post" action="." enctype="multipart/form-data">
 
 <h4 class="mt-4">Jméno</h4>
-<input type="text" class="form-control" id="firstname" name="firstname" placeholder="Pavel" value="" required>
+<input type="text" class="form-control" id="firstname" name="firstname" maxlength="20" placeholder="Pavel" value="" required>
 <h4 class="mt-4">Příjmení</h4>
-<input type="text" class="form-control" id="surname" name="surname" placeholder="Novák" value="" required>
+<input type="text" class="form-control" id="surname" name="surname" maxlength="20" placeholder="Novák" value="" required>
 <h4 class="mt-4">Rok narození</h4>
-<input type="text" class="form-control" id="year" name="year" placeholder="1949" value="" required>
+<input type="text" class="form-control" id="year" name="year" maxlength="4" placeholder="1949" value="" required>
 
 <div id="prescriptions">
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4 class="mt-4">Lék 1</h4>
-		<input type="text" class="form-control" id="prescription1" name="prescription1" placeholder="Triplixam" value="" required>
+		<input type="text" class="form-control" id="prescription0" name="prescription[0][prescription]" maxlength="30" placeholder="Triplixam" value="" required>
 	</div>
 	<div class="col">
 		<h4 class="mt-4">gramáž</h4>
-		<input type="text" class="form-control" id="volume1" name="volume1" placeholder="5/1.25/5mg" value="" required>
+		<input type="text" class="form-control" id="volume0" name="prescription[0][volume]" maxlength="10" placeholder="5/1.25/5mg" value="" required>
 	</div>
 	<div class="col">
 		<h4 class="mt-4">dávkování</h4>
-		<input type="text" class="form-control" id="dosage1" name="dosage1" placeholder="1-0-1" value="" required>
+		<input type="text" class="form-control" id="dosage0" name="prescription[0][dosage]" maxlength="10" placeholder="1-0-1" value="" required>
 	</div>
 </div>
 
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4 class="mt-4">Lék 2</h4>
-		<input type="text" class="form-control" id="prescription2" name="prescription2" value="">
+		<input type="text" class="form-control" id="prescription1" maxlength="30" name="prescription[1][prescription]" value="">
 	</div>
 	<div class="col">
 		<h4 class="mt-4">gramáž</h4>
-		<input type="text" class="form-control" id="volume2" name="volume2" value="">
+		<input type="text" class="form-control" id="volume1" maxlength="10" name="prescription[1][volume]" value="">
 	</div>
 	<div class="col">
 		<h4 class="mt-4">dávkování</h4>
-		<input type="text" class="form-control" id="dosage2" name="dosage2" value="">
+		<input type="text" class="form-control" id="dosage1" maxlength="10" name="prescription[1][dosage]" value="">
 	</div>
 </div>
 
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4 class="mt-4">Lék 3</h4>
-		<input type="text" class="form-control" id="prescription3" name="prescription3" value="">
+		<input type="text" class="form-control" id="prescription2" maxlength="30" name="prescription[2][prescription]" value="">
 	</div>
 	<div class="col">
 		<h4 class="mt-4">gramáž</h4>
-		<input type="text" class="form-control" id="volume3" name="volume3" value="">
+		<input type="text" class="form-control" id="volume2" maxlength="10" name="prescription[2][volume]" value="">
 	</div>
 	<div class="col">
 		<h4 class="mt-4">dávkování</h4>
-		<input type="text" class="form-control" id="dosage3" name="dosage3" value="">
+		<input type="text" class="form-control" id="dosage2" maxlength="10" name="prescription[2][dosage]" value="">
 	</div>
 </div>
 </div>
@@ -110,7 +130,7 @@ if (isset($_POST['code'])) {
 </div>
 
 <div class="d-grid col-4 mx-auto my-4">
-	<button type="submit" class="btn btn-primary">Odeslat</button>
+	<button type="submit" name="submit" class="btn btn-primary">Odeslat</button>
 </div>
 </form>
 

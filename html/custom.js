@@ -9,7 +9,7 @@ function last_prescription() {
 	last = prescriptions[prescriptions.length - 1].id;
 	id = last.match('\\d+')
 	if (Array.isArray(id) && id.length) {
-		return Number(id[0]) + 1
+		return Number(id[0]) + 2
 	} else {
 		return null;
 	}
@@ -30,8 +30,9 @@ function add_prescription() {
 	input = document.createElement('input');
 	input.className = 'form-control';
 	input.id = 'prescription' + id;
-	input.name = 'prescription' + id;
+	input.name = 'prescription[' + id + '][prescription]';
 	input.type = 'text';
+	input.maxLength = '30';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
@@ -45,8 +46,9 @@ function add_prescription() {
 	input = document.createElement('input');
 	input.className = 'form-control';
 	input.id = 'volume' + id;
-	input.name = 'volume' + id;
+	input.name = 'prescription[' + id + '][volume]';
 	input.type = 'text';
+	input.maxLength = '10';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
@@ -60,8 +62,9 @@ function add_prescription() {
 	input = document.createElement('input');
 	input.className = 'form-control';
 	input.id = 'dosage' + id;
-	input.name = 'dosage' + id;
+	input.name = 'prescription[' + id + '][dosage]';
 	input.type = 'text';
+	input.maxLength = '10';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
