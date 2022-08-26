@@ -1,7 +1,8 @@
 
 /* SVG */
 
-.bi-plus-square:hover, .bi-plus-square:focus
+.bi-plus-square:hover, .bi-plus-square:focus,
+.bi-trash:hover, .bi-trash:focus
 {
 	color: #0d6efd;
 }
