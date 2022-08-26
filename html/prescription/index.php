@@ -53,7 +53,7 @@ if (preg_match('/drop:.*/', $raw)) {
 
 <main class="container">
 <div class="row my-4 justify-content-center">
-<div class="col col-md-10 m-2">
+<div class="col col-md-8 m-2">
 
 <?php
 	
@@ -64,22 +64,20 @@ if (preg_match('/drop:.*/', $raw)) {
 		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádná data.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	} else {
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th><th scope="col">Příjmení</th><th scope="col">Recepty</th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th><th scope="col">Recept</th></tr>';
 		echo '</thead><tbody>';
 
 		while ($row = $data->fetchArray(SQLITE3_ASSOC)) {
-			echo '<tr id="' . $row['timestamp'] . '"><td>' . date(" d.m Y H:i", hexdec(substr($row['timestamp'],0,8))) . '</td>';
-			echo '<td>' . $row['firstname'] . '</td>';
-			echo '<td>' . $row['surname'] . '</td>';
+			echo '<tr id="' . $row['timestamp'] . '"><td>' . date("d.m.Y H:i", hexdec(substr($row['timestamp'],0,8))) . '</td>';
+			echo '<td>' . $row['surname'] . ' ' . $row['firstname'] . '</td>';
 			echo '<td>';
 
 			foreach(unserialize($row['prescription']) as $prescription) {
 				if (!empty($prescription['prescription'])) {
-					echo '<table><tr>';
-					echo '<td>' . $prescription['prescription'] . '</td>';
-					if (!empty($prescription['volume'])) {	echo '<td>/</td><td>' . $prescription['volume'] . '</td>'; }
-					if (!empty($prescription['dosage'])) {	echo '<td></td><td>(' . $prescription['dosage'] . ')</td>'; }
-					echo '</tr></table>';
+					echo '<div>' . $prescription['prescription'];
+					if (!empty($prescription['volume'])) {	echo ' / ' . $prescription['volume']; }
+					if (!empty($prescription['dosage'])) {	echo ' (' . $prescription['dosage'] . ')'; }
+					echo '</div>';
 				}
 			}
 			echo '</td>';
