@@ -18,7 +18,7 @@ if(!empty($_POST)) {
 			. str_replace("'", '_', $_POST['firstname']) . "','"
 			. str_replace("'", '_', $_POST['surname']) . "','"
 			. str_replace("'", '_', $_POST['year']) . "','"
-			. serialize($_POST['prescription']) . "');"
+			. str_replace("'", '_', serialize($_POST['prescription'])) . "');"
 		);
 		if (!$query) {
 			$_SESSION['error'] = 'Chyba zápisu do databáze.';
