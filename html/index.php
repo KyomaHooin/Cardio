@@ -58,7 +58,7 @@ if(!empty($_POST)) {
 
 <?php
 
-if (isset($_SESSION['error'])) {
+if (!empty($_SESSION['error'])) {
         if ($_SESSION['error'] !== 'ok') {
 		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
