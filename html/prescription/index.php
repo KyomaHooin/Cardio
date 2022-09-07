@@ -64,7 +64,7 @@ if (preg_match('/drop:.*/', $raw)) {
 		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádná data.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	} else {
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th></tr>';
 		echo '</thead><tbody>';
 
 		while ($row = $data->fetchArray(SQLITE3_ASSOC)) {
