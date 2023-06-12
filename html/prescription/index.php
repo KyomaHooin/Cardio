@@ -29,7 +29,7 @@ if (preg_match('/drop:.*/', $raw)) {
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Kardiologie Řepy - Recepty</title>
+	<title>[1] Kardiologie Řepy - Recepty</title>
 	<link href="../custom.css" rel="stylesheet">
 	<!-- Favicons -->
 	<link rel="apple-touch-icon" href="../favicon/apple-touch-icon.png" sizes="180x180">
@@ -47,7 +47,7 @@ if (preg_match('/drop:.*/', $raw)) {
 		<div class="col">
 			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-heart-pulse-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9H1.475ZM.879 8C-2.426 1.68 4.41-2 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8H.88Z"/></svg>
 		</div>
-		<div class="col"><a class="navbar-brand nav-link active" href="/cardio/">Kardio # Recepty</a></div>
+		<div class="col"><a class="navbar-brand nav-link active" href="/prescription/">Kardiologie Řepy # Recepty</a></div>
 	</div>
 </nav>
 
@@ -61,10 +61,10 @@ if (preg_match('/drop:.*/', $raw)) {
 	$count = $db->querySingle("SELECT COUNT (timestamp) FROM cardio;");
 
 	if ($count == 0) {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádná data.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádné recepty.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	} else {
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th><th></th></tr>';
 		echo '</thead><tbody>';
 
 		while ($row = $data->fetchArray(SQLITE3_ASSOC)) {
@@ -82,6 +82,7 @@ if (preg_match('/drop:.*/', $raw)) {
 				}
 			}
 			echo '</td>';
+			echo '<td class="align-middle text-center"><button type="button" class="btn btn-sm btn-primary" style="background-color: #0e5f91;">Vydáno</button></td>';
 			echo '<td class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" onclick="remove_prescription('
 			. "'" . $row['timestamp'] . "'" . ')" width="24" height="24" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></td></tr>';
 		}
@@ -95,6 +96,26 @@ if (preg_match('/drop:.*/', $raw)) {
 </div>
 </div>
 </main>
+
+<div class="modal" id="modal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+	<div class="modal-content shadow">
+		<div class="container-fluid">
+			<div class="row my-2">
+				<div class="col my-2">
+					<span class="align-middle" id="modal-text">Opravdu chcete odstranit žádost?</span>
+				</div>
+				<div class="col-3 d-flex align-items-center">
+					<button class="btn btn-sm btn-danger w-100" onclick="on_confirm()">Ano</button>
+				</div>
+				<div class="col-1 d-flex align-items-center me-2">
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="on_dismiss()"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</div>
 
 <script src="../bootstrap.min.js"></script>
 <script src="../custom.js"></script>

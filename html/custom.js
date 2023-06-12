@@ -1,8 +1,8 @@
 
 // DROP PRESCRIPTION
 
-async function drop_prescription(id) {
-	return await fetch('/cardio/prescription/', {
+async function _drop_prescription(id) {
+	return await fetch('/prescription/', {
 		method: 'POST',
 		body: 'drop:' + id
 	})
@@ -47,12 +47,15 @@ function add_prescription() {
 	id = last_prescription();
 	prescription = document.createDocumentFragment();
 
+	hr = document.createElement('hr');
+	prescription.appendChild(hr);
+
 	row = document.createElement('div');
 	row.className = 'row g-3 row-cols-md-3 d-grid d-sm-flex';
+
 	col = document.createElement('div');
 	col.className = 'col';
 	head = document.createElement('h4');
-	head.className = 'mt-4';
 	head.innerText = 'Lék ' + String(id + 1);
 	input = document.createElement('input');
 	input.className = 'form-control';
@@ -63,12 +66,11 @@ function add_prescription() {
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
-	prescription.appendChild(row);
+	//prescription.appendChild(row);
 
 	col = document.createElement('div');
 	col.className = 'col';
 	head = document.createElement('h4');
-	head.className = 'mt-4';
 	head.innerText = 'gramáž';
 	input = document.createElement('input');
 	input.className = 'form-control';
@@ -79,12 +81,11 @@ function add_prescription() {
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
-	prescription.appendChild(row);
+	//prescription.appendChild(row);
 
 	col = document.createElement('div');
 	col.className = 'col';
 	head = document.createElement('h4');
-	head.className = 'mt-4';
 	head.innerText = 'dávkování';
 	input = document.createElement('input');
 	input.className = 'form-control';
