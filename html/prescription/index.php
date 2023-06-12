@@ -31,7 +31,7 @@ if (preg_match('/drop:.*/', $raw)) {
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>[1] Kardiologie Řepy - Recepty</title>
+	<title>(1) Kardiologie Řepy - Recepty</title>
 	<link href="../custom.css" rel="stylesheet">
 	<!-- Favicons -->
 	<link rel="apple-touch-icon" href="../favicon/apple-touch-icon.png" sizes="180x180">
@@ -59,7 +59,7 @@ if (preg_match('/drop:.*/', $raw)) {
 
 <?php
 	
-	$data = $db->query("SELECT * FROM cardio ORDER BY timestamp;");
+	$data = $db->query("SELECT * FROM cardio ORDER BY timestamp DESC;");
 	$count = $db->querySingle("SELECT COUNT (timestamp) FROM cardio;");
 
 	if ($count == 0) {
