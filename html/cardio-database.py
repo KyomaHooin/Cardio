@@ -10,9 +10,8 @@ DB='cardio.db'
 con = sqlite3.connect(DB)
 cur = con.cursor()
 
-cur.execute("CREATE TABLE cardio (timestamp TEXT, firstname TEXT, surname TEXT, year TEXT, prescription BLOB);")
-
-cur.execute("CREATE UNIQUE INDEX 'timestamp_index' ON cardio (timestamp);")
+cur.execute("CREATE TABLE alert (text TEXT);")
+cur.execute("CREATE TABLE cardio (id TEXT UNIQUE, timestamp TEXT, firstname TEXT, surname TEXT, year TEXT, prescription BLOB);")
 
 con.commit()
 con.close()

@@ -2,19 +2,37 @@
 
 session_start();
 
-$id = uniqid();
+$timestamp = uniqid();
+
+function uuid(){
+        $data = random_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); 
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); 
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+$id = uuid();
 
 if (!isset($_SESSION['error'])) { $_SESSION['error'] = null; }
 
-if(!empty($_POST)) {
+try {
+	$db = new SQlite3('cardio.db');
+} catch (Exception $e) {
+	$db = null;
+}
 
-	$db = new SQLite3('cardio.db');
+$alert = null;
+
+if ($db) { $alert = $db->querySingle("SELECT text FROM alert;"); }
+
+if(!empty($_POST)) {
 
 	if (!$db) {
 		$error = 'Chyba čtení databáze.';
 	} else {
-		$query = $db->exec("INSERT INTO cardio (timestamp,firstname,surname,year,prescription) VALUES ('"
+		$query = $db->exec("INSERT INTO cardio (id,timestamp,firstname,surname,year,prescription) VALUES ('"
 			. $id . "','"
+			. $timestamp . "','"
 			. str_replace("'", '_', $_POST['firstname']) . "','"
 			. str_replace("'", '_', $_POST['surname']) . "','"
 			. str_replace("'", '_', $_POST['year']) . "','"
@@ -74,11 +92,14 @@ if (!empty($_SESSION['error'])) {
 </div>
 <div class="p-4 text-center"><h2>Žádost vydání receptu</h2></div>
 
-<div class="alert alert-warning d-flex align-items-center" role="alert">
+<?php
+if (!empty($alert)) {
+	echo '<div class="alert alert-warning d-flex align-items-center" role="alert">
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
     <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-  </svg>
-<div>Prázdninový provoz. Vaše žádosti můžou být vyřizovány se spožděním.</div></div>
+  </svg><div>' . $alert . '</div></div>';
+}
+?>
 
 <div class="card"><div class="card-body" style="background-color: #cee5ed;">Formulář slouží k&nbsp;zaslání jednorázového požadavku na vydání předepsaného léčiva. Neslouží k&nbsp;objednání ani konzultaci Vašeho zdravotního stavu. Všechny požadavky jsou vyřizovány průběžně.</div></div>
 
