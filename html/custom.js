@@ -1,30 +1,4 @@
 
-// DROP PRESCRIPTION
-
-async function _drop_prescription(id) {
-	return await fetch('/prescription/', {
-		method: 'POST',
-		body: 'drop:' + id
-	})
-	.then(response => {
-		if (!response.ok) {
-			throw new Error('Network error.');
-	}
-		 return response.text();
-	})
-	.catch(error => {
-		console.error(error);
-		return error;
-	});
-}
-
-async function remove_prescription(id) {
-	const ret = await this.drop_prescription(id);
-	if (ret === 'ok') {
-		document.getElementById(id).style.display = 'none';	
-	}
-}
-
 // INSERT PRESCRIPTION
 
 function insertAfter(newNode, referenceNode) {
@@ -66,7 +40,6 @@ function add_prescription() {
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
-	//prescription.appendChild(row);
 
 	col = document.createElement('div');
 	col.className = 'col';
@@ -81,7 +54,6 @@ function add_prescription() {
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
-	//prescription.appendChild(row);
 
 	col = document.createElement('div');
 	col.className = 'col';

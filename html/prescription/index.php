@@ -4,9 +4,11 @@ session_start();
 
 $error = '';
 
-$db = null;
-
-$db = new SQLite3('../cardio.db');
+try {
+	$db = new SQlite3('../cardio.db');
+} catch (Exception $e) {
+	$db = null;
+}
 
 if (!$db) { $error = 'Chyba databáze.'; }
 
@@ -118,7 +120,7 @@ if (preg_match('/drop:.*/', $raw)) {
 </div>
 
 <script src="../bootstrap.min.js"></script>
-<script src="../custom.js"></script>
+<script src="custom.js"></script>
 
 </body>
 </html>
