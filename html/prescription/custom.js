@@ -2,17 +2,11 @@
 // MODAL
 
 modal = new bootstrap.Modal(document.getElementById('modal'));
-modal_action = null;
-
-function on_confirm() {
-	if (modal_action == 'prescription-remove') { document.getElementById('prescription-remove').click(); }
-	if (modal_action == 'prescription-remove') { document.getElementById('prescription-remove').click(); }
-}
 
 // FETCH  - JSON { type, value } response JSON { value }
 
 async function update(payload) {
-	return await fetch('/settings/', {
+	return await fetch('/prescription/', {
 		method: 'POST',
 		headers: {'Content-Type' :'application/json'},
 		body: JSON.stringify(payload)
@@ -27,21 +21,34 @@ async function update(payload) {
 	});
 }
 
+// ALERT
+
 function alert_on_save() { document.getElementById('alert-save').click(); }
 
-function prescription_on_save() {
-	modal.toggle();
-	modal_action = 'prescription-remove';
-}
+// PRESCRIPTION
 
-function prescription_on_mark() {
-}
+prescription_id = null;
 
-
-async function remove_prescription(id) {
+async function prescription_on_update(id) {
+	prescription_id = id;
+	payload = {'type':'update', 'id':prescription_id};
 	const ret = await this.update(payload);
-	if (ret === 'ok') {
-		document.getElementById(id).style.display = 'none';	
+	if (ret.length !== 0) {
+		document.getElementById(prescription_id).style.backgroundColor= '#fff3cd';	
 	}
+}
+
+async function prescription_on_remove(id) {
+	prescription_id = id;
+	modal.toggle();
+}
+
+async function prescription_remove() {
+	payload = {'type':'remove', 'id':prescription_id};
+	const ret = await this.update(payload);
+	if (ret.length !== 0) {
+		document.getElementById(prescription_id).style.display = 'none';	
+	}
+	modal.toggle();
 }
 

@@ -18,6 +18,19 @@ if (json_decode(file_get_contents('php://input'))) {
 	$req = json_decode(file_get_contents('php://input'), True);
 	$resp = [];
 
+	if ($req['type'] == 'remove') {
+		$query = $db->exec("DELETE FROM cardio WHERE id = '" . $req['id'] . "';");
+		if($query) {
+			$resp['value'] = 'ok';
+		}
+	}
+	
+	if ($req['type'] == 'update') {
+		$query = $db->exec("UPDATE cardio SET status = 1 WHERE id = '" . $req['id'] . "';");
+		if($query) {
+			$resp['value'] = 'ok';
+		}
+	}
 	
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($resp);
@@ -109,23 +122,29 @@ if ($db) {
 
 <?php
 	
-	$data = $db->query("SELECT * FROM cardio ORDER BY timestamp DESC;");
-	$count = $db->querySingle("SELECT COUNT (timestamp) FROM cardio;");
+	$result = $db->query("SELECT * FROM cardio ORDER BY timestamp DESC;");
 
-	if ($count == 0) {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádné recepty.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-	} else {
+	if ($result->fetchArray()) {
+		$result->reset();
+		
 		echo '<table class="table">';
 		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th><th></th></tr>';
 		echo '</thead><tbody>';
 
-		while ($row = $data->fetchArray(SQLITE3_ASSOC)) {
-			echo '<tr id="' . $row['timestamp'] . '"><td>' . date("d.m.Y H:i", hexdec(substr($row['timestamp'],0,8))) . '</td>';
-			echo '<td>' . $row['surname'] . ' ' . $row['firstname'] . '</td>';
-			echo '<td>' . $row['year'] . '</td>';
-			echo '<td>';
+		while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
+	
+			if ($res['status']) { 
+				echo '<tr id="' . $res['id'] . '" style="background-color: #fff3cd;">';
+			} else {
+				echo '<tr id="' . $res['id'] . '">';
+			}
 
-			foreach(unserialize($row['prescription']) as $prescription) {
+			echo '<td>' . date("d.m.Y H:i", hexdec(substr($res['timestamp'],0,8))) . '</td>';
+			echo '<td>' . $res['surname'] . ' ' . $res['firstname'] . '</td>';
+			echo '<td>' . $res['year'] . '</td>';
+			echo '<td class="align-middle">';
+
+			foreach(unserialize($res['prescription']) as $prescription) {
 				if (!empty($prescription['prescription'])) {
 					echo '<div>' . $prescription['prescription'];
 					if (!empty($prescription['volume'])) {	echo ' / ' . $prescription['volume']; }
@@ -134,11 +153,13 @@ if ($db) {
 				}
 			}
 			echo '</td>';
-			echo '<td class="align-middle text-center"><button type="button" class="btn btn-sm btn-primary" style="background-color: #0e5f91;">Vydáno</button></td>';
-			echo '<td class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" onclick="remove_prescription('
-			. "'" . $row['timestamp'] . "'" . ')" width="24" height="24" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></td></tr>';
+			echo '<td class="align-middle text-center"><button type="button" class="btn btn-sm btn-primary" style="background-color: #0e5f91;" onclick="prescription_on_update(' . "'" . $res['id'] . "'" . ')">Vydáno</button></td>';
+			echo '<td class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" onclick="prescription_on_remove('
+			. "'" . $res['id'] . "'" . ')" width="24" height="24" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></td></tr>';
 		}
 		echo '</tbody></table>';
+	} else {
+		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádné recepty.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	}
 
 	$db->close();
@@ -158,10 +179,10 @@ if ($db) {
 					<span class="align-middle" id="modal-text">Opravdu chcete odstranit žádost?</span>
 				</div>
 				<div class="col-3 d-flex align-items-center">
-					<button class="btn btn-sm btn-danger w-100" onclick="on_confirm()">Ano</button>
+					<button class="btn btn-sm btn-primary w-100" style="background-color: #0e5f91;" onclick="prescription_remove()">Ano</button>
 				</div>
 				<div class="col-1 d-flex align-items-center me-2">
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="on_dismiss()"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 			</div>
 		</div>
