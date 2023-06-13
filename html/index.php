@@ -80,7 +80,7 @@ if (!empty($_SESSION['error'])) {
         if ($_SESSION['error'] !== 'ok') {
 		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádost uložena.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádost byla uložena.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
 	$_SESSION['error'] = null;
 }

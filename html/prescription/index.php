@@ -57,6 +57,31 @@ if (preg_match('/drop:.*/', $raw)) {
 <div class="row my-4 justify-content-center">
 <div class="col col-md-8 m-2">
 
+<h4>Upozornění</h4>
+
+<?php
+
+if ($db) {
+	$alert = $db->querySingle("SELECT text FROM alert;");
+} else { $alert = null; }
+
+?>
+
+<form method="post" action="." enctype="multipart/form-data">
+<table class="table table-borderless my-4">
+	<tbody>
+	<tr>
+	<td class="col align-middle"><textarea class="form-control" id="alert-label" name="alert-label"><?php echo $alert;?></textarea></td>
+	<td class="col-1 align-middle text-center">
+		<svg xmlns="http://www.w3.org/2000/svg" onclick="alert_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
+	</td>
+	</tr>
+</tbody>
+</table>
+</form>
+
+<h4>Recepty</h4>
+
 <?php
 	
 	$data = $db->query("SELECT * FROM cardio ORDER BY timestamp DESC;");
