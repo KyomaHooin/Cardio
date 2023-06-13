@@ -26,23 +26,29 @@ $alert = null;
 if ($db) { $alert = $db->querySingle("SELECT text FROM alert;"); }
 
 if(!empty($_POST)) {
-
 	if (!$db) {
-		$error = 'Chyba čtení databáze.';
+		$_SESSION['error'] = 'Chyba čtení databáze.';
 	} else {
-		$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
-			. $id . "','"
-			. "0','"
-			. $timestamp . "','"
-			. $db->escapeString($_POST['firstname']) . "','"
-			. $db->escapeString($_POST['surname']) . "','"
-			. $db->escapeString($_POST['year']) . "','"
-			. $db->escapeString(serialize($_POST['prescription'])) . "');"
-		);
-		if (!$query) {
-			$_SESSION['error'] = 'Chyba zápisu do databáze.';
-		} else {
-			$_SESSION['error'] = 'ok';
+		if (
+			!empty($_POST['firstname']) &&
+			!empty($_POST['surname']) &&
+			!empty($_POST['year']) && 
+			!empty($_POST['prescription'])
+		) {
+			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
+				. $id . "','"
+				. "0','"
+				. $timestamp . "','"
+				. $db->escapeString($_POST['firstname']) . "','"
+				. $db->escapeString($_POST['surname']) . "','"
+				. $db->escapeString($_POST['year']) . "','"
+				. $db->escapeString(serialize($_POST['prescription'])) . "');"
+			);
+			if (!$query) {
+				$_SESSION['error'] = 'Chyba zápisu do databáze.';
+			} else {
+				$_SESSION['error'] = 'ok';
+			}
 		}
 	}
 	$db->close();
@@ -57,13 +63,11 @@ if(!empty($_POST)) {
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Kardiologie Řepy - Recepty</title>
+	<title>Kardiologie Praha 17 - Žádost</title>
 	<link href="custom.css" rel="stylesheet">
 	<!-- Favicons -->
-	<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png" sizes="180x180">
 	<link rel="icon" href="favicon/favicon-32x32.png" sizes="32x32" type="image/png">
 	<link rel="icon" href="favicon/favicon-16x16.png" sizes="16x16" type="image/png">
-	<link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#7952b3">
 	<!-- Custom styles -->
 	<link href="color.css" rel="stylesheet">
 </head>

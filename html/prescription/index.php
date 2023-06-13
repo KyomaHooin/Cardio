@@ -2,25 +2,42 @@
   
 session_start();
 
-$error = '';
-
 try {
 	$db = new SQlite3('../cardio.db');
 } catch (Exception $e) {
 	$db = null;
 }
 
-if (!$db) { $error = 'Chyba databáze.'; }
+if (!isset($_SESSION['result'])) { $_SESSION['result'] = null; }
+
+if (!$db) { $_SESSION['result'] = 'Chyba čtení databáze.'; }
 
 // XHR
 
-$raw = file_get_contents('php://input');
+if (json_decode(file_get_contents('php://input'))) {
+	$req = json_decode(file_get_contents('php://input'), True);
+	$resp = [];
 
-if (preg_match('/drop:.*/', $raw)) {
-	if ($db) {
-		$drop = $db->exec("DELETE FROM cardio WHERE timestamp = '" . preg_replace('/drop:(.*)/','${1}', $raw) . "';");
-		if ($drop) { echo 'ok'; }
+	
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode($resp);
+	exit();
+}
+
+// POST
+
+if (!empty($_POST)){
+	if (isset($_POST['alert-text'])) {
+		print_r($_POST);
+		$query = $db->exec("REPLACE INTO alert(rowid,text) VALUES(1, '" . $_POST['alert-text'] . "');");
+		if(!$query) {
+			$_SESSION['result'] = "Zápis upozornění selhal.";
+		} else {
+			$_SESSION['result'] = "Upozornění uloženo."; 
+		}
 	}
+
+	header('Location: /prescription/');
 	exit();
 }
 
@@ -31,13 +48,11 @@ if (preg_match('/drop:.*/', $raw)) {
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>(1) Kardiologie Řepy - Recepty</title>
+	<title>Kardiologie Praha 17 - Řepy</title>
 	<link href="../custom.css" rel="stylesheet">
 	<!-- Favicons -->
-	<link rel="apple-touch-icon" href="../favicon/apple-touch-icon.png" sizes="180x180">
 	<link rel="icon" href="../favicon/favicon-32x32.png" sizes="32x32" type="image/png">
 	<link rel="icon" href="../favicon/favicon-16x16.png" sizes="16x16" type="image/png">
-	<link rel="mask-icon" href="../favicon/safari-pinned-tab.svg" color="#7952b3">
 	<!-- Custom styles -->
 	<link href="../color.css" rel="stylesheet">
 </head>
@@ -49,13 +64,22 @@ if (preg_match('/drop:.*/', $raw)) {
 		<div class="col">
 			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-heart-pulse-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9H1.475ZM.879 8C-2.426 1.68 4.41-2 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8H.88Z"/></svg>
 		</div>
-		<div class="col"><a class="navbar-brand nav-link active" href="/prescription/">Kardiologie Řepy # Recepty</a></div>
+		<div class="col"><a class="navbar-brand nav-link active" href="/prescription/">Kardiologie Praha 17 - Řepy</a></div>
 	</div>
 </nav>
 
 <main class="container">
 <div class="row my-4 justify-content-center">
 <div class="col col-md-8 m-2">
+
+<?php 
+
+if (isset($_SESSION['result'])) {
+	echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">'. $_SESSION['result'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+	$_SESSION['result'] = null;
+}
+
+?>
 
 <h4>Upozornění</h4>
 
@@ -71,8 +95,9 @@ if ($db) {
 <table class="table table-borderless my-4">
 	<tbody>
 	<tr>
-	<td class="col align-middle"><textarea class="form-control" id="alert-label" name="alert-label"><?php echo $alert;?></textarea></td>
+	<td class="col align-middle"><textarea class="form-control" id="alert-text" name="alert-text"><?php echo $alert;?></textarea></td>
 	<td class="col-1 align-middle text-center">
+		<input type="submit" id="alert-save" name="alert-save" value="alert-save" hidden>
 		<svg xmlns="http://www.w3.org/2000/svg" onclick="alert_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
 	</td>
 	</tr>
