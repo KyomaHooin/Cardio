@@ -30,13 +30,14 @@ if(!empty($_POST)) {
 	if (!$db) {
 		$error = 'Chyba čtení databáze.';
 	} else {
-		$query = $db->exec("INSERT INTO cardio (id,timestamp,firstname,surname,year,prescription) VALUES ('"
+		$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
 			. $id . "','"
+			. "0','"
 			. $timestamp . "','"
-			. str_replace("'", '_', $_POST['firstname']) . "','"
-			. str_replace("'", '_', $_POST['surname']) . "','"
-			. str_replace("'", '_', $_POST['year']) . "','"
-			. str_replace("'", '_', serialize($_POST['prescription'])) . "');"
+			. $db->escapeString($_POST['firstname']) . "','"
+			. $db->escapeString($_POST['surname']) . "','"
+			. $db->escapeString($_POST['year']) . "','"
+			. $db->escapeString(serialize($_POST['prescription'])) . "');"
 		);
 		if (!$query) {
 			$_SESSION['error'] = 'Chyba zápisu do databáze.';
@@ -48,6 +49,7 @@ if(!empty($_POST)) {
 	header('Location: /');
 	exit();
 }
+
 ?>
 
 <!doctype html>
