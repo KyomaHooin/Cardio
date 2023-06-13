@@ -140,15 +140,15 @@ if ($db) {
 			}
 
 			echo '<td>' . date("d.m.Y H:i", hexdec(substr($res['timestamp'],0,8))) . '</td>';
-			echo '<td>' . $res['surname'] . ' ' . $res['firstname'] . '</td>';
-			echo '<td>' . $res['year'] . '</td>';
+			echo '<td>' . htmlspecialchars($res['surname']). ' ' . htmlspecialchars($res['firstname']). '</td>';
+			echo '<td>' . htmlspecialchars($res['year']). '</td>';
 			echo '<td class="align-middle">';
 
 			foreach(unserialize($res['prescription']) as $prescription) {
 				if (!empty($prescription['prescription'])) {
-					echo '<div>' . $prescription['prescription'];
-					if (!empty($prescription['volume'])) {	echo ' / ' . $prescription['volume']; }
-					if (!empty($prescription['dosage'])) {	echo ' (' . $prescription['dosage'] . ')'; }
+					echo '<div>' . htmlspecialchars($prescription['prescription']);
+					if (!empty($prescription['volume'])) {	echo ' / ' . htmlspecialchars($prescription['volume']); }
+					if (!empty($prescription['dosage'])) {	echo ' (' . htmlspecialchars($prescription['dosage']) . ')'; }
 					echo '</div>';
 				}
 			}
