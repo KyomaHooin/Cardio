@@ -12,6 +12,10 @@ if (!isset($_SESSION['result'])) { $_SESSION['result'] = null; }
 
 if (!$db) { $_SESSION['result'] = 'Chyba čtení databáze.'; }
 
+// ROTATE
+
+if ($db) { $query = $db->exec("DELETE FROM cardio WHERE status = 1 AND timestamp < " . strtotime("last month") . ";"); }
+
 // XHR
 
 if (json_decode(file_get_contents('php://input'))) {
@@ -139,7 +143,7 @@ if ($db) {
 				echo '<tr id="' . $res['id'] . '">';
 			}
 
-			echo '<td>' . date("d.m.Y H:i", hexdec(substr($res['timestamp'],0,8))) . '</td>';
+			echo '<td>' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
 			echo '<td>' . htmlspecialchars($res['surname']). ' ' . htmlspecialchars($res['firstname']). '</td>';
 			echo '<td>' . htmlspecialchars($res['year']). '</td>';
 			echo '<td class="align-middle">';

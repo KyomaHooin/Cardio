@@ -2,7 +2,7 @@
 
 session_start();
 
-$timestamp = uniqid();
+$timestamp = time();
 
 function uuid(){
         $data = random_bytes(16);
