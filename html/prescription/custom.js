@@ -1,4 +1,17 @@
 
+// EVENT
+
+//const evtSource = new EventSource("/prescription/event.php");
+
+//evtSource.onmessage = (event) => {
+
+	//data = JSON.parse(event.data);
+
+	//data.forEach((prescription) => {
+	//	console.log(prescription.id);
+	//});
+//};
+
 // MODAL
 
 modal = new bootstrap.Modal(document.getElementById('modal'));

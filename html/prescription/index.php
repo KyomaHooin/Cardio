@@ -45,7 +45,6 @@ if (json_decode(file_get_contents('php://input'))) {
 
 if (!empty($_POST)){
 	if (isset($_POST['alert-text'])) {
-		print_r($_POST);
 		$query = $db->exec("REPLACE INTO alert(rowid,text) VALUES(1, '" . $_POST['alert-text'] . "');");
 		if(!$query) {
 			$_SESSION['result'] = "Zápis upozornění selhal.";
@@ -133,7 +132,7 @@ if ($db) {
 		
 		echo '<table class="table">';
 		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th><th></th></tr>';
-		echo '</thead><tbody>';
+		echo '</thead><tbody id="tbody">';
 
 		while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
 	
