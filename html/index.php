@@ -16,7 +16,7 @@ $id = uuid();
 if (!isset($_SESSION['error'])) { $_SESSION['error'] = null; }
 
 try {
-	$db = new SQlite3('cardio.db');
+	$db = new SQlite3('../data/cardio.db');
 } catch (Exception $e) {
 	$db = null;
 }
@@ -32,16 +32,14 @@ if(!empty($_POST)) {
 		if (
 			!empty($_POST['firstname']) &&
 			!empty($_POST['surname']) &&
-			!empty($_POST['year']) && 
 			!empty($_POST['prescription'])
 		) {
-			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
+			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,prescription) VALUES ('"
 				. $id . "','"
 				. "0','"
 				. $timestamp . "','"
-				. $db->escapeString($_POST['firstname']) . "','"
-				. $db->escapeString($_POST['surname']) . "','"
-				. $db->escapeString($_POST['year']) . "','"
+				. $db->escapeString(substr($_POST['firstname'],0,20)) . "','"
+				. $db->escapeString(substr($_POST['surname'],0,20)) . "','"
 				. $db->escapeString(serialize($_POST['prescription'])) . "');"
 			);
 			if (!$query) {
@@ -49,6 +47,8 @@ if(!empty($_POST)) {
 			} else {
 				$_SESSION['error'] = 'ok';
 			}
+		} else {
+			$_SESSION['error'] = 'Neplatný vstup.';
 		}
 	}
 	$db->close();
@@ -115,8 +115,6 @@ if (!empty($alert)) {
 <input type="text" class="form-control" id="firstname" name="firstname" maxlength="20" placeholder="Pavel" value="" required>
 <h4 class="mt-4">Příjmení</h4>
 <input type="text" class="form-control" id="surname" name="surname" maxlength="20" placeholder="Novák" value="" required>
-<h4 class="mt-4">Rok narození</h4>
-<input type="text" class="form-control" id="year" name="year" maxlength="4" placeholder="1949" value="" required>
 
 <hr/>
 

@@ -17,7 +17,6 @@ cur.execute("""CREATE TABLE cardio (
 	timestamp TEXT,
 	firstname TEXT,
 	surname TEXT,
-	year TEXT,
 	prescription BLOB);"""
 )
 

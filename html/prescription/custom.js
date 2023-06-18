@@ -47,7 +47,7 @@ async function prescription_on_update(id) {
 	payload = {'type':'update', 'id':prescription_id};
 	const ret = await this.update(payload);
 	if (ret.length !== 0) {
-		document.getElementById(prescription_id).style.backgroundColor= '#fff3cd';	
+		document.getElementById(prescription_id).style.backgroundColor= '#9ec5ef';	
 	}
 }
 

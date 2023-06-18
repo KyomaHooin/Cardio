@@ -3,7 +3,7 @@
 session_start();
 
 try {
-	$db = new SQlite3('../cardio.db');
+	$db = new SQlite3('../../data/cardio.db');
 } catch (Exception $e) {
 	$db = null;
 }
@@ -131,20 +131,19 @@ if ($db) {
 		$result->reset();
 		
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th>Rok</th><th scope="col">Recept</th><th></th><th></th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th scope="col">Recept</th><th></th><th></th></tr>';
 		echo '</thead><tbody id="tbody">';
 
 		while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
 	
 			if ($res['status']) { 
-				echo '<tr id="' . $res['id'] . '" style="background-color: #fff3cd;">';
+				echo '<tr id="' . $res['id'] . '" style="background-color: #9ec5ef;">';
 			} else {
 				echo '<tr id="' . $res['id'] . '">';
 			}
 
-			echo '<td>' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
-			echo '<td>' . htmlspecialchars($res['surname']). ' ' . htmlspecialchars($res['firstname']). '</td>';
-			echo '<td>' . htmlspecialchars($res['year']). '</td>';
+			echo '<td class="align-middle">' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
+			echo '<td class="align-middle">' . htmlspecialchars($res['surname']). ' ' . htmlspecialchars($res['firstname']). '</td>';
 			echo '<td class="align-middle">';
 
 			foreach(unserialize($res['prescription']) as $prescription) {
