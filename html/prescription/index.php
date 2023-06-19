@@ -44,12 +44,32 @@ if (json_decode(file_get_contents('php://input'))) {
 // POST
 
 if (!empty($_POST)){
+
+	if (isset($_POST['title-text'])) {
+		$query = $db->exec("REPLACE INTO title(rowid,text) VALUES(1, '" . $_POST['title-text'] . "');");
+		if(!$query) {
+			$_SESSION['result'] = "Zápis nadpisu selhal.";
+		} else {
+			$_SESSION['result'] = "Nadpis uložen."; 
+		}
+	}
+
+
 	if (isset($_POST['alert-text'])) {
 		$query = $db->exec("REPLACE INTO alert(rowid,text) VALUES(1, '" . $_POST['alert-text'] . "');");
 		if(!$query) {
 			$_SESSION['result'] = "Zápis upozornění selhal.";
 		} else {
 			$_SESSION['result'] = "Upozornění uloženo."; 
+		}
+	}
+
+	if (isset($_POST['descr-text'])) {
+		$query = $db->exec("REPLACE INTO description(rowid,text) VALUES(1, '" . $_POST['descr-text'] . "');");
+		if(!$query) {
+			$_SESSION['result'] = "Zápis popisu selhal.";
+		} else {
+			$_SESSION['result'] = "Popis uložen."; 
 		}
 	}
 
@@ -97,6 +117,31 @@ if (isset($_SESSION['result'])) {
 
 ?>
 
+<h4>Nadpis</h4>
+
+<?php
+
+if ($db) {
+	$title = $db->querySingle("SELECT text FROM title;");
+} else { $title = null; }
+
+?>
+
+<form method="post" action="." enctype="multipart/form-data">
+<table class="table table-borderless my-4">
+	<tbody>
+	<tr>
+	<td class="col align-middle"><textarea class="form-control" id="title-text" name="title-text" rows="1"><?php echo $title;?></textarea></td>
+	<td class="col-1 align-middle text-center">
+		<input type="submit" id="title-save" name="title-save" value="title-save" hidden>
+		<svg xmlns="http://www.w3.org/2000/svg" onclick="title_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
+	</td>
+	</tr>
+</tbody>
+</table>
+</form>
+
+
 <h4>Upozornění</h4>
 
 <?php
@@ -121,6 +166,30 @@ if ($db) {
 </table>
 </form>
 
+<h4>Popis</h4>
+
+<?php
+
+if ($db) {
+	$descr = $db->querySingle("SELECT text FROM description;");
+} else { $descr = null; }
+
+?>
+
+<form method="post" action="." enctype="multipart/form-data">
+<table class="table table-borderless my-4">
+	<tbody>
+	<tr>
+	<td class="col align-middle"><textarea class="form-control" id="descr-text" name="descr-text" rows="4"><?php echo $descr;?></textarea></td>
+	<td class="col-1 align-middle text-center">
+		<input type="submit" id="descr-save" name="descr-save" value="descr-save" hidden>
+		<svg xmlns="http://www.w3.org/2000/svg" onclick="descr_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
+	</td>
+	</tr>
+</tbody>
+</table>
+</form>
+
 <h4>Recepty</h4>
 
 <?php
@@ -131,7 +200,7 @@ if ($db) {
 		$result->reset();
 		
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th scope="col">Recept</th><th></th><th></th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum</th><th scope="col">Jméno</th scope="col"><th scope="col">Rok</th><th scope="col">Recept</th><th></th><th></th></tr>';
 		echo '</thead><tbody id="tbody">';
 
 		while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
@@ -144,6 +213,7 @@ if ($db) {
 
 			echo '<td class="align-middle">' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
 			echo '<td class="align-middle">' . htmlspecialchars($res['surname']). ' ' . htmlspecialchars($res['firstname']). '</td>';
+			echo '<td class="align-middle">' . htmlspecialchars($res['year']) . '</td>';
 			echo '<td class="align-middle">';
 
 			foreach(unserialize($res['prescription']) as $prescription) {

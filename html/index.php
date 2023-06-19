@@ -21,9 +21,13 @@ try {
 	$db = null;
 }
 
+$title = null;
 $alert = null;
+$descr = null;
 
+if ($db) { $title = $db->querySingle("SELECT text FROM title;"); }
 if ($db) { $alert = $db->querySingle("SELECT text FROM alert;"); }
+if ($db) { $descr = $db->querySingle("SELECT text FROM description;"); }
 
 if(!empty($_POST)) {
 	if (!$db) {
@@ -32,14 +36,16 @@ if(!empty($_POST)) {
 		if (
 			!empty($_POST['firstname']) &&
 			!empty($_POST['surname']) &&
+			!empty($_POST['year']) &&
 			!empty($_POST['prescription'])
 		) {
-			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,prescription) VALUES ('"
+			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
 				. $id . "','"
 				. "0','"
 				. $timestamp . "','"
 				. $db->escapeString(substr($_POST['firstname'],0,20)) . "','"
 				. $db->escapeString(substr($_POST['surname'],0,20)) . "','"
+				. $db->escapeString(substr($_POST['year'],0,4)) . "','"
 				. $db->escapeString(serialize($_POST['prescription'])) . "');"
 			);
 			if (!$query) {
@@ -96,18 +102,25 @@ if (!empty($_SESSION['error'])) {
 <div class="text-center m-4">
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-capsule-pill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.02 5.364a3 3 0 0 0-4.242-4.243L1.121 6.778a3 3 0 1 0 4.243 4.243l5.657-5.657Zm-6.413-.657 2.878-2.879a2 2 0 1 1 2.829 2.829L7.435 7.536 4.607 4.707ZM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm-.5 1.041a3 3 0 0 0 0 5.918V9.04Zm1 5.918a3 3 0 0 0 0-5.918v5.918Z"/></svg>
 </div>
-<div class="p-4 text-center"><h2>Žádost vydání receptu</h2></div>
 
 <?php
+
+if (!empty($title)) {
+	echo '<div class="p-4 text-center"><h2>' . $title . '</h2></div>';
+}
+
 if (!empty($alert)) {
 	echo '<div class="alert alert-warning d-flex align-items-center" role="alert">
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
     <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
   </svg><div>' . $alert . '</div></div>';
 }
-?>
 
-<div class="card"><div class="card-body" style="background-color: #cee5ed;">Formulář slouží k&nbsp;zaslání jednorázového požadavku na vydání předepsaného léčiva. Neslouží k&nbsp;objednání ani konzultaci Vašeho zdravotního stavu. Všechny požadavky jsou vyřizovány průběžně.</div></div>
+if (!empty($descr)) {
+	echo '<div class="card"><div class="card-body" style="background-color: #cee5ed;">' . $descr . '</div></div>';
+}
+
+?>
 
 <form method="post" action="." enctype="multipart/form-data">
 
@@ -115,6 +128,8 @@ if (!empty($alert)) {
 <input type="text" class="form-control" id="firstname" name="firstname" maxlength="20" placeholder="Pavel" value="" required>
 <h4 class="mt-4">Příjmení</h4>
 <input type="text" class="form-control" id="surname" name="surname" maxlength="20" placeholder="Novák" value="" required>
+<h4 class="mt-4">Rok narození</h4>
+<input type="text" class="form-control" id="year" name="year" maxlength="4" placeholder="1964" value="" required>
 
 <hr/>
 

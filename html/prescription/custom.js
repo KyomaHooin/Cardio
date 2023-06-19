@@ -34,9 +34,17 @@ async function update(payload) {
 	});
 }
 
+// TITLE
+
+function title_on_save() { document.getElementById('title-save').click(); }
+
 // ALERT
 
 function alert_on_save() { document.getElementById('alert-save').click(); }
+
+// DESCRIPTION
+
+function descr_on_save() { document.getElementById('descr-save').click(); }
 
 // PRESCRIPTION
 
