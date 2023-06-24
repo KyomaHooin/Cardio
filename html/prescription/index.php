@@ -156,7 +156,7 @@ if ($db) {
 <table class="table table-borderless my-4">
 	<tbody>
 	<tr>
-	<td class="col align-middle"><textarea class="form-control" id="alert-text" name="alert-text"><?php echo $alert;?></textarea></td>
+	<td class="col align-middle"><textarea class="form-control" id="alert-text" name="alert-text" rows="1"><?php echo $alert;?></textarea></td>
 	<td class="col-1 align-middle text-center">
 		<input type="submit" id="alert-save" name="alert-save" value="alert-save" hidden>
 		<svg xmlns="http://www.w3.org/2000/svg" onclick="alert_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
@@ -180,7 +180,7 @@ if ($db) {
 <table class="table table-borderless my-4">
 	<tbody>
 	<tr>
-	<td class="col align-middle"><textarea class="form-control" id="descr-text" name="descr-text" rows="4"><?php echo $descr;?></textarea></td>
+	<td class="col align-middle"><textarea class="form-control" id="descr-text" name="descr-text" rows="1"><?php echo $descr;?></textarea></td>
 	<td class="col-1 align-middle text-center">
 		<input type="submit" id="descr-save" name="descr-save" value="descr-save" hidden>
 		<svg xmlns="http://www.w3.org/2000/svg" onclick="descr_on_save()" width="24" height="24" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>	
