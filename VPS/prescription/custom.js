@@ -19,7 +19,7 @@ modal = new bootstrap.Modal(document.getElementById('modal'));
 // FETCH  - JSON { type, value } response JSON { value }
 
 async function update(payload) {
-	return await fetch('/prescription/', {
+	return await fetch('/', {
 		method: 'POST',
 		headers: {'Content-Type' :'application/json'},
 		body: JSON.stringify(payload)
