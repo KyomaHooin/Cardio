@@ -73,7 +73,7 @@ if (!empty($_POST)){
 		}
 	}
 
-	header('Location: /prescription/');
+	header('Location: /');
 	exit();
 }
 
