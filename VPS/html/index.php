@@ -25,6 +25,10 @@ $title = null;
 $alert = null;
 $descr = null;
 
+if (!isset($_SESSION['firstname'])) { $_SESSION['firstname'] = null; }
+if (!isset($_SESSION['surname'])) { $_SESSION['surname'] = null; }
+if (!isset($_SESSION['year'])) { $_SESSION['year'] = null; }
+
 if ($db) { $title = $db->querySingle("SELECT text FROM title;"); }
 if ($db) { $alert = $db->querySingle("SELECT text FROM alert;"); }
 if ($db) { $descr = $db->querySingle("SELECT text FROM description;"); }
@@ -53,6 +57,9 @@ if(!empty($_POST)) {
 			} else {
 				$_SESSION['error'] = 'ok';
 			}
+			$_SESSION['firstname'] = $_POST['firstname'];
+			$_SESSION['surname'] = $_POST['surname'];
+			$_SESSION['year'] = $_POST['year'];
 		} else {
 			$_SESSION['error'] = 'Neplatný vstup.';
 		}
@@ -84,24 +91,7 @@ if(!empty($_POST)) {
 
 <main>
 <div class="row py-4 justify-content-center">
-<div class="col-md-8">
-
-<?php
-
-if (!empty($_SESSION['error'])) {
-        if ($_SESSION['error'] !== 'ok') {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        } else {
-		echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">Žádost byla uložena.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        }
-	$_SESSION['error'] = null;
-}
-
-?>
-
-<div class="text-center m-4">
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-capsule-pill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.02 5.364a3 3 0 0 0-4.242-4.243L1.121 6.778a3 3 0 1 0 4.243 4.243l5.657-5.657Zm-6.413-.657 2.878-2.879a2 2 0 1 1 2.829 2.829L7.435 7.536 4.607 4.707ZM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm-.5 1.041a3 3 0 0 0 0 5.918V9.04Zm1 5.918a3 3 0 0 0 0-5.918v5.918Z"/></svg>
-</div>
+<div class="col-md-10">
 
 <?php
 
@@ -122,14 +112,27 @@ if (!empty($descr)) {
 
 ?>
 
+<?php
+
+if (!empty($_SESSION['error'])) {
+        if ($_SESSION['error'] !== 'ok') {
+		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert"><strong>' . $_SESSION['error'] . '</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        } else {
+		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert"><strong>Žádost byla uložena.</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        }
+	$_SESSION['error'] = null;
+}
+		
+?>
+
 <form method="post" action="." enctype="multipart/form-data">
 
-<h4 class="mt-4">Jméno</h4>
-<input type="text" class="form-control" id="firstname" name="firstname" maxlength="20" placeholder="Pavel" value="" required>
 <h4 class="mt-4">Příjmení</h4>
-<input type="text" class="form-control" id="surname" name="surname" maxlength="20" placeholder="Novák" value="" required>
+<input type="text" class="form-control fw-bold" id="surname" name="surname" maxlength="20" value="<?php if (isset($_SESSION['surname'])) { echo htmlspecialchars($_SESSION['surname'], ENT_QUOTES, 'UTF-8'); } ?>" required>
+<h4 class="mt-4">Jméno</h4>
+<input type="text" class="form-control fw-bold" id="firstname" name="firstname" maxlength="20" value="<?php if (isset($_SESSION['firstname'])) { echo htmlspecialchars($_SESSION['firstname'], ENT_QUOTES, 'UTF-8'); } ?>" required>
 <h4 class="mt-4">Rok narození</h4>
-<input type="text" class="form-control" id="year" name="year" maxlength="4" placeholder="1964" value="" required>
+<input type="text" class="form-control fw-bold" id="year" name="year" maxlength="4" value="<?php if (isset($_SESSION['year'])) { echo htmlspecialchars($_SESSION['year'], ENT_QUOTES, 'UTF-8'); } ?>" required>
 
 <hr/>
 
@@ -137,45 +140,45 @@ if (!empty($descr)) {
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4>Lék 1</h4>
-		<input type="text" class="form-control" id="prescription0" name="prescription[0][prescription]" maxlength="30" placeholder="Triplixam" value="" required>
+		<input type="text" class="form-control fw-bold" id="prescription0" name="prescription[0][prescription]" maxlength="30" value="" required>
 	</div>
 	<div class="col">
-		<h4>gramáž</h4>
-		<input type="text" class="form-control" id="volume0" name="prescription[0][volume]" maxlength="10" placeholder="5/1.25/5mg" value="" required>
+		<span class="h4">gramáž</span><span>&nbsp;&nbsp;(např. 5mg, 1.25/5mg)</span>
+		<input type="text" class="form-control fw-bold mt-2" id="volume0" name="prescription[0][volume]" maxlength="10" value="" required>
 	</div>
 	<div class="col">
-		<h4>dávkování</h4>
-		<input type="text" class="form-control" id="dosage0" name="prescription[0][dosage]" maxlength="10" placeholder="1-0-1" value="" required>
+		<span class="h4">dávkování</span><span>&nbsp;&nbsp;(např. 1-0-1)</span>
+		<input type="text" class="form-control fw-bold mt-2" id="dosage0" name="prescription[0][dosage]" maxlength="10" value="" required>
 	</div>
 </div>
 <hr/>
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4>Lék 2</h4>
-		<input type="text" class="form-control" id="prescription1" maxlength="30" name="prescription[1][prescription]" value="">
+		<input type="text" class="form-control fw-bold" id="prescription1" maxlength="30" name="prescription[1][prescription]" value="">
 	</div>
 	<div class="col">
 		<h4>gramáž</h4>
-		<input type="text" class="form-control" id="volume1" maxlength="10" name="prescription[1][volume]" value="">
+		<input type="text" class="form-control fw-bold" id="volume1" maxlength="10" name="prescription[1][volume]" value="">
 	</div>
 	<div class="col">
 		<h4>dávkování</h4>
-		<input type="text" class="form-control" id="dosage1" maxlength="10" name="prescription[1][dosage]" value="">
+		<input type="text" class="form-control fw-bold" id="dosage1" maxlength="10" name="prescription[1][dosage]" value="">
 	</div>
 </div>
 <hr/>
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
 		<h4>Lék 3</h4>
-		<input type="text" class="form-control" id="prescription2" maxlength="30" name="prescription[2][prescription]" value="">
+		<input type="text" class="form-control fw-bold" id="prescription2" maxlength="30" name="prescription[2][prescription]" value="">
 	</div>
 	<div class="col">
 		<h4>gramáž</h4>
-		<input type="text" class="form-control" id="volume2" maxlength="10" name="prescription[2][volume]" value="">
+		<input type="text" class="form-control fw-bold" id="volume2" maxlength="10" name="prescription[2][volume]" value="">
 	</div>
 	<div class="col">
 		<h4>dávkování</h4>
-		<input type="text" class="form-control" id="dosage2" maxlength="10" name="prescription[2][dosage]" value="">
+		<input type="text" class="form-control fw-bold" id="dosage2" maxlength="10" name="prescription[2][dosage]" value="">
 	</div>
 </div>
 </div>

@@ -32,7 +32,7 @@ function add_prescription() {
 	head = document.createElement('h4');
 	head.innerText = 'Lék ' + String(id + 1);
 	input = document.createElement('input');
-	input.className = 'form-control';
+	input.className = 'form-control fw-bold';
 	input.id = 'prescription' + String(id);
 	input.name = 'prescription[' + String(id) + '][prescription]';
 	input.type = 'text';
@@ -46,7 +46,7 @@ function add_prescription() {
 	head = document.createElement('h4');
 	head.innerText = 'gramáž';
 	input = document.createElement('input');
-	input.className = 'form-control';
+	input.className = 'form-control fw-bold';
 	input.id = 'volume' + String(id);
 	input.name = 'prescription[' + String(id) + '][volume]';
 	input.type = 'text';
@@ -60,7 +60,7 @@ function add_prescription() {
 	head = document.createElement('h4');
 	head.innerText = 'dávkování';
 	input = document.createElement('input');
-	input.className = 'form-control';
+	input.className = 'form-control fw-bold';
 	input.id = 'dosage' + String(id);
 	input.name = 'prescription[' + String(id) + '][dosage]';
 	input.type = 'text';
