@@ -116,9 +116,9 @@ if (!empty($descr)) {
 
 if (!empty($_SESSION['error'])) {
         if ($_SESSION['error'] !== 'ok') {
-		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert"><strong>' . $_SESSION['error'] . '</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert"><strong>' . $_SESSION['error'] . '</strong><button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
-		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert"><strong>Žádost byla uložena.</strong><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert"><strong>Žádost byla uložena.</strong><button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
 	$_SESSION['error'] = null;
 }
