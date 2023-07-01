@@ -10,7 +10,7 @@ INSTALL
 apt-get install apache2 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
 
 certbot --apache -d xxx -d www.xxx
-
+a2enmod headers
 </pre>
 FILE
 <pre>
