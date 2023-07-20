@@ -5,7 +5,7 @@
 
 import sqlite3
 
-DB='cardio.db'
+DB='cardio2.db'
 
 con = sqlite3.connect(DB)
 cur = con.cursor()
@@ -16,7 +16,8 @@ cur.execute("CREATE TABLE description (text TEXT);")
 cur.execute("""CREATE TABLE cardio (
 	id TEXT UNIQUE,
 	status INTEGER,
-	timestamp TEXT,
+	confirmation INTEGER,
+	timestamp INTEGER,
 	firstname TEXT,
 	surname TEXT,
 	year TEXT,

@@ -43,10 +43,9 @@ if(!empty($_POST)) {
 			!empty($_POST['year']) &&
 			!empty($_POST['prescription'])
 		) {
-			$query = $db->exec("INSERT INTO cardio (id,status,timestamp,firstname,surname,year,prescription) VALUES ('"
-				. $id . "','"
-				. "0','"
-				. $timestamp . "','"
+			$query = $db->exec("INSERT INTO cardio (id,status,confirmation,timestamp,firstname,surname,year,prescription) VALUES ('"
+				. $id . "',0,0,"
+				. $timestamp . ",'"
 				. $db->escapeString(substr($_POST['firstname'],0,20)) . "','"
 				. $db->escapeString(substr($_POST['surname'],0,20)) . "','"
 				. $db->escapeString(substr($_POST['year'],0,4)) . "','"
@@ -116,9 +115,9 @@ if (!empty($descr)) {
 
 if (!empty($_SESSION['error'])) {
         if ($_SESSION['error'] !== 'ok') {
-		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert"><strong>' . $_SESSION['error'] . '</strong><button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
-		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert"><strong>Žádost byla uložena.</strong><button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert">Žádost uložena. Děkujeme, že šetříte kapacitu naší telefonní linky.<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
 	$_SESSION['error'] = null;
 }
@@ -143,11 +142,11 @@ if (!empty($_SESSION['error'])) {
 		<input type="text" class="form-control fw-bold" id="prescription0" name="prescription[0][prescription]" maxlength="30" value="" required>
 	</div>
 	<div class="col">
-		<span class="h4">gramáž</span><span>&nbsp;&nbsp;(např. 5mg, 1.25/5mg)</span>
+		<span class="h4">gramáž</span><span class="ms-2">(např. 10mg, 5/1.25mg)</span>
 		<input type="text" class="form-control fw-bold mt-2" id="volume0" name="prescription[0][volume]" maxlength="10" value="" required>
 	</div>
 	<div class="col">
-		<span class="h4">dávkování</span><span>&nbsp;&nbsp;(např. 1-0-1)</span>
+		<span class="h4">dávkování</span><span class="ms-2">(např. 1-0-1)</span>
 		<input type="text" class="form-control fw-bold mt-2" id="dosage0" name="prescription[0][dosage]" maxlength="10" value="" required>
 	</div>
 </div>
@@ -184,7 +183,7 @@ if (!empty($_SESSION['error'])) {
 </div>
 
 <div id="add-prescription" class="my-4">
-<svg xmlns="http://www.w3.org/2000/svg" onclick="add_prescription()" width="36" height="36" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" onclick="add_prescription()" width="36" height="36" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg><span class="ms-2">(přidat další lék)</span>
 </div>
 
 <div class="d-grid col-4 mx-auto my-4">

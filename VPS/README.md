@@ -1,13 +1,11 @@
 
-![NAS](https://github.com/KyomaHooin/Cardio/raw/master/NAS/prescription.png "screenshot")
-
 DESCRIPTION
 
 Prescription website.
 
 INSTALL
 <pre>
-apt-get install apache2 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
+apt-get install apache2 sqlite3 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
 
 certbot --apache -d xxx -d www.xxx
 a2enmod headers

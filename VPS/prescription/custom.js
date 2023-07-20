@@ -1,17 +1,4 @@
 
-// EVENT
-
-//const evtSource = new EventSource("/prescription/event.php");
-
-//evtSource.onmessage = (event) => {
-
-	//data = JSON.parse(event.data);
-
-	//data.forEach((prescription) => {
-	//	console.log(prescription.id);
-	//});
-//};
-
 // MODAL
 
 modal = new bootstrap.Modal(document.getElementById('modal'));
@@ -34,17 +21,9 @@ async function update(payload) {
 	});
 }
 
-// TITLE
+// TEXT
 
-function title_on_save() { document.getElementById('title-save').click(); }
-
-// ALERT
-
-function alert_on_save() { document.getElementById('alert-save').click(); }
-
-// DESCRIPTION
-
-function descr_on_save() { document.getElementById('descr-save').click(); }
+function text_on_save() { document.getElementById('text-save').click(); }
 
 // PRESCRIPTION
 
@@ -55,7 +34,10 @@ async function prescription_on_update(id) {
 	payload = {'type':'update', 'id':prescription_id};
 	const ret = await this.update(payload);
 	if (ret.length !== 0) {
-		document.getElementById(prescription_id).style.backgroundColor= '#9ec5ef';	
+		document.getElementById(prescription_id).style.backgroundColor= '#adb5bd';
+		data = document.getElementById('data-' + prescription_id);
+		data.removeChild(data.firstChild);
+		data.textContent = ret['value'];
 	}
 }
 
