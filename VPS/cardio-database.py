@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 #
-# ČLB - Návrhy podkladů DB 
+# Cardio DB 
 #
 
 import sqlite3
 
-DB='cardio2.db'
+DB='cardio.db'
 
 con = sqlite3.connect(DB)
 cur = con.cursor()
