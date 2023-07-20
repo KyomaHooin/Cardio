@@ -136,10 +136,10 @@ if (!empty($_SESSION['error'])) {
 <hr/>
 
 <div id="prescriptions">
-<div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
+<div class="row align-items-end g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
-		<h4>Lék 1</h4>
-		<input type="text" class="form-control fw-bold" id="prescription0" name="prescription[0][prescription]" maxlength="30" value="" required>
+		<span class="h4">Lék 1</span>
+		<input type="text" class="form-control fw-bold mt-2" id="prescription0" name="prescription[0][prescription]" maxlength="30" value="" required>
 	</div>
 	<div class="col">
 		<span class="h4">gramáž</span><span class="ms-2">(např. 10mg, 5/1.25mg)</span>
