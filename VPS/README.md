@@ -3,6 +3,8 @@ DESCRIPTION
 
 Prescription website.
 
+![VPS](https://github.com/KyomaHooin/Cardio/raw/master/VPS/vps_screen.png "screenshot")
+
 INSTALL
 <pre>
 apt-get install apache2 sqlite3 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
