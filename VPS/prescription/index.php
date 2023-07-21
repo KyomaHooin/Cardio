@@ -31,9 +31,8 @@ if (json_decode(file_get_contents('php://input'))) {
 	
 	if ($req['type'] == 'update') {
 		$confirmation = time();
-		$query_status = $db->exec("UPDATE cardio SET status = 1 WHERE id = '" . $req['id'] . "';");
-		$query_confirmation = $db->exec("UPDATE cardio SET confirmation = " . $confirmation . " WHERE id = '" . $req['id'] . "';");
-		if($query_status && $query_confirmation) {
+		$query = $db->exec("UPDATE cardio SET status = 1, confirmation = " . $confirmation . " WHERE id = '" . $req['id'] . "';");
+		if($query) {
 			$resp['value'] = date("d.m.Y H:i", $confirmation);
 		}
 	}
