@@ -14,13 +14,13 @@ a2enmod headers
 </pre>
 FILE
 <pre>
-                html/ - Frontend.
-          prescription/ - Backend.
+                  html/ - PHP Bootstrap frontend.
+          prescription/ - PHP Bootstrap backend.
      cardio-database.py - SQLite3 template.
      
-       000-default.conf - Apache default configuration.
-000-default-ca-ssl.conf - Backend Apache configuration.
-000-default-le-ssl.conf - Apache frontend configuration.
+       000-default.conf - Default configuration.
+000-default-ca-ssl.conf - Backend configuration.
+000-default-le-ssl.conf - Frontend configuration.
 </pre>
 SOURCE
 
