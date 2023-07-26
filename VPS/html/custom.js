@@ -36,7 +36,7 @@ function add_prescription() {
 	input.id = 'prescription' + String(id);
 	input.name = 'prescription[' + String(id) + '][prescription]';
 	input.type = 'text';
-	input.maxLength = '30';
+	input.maxLength = '25';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
@@ -50,7 +50,7 @@ function add_prescription() {
 	input.id = 'volume' + String(id);
 	input.name = 'prescription[' + String(id) + '][volume]';
 	input.type = 'text';
-	input.maxLength = '10';
+	input.maxLength = '15';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
@@ -64,7 +64,7 @@ function add_prescription() {
 	input.id = 'dosage' + String(id);
 	input.name = 'prescription[' + String(id) + '][dosage]';
 	input.type = 'text';
-	input.maxLength = '10';
+	input.maxLength = '15';
 	col.appendChild(head);
 	col.appendChild(input);
 	row.appendChild(col);
