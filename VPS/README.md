@@ -5,6 +5,11 @@ DESCRIPTION
 
 Prescription website.
 
+TODO
+<pre>
+-CAA record
+-backend LE
+</pre>
 INSTALL
 <pre>
 apt-get install apache2 sqlite3 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
