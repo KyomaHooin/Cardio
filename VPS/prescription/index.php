@@ -188,7 +188,7 @@ if ($db) {
 		$result->reset();
 		
 		echo '<table class="table">';
-		echo '<thead class=""><tr><th scope="col">Datum žádosti</th><th scope="col">Jméno</th scope="col"><th scope="col">Rok</th><th class="text-nowrap" scope="col">Recept # gramáž (dávkování)</th><th class="text-center">Stav / Odesláno</th><th></th></tr>';
+		echo '<thead class=""><tr><th scope="col">Datum žádosti</th><th scope="col">Jméno</th scope="col"><th scope="col">Rok</th><th class="text-nowrap" scope="col">Lék # gramáž (dávkování)</th><th class="text-center">Stav / Odesláno</th><th></th></tr>';
 		echo '</thead><tbody id="tbody">';
 
 		while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
