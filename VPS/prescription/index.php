@@ -101,7 +101,7 @@ if (!empty($_POST)){
 
 <main class="container">
 <div class="row my-4 justify-content-center">
-<div class="col col-md-9 m-2">
+<div class="col col-xxl-9 m-2">
 
 <?php 
 
