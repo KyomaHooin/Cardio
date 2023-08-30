@@ -102,6 +102,15 @@ if (!empty($title)) {
 	echo '<div class="p-4 text-center"><h2>' . typo($title) . '</h2></div>';
 }
 
+if (!empty($_SESSION['error'])) {
+        if ($_SESSION['error'] !== 'ok') {
+		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        } else {
+		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert">Žádost uložena. Děkujeme, že šetříte kapacitu naší telefonní linky.<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        }
+	$_SESSION['error'] = null;
+}
+
 if (!empty($alert)) {
 	echo '<div class="alert alert-warning d-flex align-items-center" role="alert">
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
@@ -113,19 +122,6 @@ if (!empty($descr)) {
 	echo '<div class="card"><div class="card-body" style="background-color: #cee5ed;">' . typo(nl2br($descr)) . '</div></div>';
 }
 
-?>
-
-<?php
-
-if (!empty($_SESSION['error'])) {
-        if ($_SESSION['error'] !== 'ok') {
-		echo '<div class="alert alert-danger alert-dismissible fade show my-3" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        } else {
-		echo '<div class="alert alert-success alert-dismissible fade show my-3" role="alert">Žádost uložena. Děkujeme, že šetříte kapacitu naší telefonní linky.<button type="button" class="btn-close btn-close-fix" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        }
-	$_SESSION['error'] = null;
-}
-		
 ?>
 
 <form method="post" action="." enctype="multipart/form-data">
