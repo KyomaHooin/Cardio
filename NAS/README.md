@@ -5,6 +5,11 @@ DESCRIPTION
 
 Secure Rsync NAS GUI for Win64-bit OS.
 
+TUNE
+<pre>
+/var/packages/VPNCenter/etc/openvpn/openvpn.conf:
+keepalive 10 120
+</pre>
 FILE
 <pre>
                bin/ - Cygwin lib/binary.
