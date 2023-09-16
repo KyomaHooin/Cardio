@@ -7,8 +7,17 @@ Secure Rsync NAS GUI for Win64-bit OS.
 
 TUNE
 <pre>
+mkdir /var/services/homes/backup/.ssh/
+chmod 700 .ssh
+chown backup:users .ssh
+echo 'ssh-ed25519 ...' > .ssh/authorized_keys
+chmod 644 authorized_keys
+chown backup:users authorized_keys
+
 /var/packages/VPNCenter/etc/openvpn/openvpn.conf:
+log-append /var/log/openvpn.log
 keepalive 10 120
+#plugin /var/packages/VPNCenter/target/lib/radiusplugin.so ...
 </pre>
 FILE
 <pre>
