@@ -5,6 +5,13 @@ DESCRIPTION
 
 Secure Rsync NAS GUI for Win64-bit OS.
 
+UART
+<pre>
+1 .. 3v3
+2 .. GND
+4 .. TX
+6 .. RX
+</pre>
 TUNE
 <pre>
 mkdir /var/services/homes/backup/.ssh/
