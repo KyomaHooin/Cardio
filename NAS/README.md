@@ -3,14 +3,22 @@
 
 DESCRIPTION
 
-Secure Rsync NAS GUI for Win64-bit OS.
+Secure Rsync NAS GUI for Win64-bit OS for Synology DS118j.
 
 UART
 <pre>
+| 2 | 4 | 6 |
+| 1 | 3 | 5 |
+  ^
+
 1 .. 3v3
-2 .. GND
-4 .. TX
-6 .. RX
+2 .. <b>GND</b>
+4 .. <b>TX</b>
+6 .. <b>RX</b>
+
+minicom -D /dev/ttyUSB0 -b 115200
+
+[Ctrl] > [A] > [Z] > [O] > Serial port setup > [F]low control > Off
 </pre>
 TUNE
 <pre>
