@@ -5,6 +5,11 @@ DESCRIPTION
 
 Secure Rsync NAS GUI for Win64-bit OS for Synology DS118j.
 
+TODO
+<pre>
+- Wireguard
+- S70 archiving SW
+</pre>
 UART
 <pre>
 | 2 | 4 | 6 |
