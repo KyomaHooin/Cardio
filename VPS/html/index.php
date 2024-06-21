@@ -104,9 +104,9 @@ if (!empty($title)) {
 
 if (!empty($_SESSION['error'])) {
         if ($_SESSION['error'] !== 'ok') {
-		echo '<div class="alert alert-danger fade show my-3 d-flex align-items-center" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close btn-close-fix ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-danger fade show my-3 d-flex align-items-center" role="alert">' . $_SESSION['error'] . '<button type="button" class="btn-close btn-close-fix shadow-none ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         } else {
-		echo '<div class="alert alert-success fade show my-3 d-flex align-items-center" role="alert">Žádost uložena. Děkujeme, že šetříte kapacitu naší telefonní linky.<button type="button" class="btn-close btn-close-fix ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-success fade show my-3 d-flex align-items-center" role="alert">Žádost uložena. Děkujeme, že šetříte kapacitu naší telefonní linky.<button type="button" class="btn-close btn-close-fix shadow-none ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
 	$_SESSION['error'] = null;
 }

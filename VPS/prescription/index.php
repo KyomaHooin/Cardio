@@ -106,7 +106,7 @@ if (!empty($_POST)){
 <?php 
 
 if (isset($_SESSION['result'])) {
-	echo '<div class="alert alert-warning fade show d-flex align-items-center" role="alert">'. $_SESSION['result'] . '<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+	echo '<div class="alert alert-warning fade show d-flex align-items-center" role="alert">'. $_SESSION['result'] . '<button type="button" class="btn-close shadow-none ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	$_SESSION['result'] = null;
 }
 
