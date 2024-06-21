@@ -181,7 +181,8 @@ if ($db) {
 <h4>Recepty</h4>
 
 <?php
-	
+
+if ($db) {
 	$result = $db->query("SELECT * FROM cardio ORDER BY timestamp DESC;");
 
 	if ($result->fetchArray()) {
@@ -233,6 +234,7 @@ if ($db) {
 	}
 
 	$db->close();
+}
 
 ?>
 
