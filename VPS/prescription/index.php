@@ -230,7 +230,7 @@ if ($db) {
 		}
 		echo '</tbody></table>';
 	} else {
-		echo '<div class="alert alert-warning alert-dismissible fade show my-4" role="alert">Žádné recepty.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+		echo '<div class="alert alert-warning fade show my-4 d-flex align-items-center" role="alert">Žádné recepty.<button type="button" class="btn-close shadow-none ms-auto" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 	}
 
 	$db->close();
