@@ -82,8 +82,8 @@ if (!empty($_POST)){
 	<title>Kardiologie Praha 17 - Řepy</title>
 	<link href="custom.css" rel="stylesheet">
 	<!-- Favicons -->
-	<link rel="icon" href="../favicon/favicon-32x32.png" sizes="32x32" type="image/png">
-	<link rel="icon" href="../favicon/favicon-16x16.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="favicon/favicon-32x32.png" sizes="32x32" type="image/png">
+	<link rel="icon" href="favicon/favicon-16x16.png" sizes="16x16" type="image/png">
 	<!-- Custom styles -->
 	<link href="color.css" rel="stylesheet">
 </head>
