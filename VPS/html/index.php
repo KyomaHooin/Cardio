@@ -93,7 +93,7 @@ if(!empty($_POST)) {
 <div class="container">
 
 <main>
-<div class="row py-4 justify-content-center">
+<div class="row py-4 px-1 justify-content-center">
 <div class="col-md-10">
 
 <?php
