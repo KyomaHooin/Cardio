@@ -28,7 +28,6 @@ if (json_decode(file_get_contents('php://input'))) {
 			$resp['value'] = 'ok';
 		}
 	}
-	
 
 	if ($req['type'] == 'remove') {
 		$query = $db->exec("DELETE FROM cardio WHERE id = '" . $req['id'] . "';");
