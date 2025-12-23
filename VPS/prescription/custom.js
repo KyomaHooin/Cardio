@@ -25,6 +25,13 @@ async function update(payload) {
 
 function text_on_save() { document.getElementById('text-save').click(); }
 
+// STATUS
+
+async function status_update(state) {
+	payload = {'type':'offline', 'state':state};
+	const ret = await this.update(payload);
+}
+
 // PRESCRIPTION
 
 prescription_id = null;

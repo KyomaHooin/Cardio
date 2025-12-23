@@ -25,6 +25,7 @@ try {
 	$db = null;
 }
 
+$state = null; 
 $title = null;
 $alert = null;
 $descr = null;
@@ -33,13 +34,14 @@ if (!isset($_SESSION['firstname'])) { $_SESSION['firstname'] = null; }
 if (!isset($_SESSION['surname'])) { $_SESSION['surname'] = null; }
 if (!isset($_SESSION['year'])) { $_SESSION['year'] = null; }
 
+if ($db) { $state = $db->querySingle("SELECT state FROM offline;"); }
 if ($db) { $title = $db->querySingle("SELECT text FROM title;"); }
 if ($db) { $alert = $db->querySingle("SELECT text FROM alert;"); }
 if ($db) { $descr = $db->querySingle("SELECT text FROM description;"); }
 
 if(!empty($_POST)) {
-	if (!$db) {
-		$_SESSION['error'] = 'Chyba čtení databáze.';
+	if (!($db and $state)) {
+		$_SESSION['error'] = 'Požadavek nyní nelze přijmout.';
 	} else {
 		if (
 			!empty($_POST['firstname']) &&
@@ -125,6 +127,7 @@ if (!empty($descr)) {
 ?>
 
 <form method="post" action="." enctype="multipart/form-data">
+<fieldset <?php echo (!$state) ? 'disabled' : ''; ?>>
 
 <h4 class="mt-4">Příjmení</h4>
 <input type="text" class="form-control fw-bold" id="surname" name="surname" maxlength="20" value="<?php if (isset($_SESSION['surname'])) { echo htmlspecialchars($_SESSION['surname'], ENT_QUOTES, 'UTF-8'); } ?>" required>
@@ -189,6 +192,7 @@ if (!empty($descr)) {
 <div class="d-grid col-4 mx-auto my-4">
 	<button type="submit" name="submit" class="btn btn-primary" style="background-color: #0e5f91;">Odeslat</button>
 </div>
+</fieldset>
 </form>
 
 <hr/>

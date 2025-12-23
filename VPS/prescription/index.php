@@ -21,6 +21,14 @@ if ($db) { $query = $db->exec("DELETE FROM cardio WHERE status = 1 AND timestamp
 if (json_decode(file_get_contents('php://input'))) {
 	$req = json_decode(file_get_contents('php://input'), True);
 	$resp = [];
+	
+	if ($req['type'] == 'offline') {
+		$query = $db->exec("REPLACE INTO offline(rowid,state) VALUES(1, '" . $req['state'] . "');");
+		if($query) {
+			$resp['value'] = 'ok';
+		}
+	}
+	
 
 	if ($req['type'] == 'remove') {
 		$query = $db->exec("DELETE FROM cardio WHERE id = '" . $req['id'] . "';");
@@ -111,6 +119,21 @@ if (isset($_SESSION['result'])) {
 }
 
 ?>
+
+<?php
+
+if ($db) {
+	$state = $db->querySingle("SELECT state FROM offline;");
+} else { $state = null; }
+
+?>
+
+
+<div class="d-flex gap-2 align-items-center justify-content-end">
+<span>Status:</span>
+<input type="radio" class="btn-check" name="status" id="online" onclick="status_update(1)" <?php echo ($state) ? 'checked' : ''; ?> autocomplete="off"><label class="btn btn-outline-dark btn-sm" for="online">online</label>
+<input type="radio" class="btn-check" name="status" id="offline" onclick="status_update(0)" <?php echo (!$state) ? 'checked' : ''; ?> autocomplete="off"><label class="btn btn-outline-dark btn-sm" for="offline">offline</label>
+</div>
 
 <h4>Nadpis</h4>
 
