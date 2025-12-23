@@ -128,7 +128,6 @@ if ($db) {
 
 ?>
 
-
 <div class="d-flex gap-2 align-items-center justify-content-end">
 <span>Status:</span>
 <input type="radio" class="btn-check" name="status" id="online" onclick="status_update(1)" <?php echo ($state) ? 'checked' : ''; ?> autocomplete="off"><label class="btn btn-outline-dark btn-sm" for="online">online</label>
