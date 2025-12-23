@@ -27,10 +27,7 @@ function text_on_save() { document.getElementById('text-save').click(); }
 
 // STATUS
 
-async function status_update(state) {
-	payload = {'type':'offline', 'state':state};
-	const ret = await this.update(payload);
-}
+function status_update() { document.getElementById('status-update').click(); }
 
 // PRESCRIPTION
 
