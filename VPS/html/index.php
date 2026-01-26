@@ -202,7 +202,7 @@ if (!empty($descr)) {
 </div>
 </main>
 
-<footer class="text-muted text-small text-center">
+<footer class="text-small text-center">
 	<p>&copy; <?php echo date('Y');?> Kardiologie Praha 17 - Řepy s.r.o.</p>
 	<ul class="list-inline">
 		<li class="list-inline-item"><a class="link-primary" href="#">Nahoru</a></li>
