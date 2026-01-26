@@ -129,11 +129,11 @@ if (!empty($descr)) {
 <form method="post" action="." enctype="multipart/form-data">
 <fieldset <?php echo (!$state) ? 'disabled' : ''; ?>>
 
-<h4 class="mt-4">Příjmení</h4>
+<label for="surname"><h4 class="mt-4">Příjmení</h4></label>
 <input type="text" class="form-control fw-bold" id="surname" name="surname" maxlength="20" value="<?php if (isset($_SESSION['surname'])) { echo htmlspecialchars($_SESSION['surname'], ENT_QUOTES, 'UTF-8'); } ?>" required>
-<h4 class="mt-4">Jméno</h4>
+<label for="firstname"><h4 class="mt-4">Jméno</h4></label>
 <input type="text" class="form-control fw-bold" id="firstname" name="firstname" maxlength="20" value="<?php if (isset($_SESSION['firstname'])) { echo htmlspecialchars($_SESSION['firstname'], ENT_QUOTES, 'UTF-8'); } ?>" required>
-<h4 class="mt-4">Rok narození</h4>
+<label for="year"><h4 class="mt-4">Rok narození</h4></label>
 <input type="text" class="form-control fw-bold" id="year" name="year" maxlength="4" value="<?php if (isset($_SESSION['year'])) { echo htmlspecialchars($_SESSION['year'], ENT_QUOTES, 'UTF-8'); } ?>" required>
 
 <hr/>
@@ -141,45 +141,45 @@ if (!empty($descr)) {
 <div id="prescriptions">
 <div class="row align-items-end g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
-		<span class="h4">Lék 1</span>
+		<label for="prescription0"><span class="h4">Lék 1</span></label>
 		<input type="text" class="form-control fw-bold mt-2" id="prescription0" name="prescription[0][prescription]" maxlength="25" value="" required>
 	</div>
 	<div class="col">
-		<span class="h4">gramáž</span><span class="ms-2">(např. 10mg, 5/1.25mg)</span>
+		<label for="volume0"><span class="h4">gramáž</span></label><span class="ms-2">(např. 10mg, 5/1.25mg)</span>
 		<input type="text" class="form-control fw-bold mt-2" id="volume0" name="prescription[0][volume]" maxlength="15" value="" required>
 	</div>
 	<div class="col">
-		<span class="h4">dávkování</span><span class="ms-2">(např. 1-0-1)</span>
+		<label for="dosage0"><span class="h4">dávkování</span></label><span class="ms-2">(např. 1-0-1)</span>
 		<input type="text" class="form-control fw-bold mt-2" id="dosage0" name="prescription[0][dosage]" maxlength="15" value="" required>
 	</div>
 </div>
 <hr/>
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
-		<h4>Lék 2</h4>
+		<label for="prescription1"><h4>Lék 2</h4></label>
 		<input type="text" class="form-control fw-bold" id="prescription1" maxlength="25" name="prescription[1][prescription]" value="">
 	</div>
 	<div class="col">
-		<h4>gramáž</h4>
+		<label for="volume1"><h4>gramáž</h4></label>
 		<input type="text" class="form-control fw-bold" id="volume1" maxlength="15" name="prescription[1][volume]" value="">
 	</div>
 	<div class="col">
-		<h4>dávkování</h4>
+		<label for="dosage1"><h4>dávkování</h4></label>
 		<input type="text" class="form-control fw-bold" id="dosage1" maxlength="15" name="prescription[1][dosage]" value="">
 	</div>
 </div>
 <hr/>
 <div class="row g-3 row-cols-md-3 d-grid d-sm-flex">
 	<div class="col">
-		<h4>Lék 3</h4>
+		<label for="prescription2"><h4>Lék 3</h4></label>
 		<input type="text" class="form-control fw-bold" id="prescription2" maxlength="25" name="prescription[2][prescription]" value="">
 	</div>
 	<div class="col">
-		<h4>gramáž</h4>
+		<label for="volume2"><h4>gramáž</h4></label>
 		<input type="text" class="form-control fw-bold" id="volume2" maxlength="15" name="prescription[2][volume]" value="">
 	</div>
 	<div class="col">
-		<h4>dávkování</h4>
+		<label for="dosage2"><h4>dávkování</h4></label>
 		<input type="text" class="form-control fw-bold" id="dosage2" maxlength="15" name="prescription[2][dosage]" value="">
 	</div>
 </div>
