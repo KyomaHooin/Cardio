@@ -29,6 +29,8 @@ function add_prescription() {
 
 	col = document.createElement('div');
 	col.className = 'col';
+	label = document.createElement('label');
+	label.for = 'prescription' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'Lék ' + String(id + 1);
 	input = document.createElement('input');
@@ -37,12 +39,15 @@ function add_prescription() {
 	input.name = 'prescription[' + String(id) + '][prescription]';
 	input.type = 'text';
 	input.maxLength = '25';
-	col.appendChild(head);
+	label.appendChild(head);
+	col.appendChild(label);
 	col.appendChild(input);
 	row.appendChild(col);
 
 	col = document.createElement('div');
 	col.className = 'col';
+	label = document.createElement('label');
+	label.for = 'volume' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'gramáž';
 	input = document.createElement('input');
@@ -51,12 +56,15 @@ function add_prescription() {
 	input.name = 'prescription[' + String(id) + '][volume]';
 	input.type = 'text';
 	input.maxLength = '15';
-	col.appendChild(head);
+	label.appendChild(head);
+	col.appendChild(label);
 	col.appendChild(input);
 	row.appendChild(col);
 
 	col = document.createElement('div');
 	col.className = 'col';
+	label = document.createElement('label');
+	label.for = 'dosage' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'dávkování';
 	input = document.createElement('input');
@@ -65,7 +73,8 @@ function add_prescription() {
 	input.name = 'prescription[' + String(id) + '][dosage]';
 	input.type = 'text';
 	input.maxLength = '15';
-	col.appendChild(head);
+	label.appendChild(head);
+	col.appendChild(label);
 	col.appendChild(input);
 	row.appendChild(col);
 	prescription.appendChild(row);
