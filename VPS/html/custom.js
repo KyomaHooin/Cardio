@@ -30,7 +30,7 @@ function add_prescription() {
 	col = document.createElement('div');
 	col.className = 'col';
 	label = document.createElement('label');
-	label.for = 'prescription' + String(id);
+	label.htmlFor = 'prescription' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'Lék ' + String(id + 1);
 	input = document.createElement('input');
@@ -47,7 +47,7 @@ function add_prescription() {
 	col = document.createElement('div');
 	col.className = 'col';
 	label = document.createElement('label');
-	label.for = 'volume' + String(id);
+	label.htmlFor = 'volume' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'gramáž';
 	input = document.createElement('input');
@@ -64,7 +64,7 @@ function add_prescription() {
 	col = document.createElement('div');
 	col.className = 'col';
 	label = document.createElement('label');
-	label.for = 'dosage' + String(id);
+	label.htmlFor = 'dosage' + String(id);
 	head = document.createElement('h4');
 	head.innerText = 'dávkování';
 	input = document.createElement('input');
@@ -85,4 +85,9 @@ function add_prescription() {
 		document.getElementById('add-prescription').style.display = 'none';	
 	}
 }
+
+// SVG KEYDOWN EVENT
+
+const svg = document.getElementById('svg');
+svg.addEventListener('keydown', event => { add_prescription(); });
 
