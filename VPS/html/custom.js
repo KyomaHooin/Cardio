@@ -89,5 +89,6 @@ function add_prescription() {
 // SVG KEYDOWN EVENT
 
 const svg = document.getElementById('svg');
-svg.addEventListener('keydown', event => { add_prescription(); });
-
+svg.addEventListener('keydown', event => {
+	if (event.code === 'Enter' || event.code === 'Space'} { add_prescription(); }
+});
