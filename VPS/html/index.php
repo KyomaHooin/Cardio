@@ -121,7 +121,7 @@ if (!empty($alert)) {
 }
 
 if (!empty($descr)) {
-	echo '<div class="card"><div class="card-body" style="background-color: #cee5ed;">' . typo(nl2br($descr)) . '</div></div>';
+	echo '<div class="card overflow-hidden"><div class="card-body" style="background-color: #cee5ed;">' . typo(nl2br($descr)) . '</div></div>';
 }
 
 ?>
