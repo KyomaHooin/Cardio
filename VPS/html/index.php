@@ -203,7 +203,7 @@ if (!empty($descr)) {
 </main>
 
 <footer class="text-small text-center">
-	<p>&copy; 2023-<?php echo date('Y');?> Kardiologie Praha 17 - Řepy s.r.o.</p>
+	<p>&copy; 2023 - <?php echo date('Y');?> Kardiologie Praha 17 - Řepy s.r.o.</p>
 	<ul class="list-inline">
 		<li class="list-inline-item"><a class="link-dark" href="#">Nahoru</a></li>
 	</ul>
