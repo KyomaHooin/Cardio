@@ -20,6 +20,7 @@ a2enmod headers
 FILE
 <pre>
                   html/ - PHP Bootstrap frontend.
+                   nas/ - Simple NAS IP lookup.
           prescription/ - PHP Bootstrap backend.
      cardio-database.py - SQLite3 template.
      
