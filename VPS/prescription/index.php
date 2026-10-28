@@ -226,7 +226,7 @@ if ($db) {
 				echo '<tr id="' . $res['id'] . '">';
 			}
 
-			echo '<td class="align-middle">' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
+			echo '<td class="align-middle text-nowrap">' . date("d.m.Y H:i", $res['timestamp']) . '</td>';
 			echo '<td class="align-middle text-nowrap">' . htmlspecialchars($res['surname']) . ' ' . htmlspecialchars($res['firstname']) . '</td>';
 			echo '<td class="align-middle">' . htmlspecialchars($res['year']) . '</td>';
 			echo '<td class="align-middle">';
