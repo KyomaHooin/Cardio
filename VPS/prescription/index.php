@@ -248,7 +248,7 @@ if ($db) {
 					echo '<td class="align-middle text-center" id="data-' . $res['id'] . '"></td>';
 				}
 			} else {
-				echo '<td class="align-middle text-center" id="data-' . $res['id'] . '"><button type="button" class="btn btn-sm btn-secondary" onclick="prescription_on_update(' . "'" . $res['id'] . "'" . ')">Potvrdit odeslání</button></td>';
+				echo '<td class="align-middle text-center" id="data-' . $res['id'] . '"><button type="button" class="btn btn-sm btn-secondary text-nowrap" onclick="prescription_on_update(' . "'" . $res['id'] . "'" . ')">Potvrdit odeslání</button></td>';
 			}
 
 			echo '<td class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" onclick="prescription_on_remove('
