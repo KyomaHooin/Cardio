@@ -30,6 +30,14 @@ FILE
     000-nas-ca-ssl.conf - NAS backend configuration.
 000-default-le-ssl.conf - Frontend configuration.
 </pre>
+TODO
+<pre>
+- bookworm -> trixie
+- subdomain cert
+- cron | timer hourly probe
+- lock detection payload
+</pre>
+
 SOURCE
 
 https://github.com/KyomaHooin/Cardio
