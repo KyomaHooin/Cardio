@@ -33,9 +33,9 @@ FILE
 TODO
 <pre>
 - bookworm -> trixie
-- subdomain cert
+- subdomain + client cert
 - cron | timer hourly probe
-- lock detection payload
+- lock detection payload (synoshare --is_accessible $mount))
 </pre>
 
 SOURCE
