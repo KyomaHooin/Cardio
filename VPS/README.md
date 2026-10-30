@@ -25,6 +25,10 @@ cp vars /usr/share/easy-rsa/
 3.0.7 to 3.1.7:
 
 cp -r pki/ /usr/share/easy-rsa/
+
+./easyrsa build-server-full "domain name" nopass
+./easyrsa build-client-full "name" nopass
+./easyrsa export-p12 "name"
 </pre>
 FILE
 <pre>
@@ -44,9 +48,8 @@ TODO
 - CAA record
 - backend LE
 - bookworm -> trixie
-- subdomain + client cert
-- cron | timer hourly probe
-- lock detection payload (synoshare --is_accessible $mount))
+- cron | timer hourly probe 
+- lock detection payload (synoshare --is_accessible $mount + HTTP_X_NAS_I_LOCK)
 </pre>
 
 SOURCE
