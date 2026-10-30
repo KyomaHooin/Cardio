@@ -5,17 +5,26 @@ DESCRIPTION
 
 Prescription website.
 
-TODO
-<pre>
--CAA record
--backend LE
-</pre>
 INSTALL
 <pre>
 apt-get install apache2 sqlite3 apache2-mod-php php php-sqlite3 certbot python3-certbot-apache
 
 certbot --apache -d xxx -d www.xxx
 a2enmod headers
+</pre>
+EASY-RSA
+<pre>
+2.2.2 to 3.0.7:
+
+cp -r EasyRSA-2.2.2/* /usr/share/easy-rsa/
+cp -r keys/ /usr/share/easy-rsa/
+cp vars /usr/share/easy-rsa/
+
+./easyrsa upgrade pki
+
+3.0.7 to 3.1.7:
+
+cp -r pki/ /usr/share/easy-rsa/
 </pre>
 FILE
 <pre>
@@ -32,6 +41,8 @@ FILE
 </pre>
 TODO
 <pre>
+- CAA record
+- backend LE
 - bookworm -> trixie
 - subdomain + client cert
 - cron | timer hourly probe
