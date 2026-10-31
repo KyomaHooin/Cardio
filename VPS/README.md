@@ -52,7 +52,6 @@ TODO
 - backend LE
 - bookworm -> trixie
 - DSM upgrade
-- cron | timer hourly probe 
 </pre>
 
 SOURCE
