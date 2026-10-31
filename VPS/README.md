@@ -35,9 +35,6 @@ FILE
                   html/ - PHP Bootstrap frontend.
                    nas/ - Simple NAS IP lookup.
           prescription/ - PHP Bootstrap backend.
-     cardio-database.py - Prescription SQLite3 template.
-        nas-database.py - NAS SQLite3 template.
-               probe.sh - NAS probe.  
        000-default.conf - Default configuration.
 000-default-ca-ssl.conf - Backend configuration.
     000-nas-ca-ssl.conf - NAS backend configuration.

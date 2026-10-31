@@ -8,18 +8,20 @@ try {
 
 date_default_timezone_set('CET');
 
-if (array_key_exists('HTTP_X_NAS_I', apache_request_headers())) {
+$headers = apache_request_headers();
+
+if (array_key_exists('HTTP_X_NAS_I', $headers)) {
 	if ($db) { $query = $db->exec("UPDATE nas SET ip = '" . $_SERVER['REMOTE_ADDR'] . "', last = '" . date('d.m.y H:i') . "' WHERE name = 'nas1';"); }
-	if (array_key_exists('HTTP_X_NAS_I_LOCK', apache_request_headers())) {
-		if ($db) { $query = $db->exec("UPDATE nas SET lock = " . $_SERVER['HTTP_X_NAS_I_LOCK'] . " WHERE name = 'nas1';"); }
+	if (array_key_exists('HTTP_X_NAS_I_LOCK', $headers)) {
+		if ($db) { $query = $db->exec("UPDATE nas SET lock = '" . $db->escapeString($headers['HTTP_X_NAS_I_LOCK']) . "' WHERE name = 'nas1';"); }
 	}
 	exit();
 }
 
-if (array_key_exists('HTTP_X_NAS_II', apache_request_headers())) {
+if (array_key_exists('HTTP_X_NAS_II', $headers)) {
 	if ($db) { $query = $db->exec("UPDATE nas SET ip = '" . $_SERVER['REMOTE_ADDR'] . "', last = '" . date('d.m.y H:i') . "' WHERE name = 'nas2';"); }
-	if (array_key_exists('HTTP_X_NAS_II_LOCK', apache_request_headers())) {
-		if ($db) { $query = $db->exec("UPDATE nas SET lock = " . $_SERVER['HTTP_X_NAS_II_LOCK'] . " WHERE name = 'nas2';"); }
+	if (array_key_exists('HTTP_X_NAS_II_LOCK', $headers)) {
+		if ($db) { $query = $db->exec("UPDATE nas SET lock = '" . $db->escapeString($headers['HTTP_X_NAS_II_LOCK']) . "' WHERE name = 'nas2';"); }
 	}
 	exit();
 }
@@ -48,13 +50,22 @@ if ($db) {
 	<meta charset="utf-8">
 	<meta name="robots" content="noindex">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>NAS IP</title>
+	<title>Kardiologie Praha 17 - Řepy</title>
 	<link rel="icon" href="favicon/favicon-32x32.png" sizes="32x32" type="image/png">
 	<link rel="icon" href="favicon/favicon-16x16.png" sizes="16x16" type="image/png">
 	<link href="custom.css" rel="stylesheet">
 </head>
 
 <body style="background-color: #dee2e6;">
+
+<nav class="navbar container-fluid navbar-expand-md navbar-dark" style="background-color: #0e5f91;">
+	<div class="row align-items-center gx-0">
+		<div class="col">
+			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-heart-pulse-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9H1.475ZM.879 8C-2.426 1.68 4.41-2 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8H.88Z"/></svg>
+		</div>
+		<div class="col"><a class="navbar-brand nav-link active" href="/">Kardiologie Praha 17 - Řepy</a></div>
+	</div>
+</nav>
 
 <main class="container">
 
