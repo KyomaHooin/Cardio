@@ -30,6 +30,12 @@ cp -r pki/ /usr/share/easy-rsa/
 ./easyrsa build-client-full "name" nopass
 ./easyrsa export-p12 "name"
 </pre>
+NAS PROBE
+<pre>
+- DNS
+- /volume1/probe/probe.sh
+- root
+</pre>
 FILE
 <pre>
                   html/ - PHP Bootstrap frontend.

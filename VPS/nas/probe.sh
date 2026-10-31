@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Volume status probe
+# volume status probe
 #
 
 CA="
@@ -19,7 +19,7 @@ HOST='https://xxx'
 
 LOCK=$(synoshare --is_accessible 'DATA' | sed -r 's/.*(.).$/\1/')
 
-wget -O - -q -4 \
+wget -O - -4 -q \
 	--header="HTTP_X_NAS_I:probe" \
 	--header="HTTP_X_NAS_I_LOCK:$LOCK" \
 	--ca-certificate <(echo "$CA") \
