@@ -6,7 +6,7 @@ try {
 	$db = null;
 }
 
-date_default_timezone_set('CET');
+date_default_timezone_set('Europe/Prague');
 
 $headers = apache_request_headers();
 
