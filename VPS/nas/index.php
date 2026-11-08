@@ -118,7 +118,7 @@ if (!$db) {
 </div>
 
 <div class="row mx-2 d-flex align-items-center justify-content-center">
-<div class="col col-md-9 col-lx-8 col-xl-6 d-flex align-items-center justify-content-start">
+<div class="col col-md-9 col-lg-8 col-xl-6 d-flex align-items-center justify-content-start">
 <div class="fs-5 text-nowrap">
 	<span class="me-2">Poslední odpověd:</span>
 	<span><?php  echo htmlspecialchars($beacon2); ?></span>
