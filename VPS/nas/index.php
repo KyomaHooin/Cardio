@@ -109,18 +109,18 @@ if (!$db) {
 </div>
 
 <div class="row mt-4 mx-2 d-flex align-items-center justify-content-center">
-<div class="col col-sm-9 col-md-8 col-lg-6 d-flex align-items-center justify-content-center">
+<div class="col col-sm-9 col-md-8 col-lg-6 d-flex align-items-center justify-content-start">
 <div class="fs-5 text-nowrap">
-	<span class="me-3">Poslední odpověd:</span>
+	<span class="me-2">Poslední odpověd:</span>
 	<span><?php  echo htmlspecialchars($beacon1); ?></span>
 </div>
 </div>
 </div>
 
 <div class="row mx-2 d-flex align-items-center justify-content-center">
-<div class="col col-sm-9 col-md-8 col-lg-6 d-flex align-items-center justify-content-center">
+<div class="col col-sm-9 col-md-8 col-lg-6 d-flex align-items-center justify-content-start">
 <div class="fs-5 text-nowrap">
-	<span class="me-3">Poslední odpověd:</span>
+	<span class="me-2">Poslední odpověd:</span>
 	<span><?php  echo htmlspecialchars($beacon2); ?></span>
 </div>
 </div>
