@@ -81,8 +81,8 @@ if (!$db) {
 <div class="row mt-4 m-2 d-flex align-items-center justify-content-center">
 
 <div class="col-3 col-xl-2 bg-dark d-flex justify-content-center align-items-center"><div class="text-light text-nowrap fs-3">NAS I</div></div>
-<div class="col-7 col-xl-3 bg-light d-flex justify-content-center align-items-center"><div class="fs-3 text-nowrap" id="nas1"><?php  echo htmlspecialchars($nas1); ?></div></div>
-<div class="col-2 col-xl-1 d-flex justify-content-start align-items-center">
+<div class="col-7 col-md-5 col-lg-4 col-xl-3 bg-light d-flex justify-content-center align-items-center"><div class="fs-3 text-nowrap" id="nas1"><?php  echo htmlspecialchars($nas1); ?></div></div>
+<div class="col-2 col-md-1 d-flex justify-content-start align-items-center">
 <?php
 	if ($lock1) {
 	echo '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#198754" class="bi bi-unlock2-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0c1.07 0 2.041.42 2.759 1.104l.14.14.062.08a.5.5 0 0 1-.71.675l-.076-.066-.216-.205A3 3 0 0 0 5 4v2h6.5A2.5 2.5 0 0 1 14 8.5v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4"/></svg>';
@@ -96,8 +96,8 @@ if (!$db) {
 <div class="row m-2 d-flex align-items-center justify-content-center">
 
 <div class="col-3 col-xl-2 bg-dark d-flex justify-content-center align-items-center"><div class="text-light text-nowrap fs-3">NAS II</div></div>
-<div class="col-7 col-xl-3 bg-light d-flex justify-content-center align-items-center"><div class="fs-3 text-nowrap" id="nas2"><?php  echo htmlspecialchars($nas2); ?></div></div>
-<div class="col-2 col-xl-1 d-flex justify-content-start align-items-center">
+<div class="col-7 col-md-5 col-lg-4 col-xl-3 bg-light d-flex justify-content-center align-items-center"><div class="fs-3 text-nowrap" id="nas2"><?php  echo htmlspecialchars($nas2); ?></div></div>
+<div class="col-2 col-md-1 d-flex justify-content-start align-items-center">
 <?php
 	if ($lock2) {
 	echo '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#198754" class="bi bi-unlock2-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0c1.07 0 2.041.42 2.759 1.104l.14.14.062.08a.5.5 0 0 1-.71.675l-.076-.066-.216-.205A3 3 0 0 0 5 4v2h6.5A2.5 2.5 0 0 1 14 8.5v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4"/></svg>';
